@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Music Player</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="playlist_name">Playlist name</string>
     <string name="_10_songs">10 Songs</string>
     <string name="now_playing">Now playing</string>
     <string name="song_name">Song Name</string>
     <string name="artist_name">Artist name</string>
+    <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
 </resources>

@@ -1,18 +1,86 @@
 package com.app.musicplayer.extentions
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import com.app.musicplayer.utils.Constants.PERMISSION_READ_MEDIA_AUDIOS
+import com.app.musicplayer.utils.Constants.PERMISSION_READ_STORAGE
+import com.app.musicplayer.utils.Constants.PERMISSION_WRITE_STORAGE
+import com.app.musicplayer.utils.Constants.isOnMainThread
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 fun createWaveform(): IntArray {
     val random = Random(System.currentTimeMillis())
-    val length = 35
+    val length = 60
     val values = IntArray(length)
     var maxValue = 0
     for (i in 0 until length) {
-        val newValue: Int = 5 + random.nextInt(35)
+        val newValue: Int = 5 + random.nextInt(60)
         if (newValue > maxValue) {
             maxValue = newValue
         }
         values[i] = newValue
     }
     return values
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+fun Context.hasPermission(permId: Int) = ContextCompat.checkSelfPermission(
+    this,
+    getPermissionString(permId)
+) == PackageManager.PERMISSION_GRANTED
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+fun getPermissionString(id: Int) = when (id) {
+    PERMISSION_READ_STORAGE -> Manifest.permission.READ_EXTERNAL_STORAGE
+    PERMISSION_WRITE_STORAGE -> Manifest.permission.WRITE_EXTERNAL_STORAGE
+    PERMISSION_READ_MEDIA_AUDIOS -> Manifest.permission.READ_MEDIA_AUDIO
+    else -> ""
+}
+fun Context.toast(id: Int, length: Int = Toast.LENGTH_SHORT) {
+    toast(getString(id), length)
+}
+
+fun Context.toast(msg: String, length: Int = Toast.LENGTH_SHORT) {
+    try {
+        if (isOnMainThread()) {
+            doToast(this, msg, length)
+        } else {
+            Handler(Looper.getMainLooper()).post {
+                doToast(this, msg, length)
+            }
+        }
+    } catch (_: java.lang.Exception) {
+    }
+}
+
+private fun doToast(context: Context, message: String, length: Int) {
+    if (context is Activity) {
+        if (!context.isFinishing && !context.isDestroyed) {
+            Toast.makeText(context, message, length).show()
+        }
+    } else {
+        Toast.makeText(context, message, length).show()
+    }
+}
+
+fun formatMillisToHMS(milliseconds: Long): String {
+    val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
+    return if (hours > 0) {
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.HOURS.toMinutes(hours)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(minutes) - TimeUnit.HOURS.toSeconds(hours)
+        String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    } else {
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(minutes)
+        String.format("%02d:%02d", minutes, seconds)
+    }
 }

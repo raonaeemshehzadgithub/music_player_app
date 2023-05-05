@@ -9,4 +9,4 @@ data class Song(
     val duration: Long,
     val data: String,
     var thumbnail: Bitmap?
-)
+):java.io.Serializable

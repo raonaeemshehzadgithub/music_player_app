@@ -1,20 +1,49 @@
 package com.app.musicplayer.ui.activities
 
+import android.Manifest
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import com.app.musicplayer.databinding.ActivityMainBinding
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
 import com.app.musicplayer.ui.fragments.*
+import com.app.musicplayer.utils.Constants
+import com.app.musicplayer.utils.Constants.PERMISSION_READ_MEDIA_AUDIOS
+import com.app.musicplayer.utils.Constants.getPermissionToRequest
+import com.app.musicplayer.utils.Constants.isRPlus
+import com.app.musicplayer.utils.Constants.isTiramisuPlus
 import com.google.android.material.tabs.TabLayoutMediator
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     lateinit var binding: ActivityMainBinding
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setUpViewPager()
+        initViews()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun initViews() {
+        handleMediaPermissions { success ->
+            if (success) {
+                setUpViewPager()
+            } else {
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_MEDIA_AUDIO
+                    ), Constants.GENERIC_PERMISSION_HANDLER
+                )
+            }
+        }
     }
 
     private fun setUpViewPager() {
@@ -46,5 +75,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }.attach()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun handleMediaPermissions(callback: (granted: Boolean) -> Unit) {
+        handlePermission(getPermissionToRequest()) { granted ->
+            callback(granted)
+            if (granted && isRPlus()) {
+                if (isTiramisuPlus()) {
+                    handlePermission(PERMISSION_READ_MEDIA_AUDIOS) {}
+                }
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                    if (!Environment.isExternalStorageManager()) {
+//                        launchGrantAllFilesDialog()
+//                    }
+//                }
+            }
+        }
     }
 }

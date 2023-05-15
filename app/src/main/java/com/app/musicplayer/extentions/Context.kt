@@ -2,7 +2,9 @@ package com.app.musicplayer.extentions
 
 import android.Manifest
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
@@ -10,20 +12,33 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import com.app.musicplayer.utils.Constants.PERMISSION_READ_MEDIA_AUDIOS
-import com.app.musicplayer.utils.Constants.PERMISSION_READ_STORAGE
-import com.app.musicplayer.utils.Constants.PERMISSION_WRITE_STORAGE
-import com.app.musicplayer.utils.Constants.isOnMainThread
+import com.app.musicplayer.services.MusicService
+import com.app.musicplayer.utils.*
+import com.app.musicplayer.utils.isOnMainThread
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+
+fun Context.sendIntent(action: String) {
+    Intent(this,MusicService::class.java).apply {
+        this.action = action
+        try {
+            if (isOreoPlus()) {
+                startForegroundService(this)
+            } else {
+                startService(this)
+            }
+        } catch (ignored: java.lang.Exception) {
+        }
+    }
+}
 fun createWaveform(): IntArray {
     val random = Random(System.currentTimeMillis())
-    val length = 60
+    val length = 50
     val values = IntArray(length)
     var maxValue = 0
     for (i in 0 until length) {
-        val newValue: Int = 5 + random.nextInt(60)
+        val newValue: Int = 5 + random.nextInt(50)
         if (newValue > maxValue) {
             maxValue = newValue
         }
@@ -43,6 +58,7 @@ fun getPermissionString(id: Int) = when (id) {
     PERMISSION_READ_STORAGE -> Manifest.permission.READ_EXTERNAL_STORAGE
     PERMISSION_WRITE_STORAGE -> Manifest.permission.WRITE_EXTERNAL_STORAGE
     PERMISSION_READ_MEDIA_AUDIOS -> Manifest.permission.READ_MEDIA_AUDIO
+    PERMISSION_POST_NOTIFICATIONS -> Manifest.permission.POST_NOTIFICATIONS
     else -> ""
 }
 fun Context.toast(id: Int, length: Int = Toast.LENGTH_SHORT) {
@@ -75,12 +91,27 @@ private fun doToast(context: Context, message: String, length: Int) {
 fun formatMillisToHMS(milliseconds: Long): String {
     val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
     return if (hours > 0) {
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.HOURS.toMinutes(hours)
-        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(minutes) - TimeUnit.HOURS.toSeconds(hours)
+        val minutes =
+            TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.HOURS.toMinutes(hours)
+        val seconds =
+            TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(minutes) - TimeUnit.HOURS.toSeconds(
+                hours
+            )
         String.format("%02d:%02d:%02d", hours, minutes, seconds)
     } else {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
-        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(minutes)
+        val seconds =
+            TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(minutes)
         String.format("%02d:%02d", minutes, seconds)
     }
+}
+
+
+val Context.notificationManager: NotificationManager
+    get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+fun calculateMusicProgress(currentPosition: Float): Float {
+    val totalDuration = 1000.0f // Total duration of the music (in milliseconds)
+    val progress = currentPosition / totalDuration
+    return progress.coerceIn(0f, 1f)
 }

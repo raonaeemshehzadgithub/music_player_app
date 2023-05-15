@@ -6,5 +6,9 @@
     <string name="now_playing">Now playing</string>
     <string name="song_name">Song Name</string>
     <string name="artist_name">Artist name</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="playpause">PlayPause</string>
+    <string name="dismiss">Dismiss</string>
     <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
 </resources>

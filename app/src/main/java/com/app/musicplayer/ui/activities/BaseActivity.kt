@@ -14,9 +14,7 @@ import androidx.core.app.ActivityCompat
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getPermissionString
 import com.app.musicplayer.extentions.hasPermission
-import com.app.musicplayer.extentions.toast
-import com.app.musicplayer.utils.Constants.GENERIC_PERMISSION_HANDLER
-import com.app.musicplayer.utils.Constants.OPEN_SETTINGS
+import com.app.musicplayer.utils.*
 
 abstract class BaseActivity : AppCompatActivity() {
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null

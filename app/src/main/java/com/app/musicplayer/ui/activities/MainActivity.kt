@@ -10,11 +10,7 @@ import androidx.core.app.ActivityCompat
 import com.app.musicplayer.databinding.ActivityMainBinding
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
 import com.app.musicplayer.ui.fragments.*
-import com.app.musicplayer.utils.Constants
-import com.app.musicplayer.utils.Constants.PERMISSION_READ_MEDIA_AUDIOS
-import com.app.musicplayer.utils.Constants.getPermissionToRequest
-import com.app.musicplayer.utils.Constants.isRPlus
-import com.app.musicplayer.utils.Constants.isTiramisuPlus
+import com.app.musicplayer.utils.*
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : BaseActivity() {
@@ -40,7 +36,7 @@ class MainActivity : BaseActivity() {
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_MEDIA_AUDIO
-                    ), Constants.GENERIC_PERMISSION_HANDLER
+                    ), GENERIC_PERMISSION_HANDLER
                 )
             }
         }
@@ -53,9 +49,9 @@ class MainActivity : BaseActivity() {
         viewPagerAdapter.addFragment(ArtistsFragment())
         viewPagerAdapter.addFragment(RecentlyPlayedFragment())
         viewPagerAdapter.addFragment(MyFavouritesFragment())
-        binding.fragmentCallsViewPager?.adapter = viewPagerAdapter
+        binding.fragmentCallsViewPager.adapter = viewPagerAdapter
         TabLayoutMediator(
-            binding.musicTabs!!, binding.fragmentCallsViewPager!!
+            binding.musicTabs, binding.fragmentCallsViewPager
         ) { tab, position ->
             when (position) {
                 0 -> {

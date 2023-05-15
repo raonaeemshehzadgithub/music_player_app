@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:allowBackup="true"
@@ -35,6 +37,31 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <service android:name=".services.MusicService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="com.app.musicplayer.action.INIT"/>
+                <action android:name="com.app.musicplayer.action.INIT_PATH"/>
+                <action android:name="com.simplemobiletools.musicplayer.action.PREVIOUS" />
+                <action android:name="com.simplemobiletools.musicplayer.action.PAUSE" />
+                <action android:name="com.simplemobiletools.musicplayer.action.PLAYPAUSE" />
+                <action android:name="com.simplemobiletools.musicplayer.action.NEXT" />
+            </intent-filter>
+
+        </service>
+        <receiver
+            android:name=".receivers.ControlActionsListener"
+            android:exported="false" />
+        <receiver
+            android:name=".receivers.NotificationDismissedReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.app.musicplayer.action.NOTIFICATION_DISMISSED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

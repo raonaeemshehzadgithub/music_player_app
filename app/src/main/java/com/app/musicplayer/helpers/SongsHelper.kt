@@ -1,4 +1,4 @@
-package com.app.musicplayer.utils
+package com.app.musicplayer.helpers
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
@@ -6,13 +6,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
-import android.util.Log
-import com.app.musicplayer.models.Song
+import com.app.musicplayer.models.Track
 
 class SongsHelper {
     @SuppressLint("Range")
-    fun retrieveAllSongs(context: Context): ArrayList<Song> {
-        val audioList = ArrayList<Song>()
+    fun retrieveAllSongs(context: Context): ArrayList<Track> {
+        val audioList = ArrayList<Track>()
 
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
         val projection = arrayOf(
@@ -42,7 +41,7 @@ class SongsHelper {
                     cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
                 val thumbnail = getAlbumArt(context, id)
-                val audio = Song(id, title, artist, duration, data, thumbnail)
+                val audio = Track(id, title, artist, duration, data, thumbnail)
                 audioList.add(audio)
             }
             cursor.close()

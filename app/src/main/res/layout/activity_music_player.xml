@@ -126,7 +126,7 @@
             android:background="@drawable/selection_ripple_bg"
             android:padding="@dimen/padding_5"
             android:src="@drawable/ic_unfavourite"
-            app:layout_constraintBottom_toTopOf="@+id/waveform_seek_bar"
+            app:layout_constraintBottom_toTopOf="@+id/seek_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/song_data"
@@ -154,20 +154,20 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/padding_20"
             android:text="00:00"
-            app:layout_constraintBottom_toBottomOf="@id/waveform_seek_bar"
-            app:layout_constraintEnd_toStartOf="@id/waveform_seek_bar"
+            app:layout_constraintBottom_toBottomOf="@id/seek_bar"
+            app:layout_constraintEnd_toStartOf="@id/seek_bar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/waveform_seek_bar" />
+            app:layout_constraintTop_toTopOf="@id/seek_bar" />
 
-        <com.frolo.waveformseekbar.WaveformSeekBar
-            android:id="@+id/waveform_seek_bar"
+        <SeekBar
+            android:id="@+id/seek_bar"
             android:layout_width="0dp"
             android:layout_height="50dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/total_duration"
             app:layout_constraintStart_toEndOf="@+id/played_duration"
             app:layout_constraintTop_toBottomOf="@+id/un_favourite"
-            app:waveProgressColor="@color/purple" />
+            />
 
         <TextView
             android:id="@+id/total_duration"
@@ -176,10 +176,10 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/padding_20"
             android:text="03:00"
-            app:layout_constraintBottom_toBottomOf="@id/waveform_seek_bar"
+            app:layout_constraintBottom_toBottomOf="@id/seek_bar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/waveform_seek_bar"
-            app:layout_constraintTop_toTopOf="@id/waveform_seek_bar" />
+            app:layout_constraintStart_toEndOf="@id/seek_bar"
+            app:layout_constraintTop_toTopOf="@id/seek_bar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -1,137 +1,91 @@
 package com.app.musicplayer.ui.activities
 
-import android.media.MediaPlayer
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.core.content.ContextCompat
-import com.app.musicplayer.R
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
-import com.app.musicplayer.extentions.createWaveform
-import com.app.musicplayer.extentions.formatMillisToHMS
-import com.app.musicplayer.extentions.toast
-import com.app.musicplayer.models.Song
-import com.app.musicplayer.utils.Constants
-import com.frolo.waveformseekbar.WaveformSeekBar
+import com.app.musicplayer.extentions.*
+import com.app.musicplayer.models.Events
+import com.app.musicplayer.models.Track
+import com.app.musicplayer.services.MusicService
+import com.app.musicplayer.utils.*
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 
-class MusicPlayerActivity : BaseActivity(), Runnable, WaveformSeekBar.Callback {
+class MusicPlayerActivity : BaseActivity() {
     lateinit var binding: ActivityMusicPlayerBinding
-    var songList: ArrayList<Song>? = null
-    var position: Int? = null
-    private var mediaPlayer: MediaPlayer? = null
-    var wasPlaying: Boolean = false
+    var track: Track? = null
+    private var bus: EventBus? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMusicPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initViews()
-        setUpPlayer()
         clickListeners()
+
+        Intent(this, MusicService::class.java).apply {
+            putExtra(TRACK, Gson().toJson(track))
+            action = INIT
+            try {
+                startService(this)
+            } catch (e: Exception) {
+            }
+        }
+
     }
 
     private fun initViews() {
-        songList = intent.getSerializableExtra(Constants.SERIALIZED_LIST) as ArrayList<Song>
-        position = intent.getIntExtra(Constants.POSITION, 0)
-        binding.songName.text = songList!![position!!].title
-        binding.artistName.text = songList!![position!!].artist
-        binding.totalDuration.text = formatMillisToHMS(songList!![position!!].duration)
+        bus = EventBus.getDefault()
+        bus!!.register(this)
+        val trackType = object : TypeToken<Track>() {}.type
+        track = Gson().fromJson<Track>(intent.getStringExtra(TRACK), trackType)
+            ?: MusicService.mCurrTrack
+        binding.songName.text = track?.title
+        binding.artistName.text = track?.artist
+        binding.totalDuration.text = formatMillisToHMS(track?.duration!!)
+        setUpSeekbar()
     }
 
-    private fun setUpPlayer() {
-        binding.waveformSeekBar.setWaveform(createWaveform(), true)
+    private fun setUpSeekbar() {
+        binding.seekBar.max = (track!!.duration / 1000).toInt()
+        binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onStartTrackingTouch(p0: SeekBar?) {
 
-        try {
-            if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
-                clearMediaPlayer()
-                binding.waveformSeekBar.setProgressInPercentage(0F)
-                wasPlaying = true
-//                binding.playPause.setImageDrawable(
-//                    ContextCompat.getDrawable(
-//                        this@MusicPlayerActivity,
-//                        android.R.drawable.ic_media_play
-//                    )
-//                )
             }
-            if (!wasPlaying) {
-                if (mediaPlayer == null) {
-                    mediaPlayer = MediaPlayer()
-                }
-//                fab.setImageDrawable(
-//                    ContextCompat.getDrawable(
-//                        this@MainActivity,
-//                        R.drawable.ic_media_pause
-//                    )
-//                )
-                val descriptor = songList!![position!!].data
-                mediaPlayer!!.setDataSource(
-                    descriptor
-                )
-                mediaPlayer!!.prepare()
-                mediaPlayer!!.setVolume(0.5f, 0.5f)
-                mediaPlayer!!.isLooping = false
-                binding.waveformSeekBar.setProgressInPercentage(mediaPlayer!!.duration.toFloat())
-                mediaPlayer!!.start()
-                Thread(this).start()
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
             }
-            wasPlaying = false
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        mediaPlayer?.setOnCompletionListener {
-            binding.playPause.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this@MusicPlayerActivity,
-                    R.drawable.ic_play
-                )
-            )
-        }
+
+            override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
+                val formattedProgress = progress.getFormattedDuration()
+                binding.playedDuration.text = formattedProgress
+            }
+
+        })
     }
 
     private fun clickListeners() {
         binding.back.setOnClickListener { finish() }
-        binding.playPause.setOnClickListener {  }
-    }
-
-    override fun run() {
-        var currentPosition = mediaPlayer!!.currentPosition
-        val total = mediaPlayer!!.duration
-
-
-        while (mediaPlayer != null && mediaPlayer!!.isPlaying) {
-            currentPosition = try {
-                Thread.sleep(1000)
-                mediaPlayer!!.currentPosition
-            } catch (e: InterruptedException) {
-                return
-            } catch (e: java.lang.Exception) {
-                return
-            }
-            binding.waveformSeekBar.setProgressInPercentage(currentPosition.toFloat())
-        }
+        binding.playPause.setOnClickListener { sendIntent(PLAYPAUSE) }
+        binding.nextSong.setOnClickListener { sendIntent(NEXT) }
+        binding.previousSong.setOnClickListener { sendIntent(PREVIOUS) }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        clearMediaPlayer()
+        bus?.unregister(this)
     }
 
-    private fun clearMediaPlayer() {
-        mediaPlayer!!.stop()
-        mediaPlayer!!.release()
-        mediaPlayer = null
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onProgressChanged(seekBar: WaveformSeekBar?, percent: Float, fromUser: Boolean) {
-    }
-
-    override fun onStartTrackingTouch(seekBar: WaveformSeekBar?) {
-    }
-
-    override fun onStopTrackingTouch(seekBar: WaveformSeekBar?) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun progressUpdated(event: Events.ProgressUpdated) {
+        binding.seekBar.progress = event.progress
+        Log.wtf("audio progress", event.progress.getFormattedDuration(true))
     }
 }

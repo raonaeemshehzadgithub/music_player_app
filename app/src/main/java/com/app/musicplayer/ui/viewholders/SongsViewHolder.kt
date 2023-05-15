@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.SongItemBinding
-import com.app.musicplayer.models.Song
+import com.app.musicplayer.models.Track
 import com.app.musicplayer.ui.interfaces.SongClick
 import com.bumptech.glide.Glide
 
@@ -13,7 +13,7 @@ class SongsViewHolder(val binding: SongItemBinding, val context: Context) :
     private var click: SongClick? = null
 
     fun onBind(
-        songsList: ArrayList<Song>,
+        songsList: ArrayList<Track>,
         position: Int,
         songClick: SongClick
     ) {
@@ -25,9 +25,7 @@ class SongsViewHolder(val binding: SongItemBinding, val context: Context) :
 
         binding.root.setOnClickListener {
             click?.onSongClick(
-                position,
-                songsList[position].data,
-                songsList
+                songsList[position]
             )
         }
     }

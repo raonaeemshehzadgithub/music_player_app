@@ -4,11 +4,12 @@
     <string name="playlist_name">Playlist name</string>
     <string name="_10_songs">10 Songs</string>
     <string name="now_playing">Now playing</string>
-    <string name="song_name">Song Name</string>
-    <string name="artist_name">Artist name</string>
+    <string name="song_name">Song</string>
+    <string name="artist_name">Artist</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="playpause">PlayPause</string>
     <string name="dismiss">Dismiss</string>
     <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
+    <string name="no_audio_files_detected_make_sure_you_have_music_files_on_your_device">No audio files detected. Make sure you have music files on your device.</string>
 </resources>

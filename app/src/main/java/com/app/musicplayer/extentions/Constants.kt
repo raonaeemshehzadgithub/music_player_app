@@ -14,6 +14,7 @@ const val NEXT = PATH + "NEXT"
 const val BROADCAST_STATUS = PATH + "BROADCAST_STATUS"
 const val INIT_PATH = PATH + "INIT_PATH"
 const val INIT = PATH + "INIT"
+const val FINISH_IF_NOT_PLAYING = PATH + "FINISH_IF_NOT_PLAYING"
 const val NOTIFICATION_DISMISSED = PATH+"NOTIFICATION_DISMISSED"
 
 const val GENERIC_PERMISSION_HANDLER = 1
@@ -29,6 +30,7 @@ const val SERIALIZED_LIST = "song_list"
 const val TRACK = "track"
 const val RESTART_PLAYER = "RESTART_PLAYER"
 const val TRACK_ID = "track_id"
+const val TRACK_ID_SERVICE = "track_id_service"
 
 fun getPermissionToRequest() =
     if (isTiramisuPlus()) PERMISSION_READ_MEDIA_AUDIOS else PERMISSION_WRITE_STORAGE

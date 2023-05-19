@@ -1,4 +1,4 @@
-package com.app.musicplayer.ui.activities
+package com.app.musicplayer.ui.base
 
 import android.Manifest
 import android.app.AlertDialog
@@ -9,21 +9,102 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getPermissionString
 import com.app.musicplayer.extentions.hasPermission
+import com.app.musicplayer.extentions.toast
+import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.utils.*
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import io.reactivex.disposables.CompositeDisposable
+import javax.inject.Inject
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<VM> {
+
+    abstract override val viewState: VM
+    abstract val contentView: View?
+    lateinit var linearLayoutManager: RecyclerView.LayoutManager
+
+    @Inject
+    lateinit var disposables: CompositeDisposable
+
+    @Inject
+    lateinit var strings: StringsInteractor
+
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
     var showSettingAlert: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_base)
+        setContentView(contentView)
+        linearLayoutManager = LinearLayoutManager(applicationContext)
+        onSetup()
+        backPressed()
+        viewState.apply {
+            attach()
+            errorEvent.observe(this@BaseActivity) {
+                it.ifNew?.let(this@BaseActivity::showError)
+            }
+
+            finishEvent.observe(this@BaseActivity) {
+                it.ifNew?.let { finish() }
+            }
+
+            messageEvent.observe(this@BaseActivity) {
+                it.ifNew?.let(this@BaseActivity::showMessage)
+            }
+        }
+    }
+
+    private fun backPressed() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT
+            ) {
+                finish()
+            }
+        } else {
+            onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    finish()
+                }
+            })
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewState.detach()
+        disposables.clear()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposables.dispose()
+    }
+
+    override fun finish() {
+        finishAndRemoveTask()
+    }
+
+    override fun showError(stringResId: Int) {
+        applicationContext.toast(strings.getString(stringResId))
+    }
+
+    override fun showMessage(stringResId: Int) {
+        applicationContext.toast(strings.getString(stringResId))
+    }
+
+    fun moveBack() {
+        finish()
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -39,6 +120,7 @@ abstract class BaseActivity : AppCompatActivity() {
             )
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
@@ -129,5 +211,7 @@ abstract class BaseActivity : AppCompatActivity() {
 //            }
 //        }
     }
+
+    open fun <VS : BaseViewState> onFragmentSetup(fragment: BaseFragment<VS>) {}
 
 }

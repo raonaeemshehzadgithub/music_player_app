@@ -1,53 +1,32 @@
 package com.app.musicplayer.ui.fragments
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.app.musicplayer.databinding.FragmentAllMusicBinding
+import android.util.Log
+import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
-import com.app.musicplayer.ui.adapters.SongsAdapter
-import com.app.musicplayer.ui.interfaces.SongClick
-import com.app.musicplayer.helpers.SongsHelper
-import com.app.musicplayer.utils.*
-import com.google.gson.Gson
+import com.app.musicplayer.ui.viewstates.SongsViewState
+import com.app.musicplayer.utils.TRACK_ID
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class AllMusicFragment : Fragment(), SongClick {
+@AndroidEntryPoint
+class AllMusicFragment : ListFragment<Track, SongsViewState>() {
+    override val viewState: SongsViewState by activityViewModels()
 
-    lateinit var binding: FragmentAllMusicBinding
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentAllMusicBinding.inflate(layoutInflater)
+    @Inject
+    override lateinit var listAdapter: com.app.musicplayer.ui.adapters.allmusic.SongsAdapter
 
-        showAllSongs()
-        return binding.root
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun showAllSongs() {
-        val songHelper = SongsHelper()
-        val linearLayout = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        val adapter =
-            SongsAdapter(requireContext(), songHelper.retrieveAllSongs(requireContext()), this)
-        binding.playlistRv.layoutManager = linearLayout
-        binding.playlistRv.adapter = adapter
-        adapter.notifyDataSetChanged()
-    }
-
-    override fun onSongClick(track: Track) {
-        Intent(requireContext(), MusicPlayerActivity::class.java).apply {
-            putExtra(TRACK, Gson().toJson(track))
-            putExtra(RESTART_PLAYER, true)
-            startActivity(this)
+    override fun onSetup() {
+        super.onSetup()
+        viewState.apply {
+            showItemEvent.observe(this@AllMusicFragment) { event ->
+                event.ifNew?.let { track ->
+                    startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
+                        putExtra(TRACK_ID, track.id)
+                    })
+                }
+            }
         }
     }
-
 }

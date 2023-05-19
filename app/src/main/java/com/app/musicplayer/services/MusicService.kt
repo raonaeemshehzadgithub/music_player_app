@@ -4,18 +4,15 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
-import android.media.AudioManager
 import android.media.AudioManager.OnAudioFocusChangeListener
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
-import android.os.PowerManager
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.net.toUri
 import androidx.media.session.MediaButtonReceiver
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getColoredBitmap
@@ -24,18 +21,21 @@ import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.helpers.MediaSessionCallback
 import com.app.musicplayer.helpers.NotificationHelper
 import com.app.musicplayer.helpers.NotificationHelper.Companion.NOTIFICATION_ID
-import com.app.musicplayer.models.Events
+import com.app.musicplayer.interator.songs.SongsInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.getPermissionToRequest
 import com.app.musicplayer.utils.isQPlus
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import org.greenrobot.eventbus.EventBus
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
     MediaPlayer.OnCompletionListener, OnAudioFocusChangeListener {
+
+    @Inject
+    lateinit var songsInteractor: SongsInteractor
 
     companion object {
         private const val PROGRESS_UPDATE_INTERVAL = 1000L
@@ -78,20 +78,18 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val trackType = object : TypeToken<Track>() {}.type
-        mCurrTrack = Gson().fromJson<Track>(intent?.getStringExtra(TRACK), trackType)
+        songsInteractor.querySong(intent!!.getLongExtra(TRACK_ID_SERVICE, 0L)) { track ->
+            mCurrTrack = track
+        }
         if (!isQPlus() && !hasPermission(getPermissionToRequest())) {
             return START_NOT_STICKY
         }
 
-        val action = intent?.action
+        val action = intent.action
         when (action) {
             INIT -> handleInit(intent)
-            INIT_PATH -> handleInitPath(intent)
-            BROADCAST_STATUS -> broadcastPlayerStatus()
             PLAYPAUSE -> handlePlayPause()
-            NEXT -> handleNext()
-            PREVIOUS -> handlePrevious()
+            FINISH_IF_NOT_PLAYING -> finishIfNotPlaying()
         }
         MediaButtonReceiver.handleIntent(mMediaSession!!, intent)
         if (action != DISMISS && action != FINISH) {
@@ -100,17 +98,7 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         return START_NOT_STICKY
     }
 
-    private fun handlePrevious() {
-    }
-
-    private fun handleNext() {
-        mPlayOnPrepare = true
-        setupNextTrack()
-    }
-
-    private fun setupNextTrack() {
-    }
-
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun handlePlayPause() {
         mPlayOnPrepare = true
         if (isPlaying()) {
@@ -122,60 +110,44 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
 
     fun resumeTrack() {
         initMediaPlayerIfNeeded()
-
-        if (mCurrTrack == null) {
-//            setupNextTrack()
-        } else {
-            mPlayer!!.start()
+        if (isPlaying()) {
         }
-
-//        trackStateChanged(true)
-//        setPlaybackSpeed()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     fun pauseTrack() {
         initMediaPlayerIfNeeded()
         mPlayer!!.pause()
-//        trackStateChanged(false, notify = notify)
+        trackStateChanged(false, notify = true)
 //        updateMediaSessionState()
 //        saveTrackProgress()
         // do not call stopForeground on android 12 as it may cause a crash later
         if (!isSPlus()) {
-            @Suppress("DEPRECATION")
             stopForeground(false)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun trackStateChanged(isPlaying: Boolean, notify: Boolean) {
+        handleProgressHandler(isPlaying)
+        broadcastTrackStateChange(isPlaying)
+        if (notify) {
+            startForegroundAndNotify()
         }
     }
 
     private fun handleInit(intent: Intent) {
         ensureBackgroundThread {
-            initService(intent)
-            setupTrack()
+            setupTrack(intent)
             updateUI()
         }
     }
-
-    private fun initService(intent: Intent) {
-//        toast(intent.data.toString())
+    private fun broadcastTrackStateChange(isPlaying: Boolean) {
+//        broadcastUpdateWidgetState()
+//        EventBus.getDefault().post(Events.TrackStateChanged(isPlaying))
     }
-
-    private fun handleInitPath(intent: Intent) {
-//        mIsThirdPartyIntent = true
-        if (mIntentUri != intent.data) {
-            mIntentUri = intent.data
-//            initService(intent)
-            initTracks()
-        }
-        //        else {
-//            updateUI()
-//        }
-    }
-
-    private fun broadcastPlayerStatus() {
-
-    }
-
     private fun broadcastTrackProgress(progress: Int) {
-        EventBus.getDefault().post(Events.ProgressUpdated(progress))
+//        EventBus.getDefault().post(Events.ProgressUpdated(progress))
         //also update media session state
     }
 
@@ -217,7 +189,7 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
             mProgressHandler.post(object : Runnable {
                 override fun run() {
                     if (mPlayer?.isPlaying == true) {
-                        val sec = getPosition()!!/1000
+                        val sec = getPosition()!! / 1000
                         broadcastTrackProgress(sec)
                     }
                     mProgressHandler.removeCallbacksAndMessages(true)
@@ -239,17 +211,22 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-    private fun setupTrack() {
+    private fun setupTrack(intent: Intent) {
         initMediaPlayerIfNeeded()
 
         try {
-            mPlayer!!.apply {
-                reset()
-                setDataSource(applicationContext, Uri.fromFile(File(mCurrTrack?.data!!)))
-                prepare()
-                start()
+            songsInteractor.querySong(intent.getLongExtra(TRACK_ID_SERVICE, 0L)){track->
+                Log.wtf("track path to play",track?.path.toString())
+                mPlayer!!.apply {
+                    reset()
+                    setDataSource(applicationContext, Uri.fromFile(track?.path?.let { File(it) }))
+                    prepare()
+                    start()
+                }
             }
-        } catch (ignored: Exception) {
+
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -257,12 +234,7 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         if (mPlayer != null) {
             return
         }
-
         mPlayer = MediaPlayer().apply { isLooping }
-    }
-
-    private fun initTracks() {
-        setupTrack()
     }
 
     private fun updateUI() {
@@ -286,7 +258,11 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
 
     override fun onAudioFocusChange(p0: Int) {
     }
-
+    private fun finishIfNotPlaying() {
+        if (!isPlaying()) {
+            stopSelf()
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
         destroyPlayer()
@@ -299,9 +275,6 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         mPlayer?.release()
         mPlayer = null
 
-//        trackStateChanged(isPlaying = false, notify = false)
-//        trackChanged()
-
         stopForegroundAndNotification()
         stopSelf()
     }
@@ -311,5 +284,4 @@ class MusicService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         stopForeground(true)
         notificationHelper?.cancel(NOTIFICATION_ID)
     }
-//        updateUI()
 }

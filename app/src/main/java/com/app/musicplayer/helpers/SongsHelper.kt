@@ -41,7 +41,7 @@ class SongsHelper {
                     cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
                 val thumbnail = getAlbumArt(context, id)
-                val audio = Track(id, title, artist, duration, data, thumbnail)
+                val audio = Track(id, title, artist, duration, data, "thumbnail","","")
                 audioList.add(audio)
             }
             cursor.close()

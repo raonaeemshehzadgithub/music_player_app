@@ -2,31 +2,36 @@ package com.app.musicplayer.ui.activities
 
 import android.Manifest
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
+import android.view.View
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.app.musicplayer.databinding.ActivityMainBinding
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
+import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.fragments.*
+import com.app.musicplayer.ui.viewstates.SongsViewState
 import com.app.musicplayer.utils.*
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : BaseActivity() {
-    lateinit var binding: ActivityMainBinding
+@AndroidEntryPoint
+class MainActivity : BaseActivity<SongsViewState>() {
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    override val viewState: SongsViewState by viewModels()
+    override val contentView: View by lazy { binding.root }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onSetup() {
+        setUpPermission()
+        viewState.apply {
 
-        initViews()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun initViews() {
+    private fun setUpPermission() {
         handleMediaPermissions { success ->
             if (success) {
                 setUpViewPager()

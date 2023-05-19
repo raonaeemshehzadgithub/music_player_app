@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
+        android:name=".app.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,7 +20,7 @@
         android:theme="@style/Theme.MusicPlayer"
         tools:targetApi="31">
         <activity
-            android:name=".ui.activities.BaseActivity"
+            android:name=".ui.base.BaseActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activities.MusicPlayerActivity"
@@ -44,10 +45,11 @@
             <intent-filter>
                 <action android:name="com.app.musicplayer.action.INIT"/>
                 <action android:name="com.app.musicplayer.action.INIT_PATH"/>
-                <action android:name="com.simplemobiletools.musicplayer.action.PREVIOUS" />
-                <action android:name="com.simplemobiletools.musicplayer.action.PAUSE" />
-                <action android:name="com.simplemobiletools.musicplayer.action.PLAYPAUSE" />
-                <action android:name="com.simplemobiletools.musicplayer.action.NEXT" />
+                <action android:name="com.app.musicplayer.action.PREVIOUS" />
+                <action android:name="com.app.musicplayer.action.PAUSE" />
+                <action android:name="com.app.musicplayer.action.PLAYPAUSE" />
+                <action android:name="com.app.musicplayer.action.NEXT" />
+                <action android:name="com.app.musicplayer.action.FINISH_IF_NOT_PLAYING" />
             </intent-filter>
 
         </service>

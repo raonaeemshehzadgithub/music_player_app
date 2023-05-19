@@ -1,60 +1,58 @@
 package com.app.musicplayer.ui.activities
 
 import android.content.Intent
-import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.activity.viewModels
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
 import com.app.musicplayer.extentions.*
-import com.app.musicplayer.models.Events
+import com.app.musicplayer.interator.songs.SongsInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService
+import com.app.musicplayer.ui.base.BaseActivity
+import com.app.musicplayer.ui.viewstates.MusicPlayerViewState
 import com.app.musicplayer.utils.*
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
-class MusicPlayerActivity : BaseActivity() {
-    lateinit var binding: ActivityMusicPlayerBinding
+@AndroidEntryPoint
+class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
+    private val binding by lazy { ActivityMusicPlayerBinding.inflate(layoutInflater) }
     var track: Track? = null
-    private var bus: EventBus? = null
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMusicPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override val viewState: MusicPlayerViewState by viewModels()
+    override val contentView: View by lazy { binding.root }
 
-        initViews()
+    @Inject
+    lateinit var songsInteractor: SongsInteractor
+
+    override fun onSetup() {
         clickListeners()
-
         Intent(this, MusicService::class.java).apply {
-            putExtra(TRACK, Gson().toJson(track))
+            putExtra(TRACK_ID_SERVICE, intent.getLongExtra(TRACK_ID, 0L))
             action = INIT
             try {
                 startService(this)
             } catch (e: Exception) {
             }
         }
+        updateUI()
+        viewState.apply {}
+    }
+
+    private fun updateUI() {
+        songsInteractor.querySong(intent.getLongExtra(TRACK_ID, 0L)) { track ->
+            binding.songName.text = track?.title
+            binding.artistName.text = track?.artist
+            binding.totalDuration.text = track?.let { formatMillisToHMS(it.duration) }
+//            track?.let { setUpSeekbar(it.duration) }
+        }
 
     }
 
-    private fun initViews() {
-        bus = EventBus.getDefault()
-        bus!!.register(this)
-        val trackType = object : TypeToken<Track>() {}.type
-        track = Gson().fromJson<Track>(intent.getStringExtra(TRACK), trackType)
-            ?: MusicService.mCurrTrack
-        binding.songName.text = track?.title
-        binding.artistName.text = track?.artist
-        binding.totalDuration.text = formatMillisToHMS(track?.duration!!)
-        setUpSeekbar()
-    }
-
-    private fun setUpSeekbar() {
-        binding.seekBar.max = (track!!.duration / 1000).toInt()
+    private fun setUpSeekbar(duration: Long) {
+//        binding.seekBar.max = (duration / 1000).toInt()
         binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) {
 
@@ -80,12 +78,6 @@ class MusicPlayerActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        bus?.unregister(this)
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun progressUpdated(event: Events.ProgressUpdated) {
-        binding.seekBar.progress = event.progress
-        Log.wtf("audio progress", event.progress.getFormattedDuration(true))
+        sendIntent(FINISH_IF_NOT_PLAYING)
     }
 }

@@ -7,6 +7,8 @@ data class Track(
     val title: String,
     val artist: String,
     val duration: Long,
-    val data: String,
-    var thumbnail: Bitmap?
+    val path: String,
+    var thumbnail: String,
+    var album: String,
+    var folderName:String
 ):java.io.Serializable

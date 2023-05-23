@@ -2,13 +2,17 @@ package com.app.musicplayer.ui.base
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
@@ -19,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getPermissionString
 import com.app.musicplayer.extentions.hasPermission
+import com.app.musicplayer.extentions.sendIntent
 import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.utils.*

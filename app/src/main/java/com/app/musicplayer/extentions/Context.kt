@@ -23,11 +23,11 @@ fun Context.sendIntent(action: String) {
     Intent(this,MusicService::class.java).apply {
         this.action = action
         try {
-            if (isOreoPlus()) {
-                startForegroundService(this)
-            } else {
+//            if (isOreoPlus()) {
+//                startForegroundService(this)
+//            } else {
                 startService(this)
-            }
+//            }
         } catch (ignored: java.lang.Exception) {
         }
     }

@@ -1,34 +1,29 @@
 package com.app.musicplayer.ui.adapters
 
-import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.app.musicplayer.databinding.SongItemBinding
+import android.util.Log
+import com.app.musicplayer.extentions.getThumbnailUri
+import com.app.musicplayer.models.ListData
 import com.app.musicplayer.models.Track
-import com.app.musicplayer.ui.interfaces.SongClick
-import com.app.musicplayer.ui.viewholders.SongsViewHolder
+import com.app.musicplayer.ui.adapters.ListAdapter
+import com.app.musicplayer.ui.holder.ListItemHolder
+import com.app.musicplayer.utils.artworkUri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class SongsAdapter(
-    private val context: Context,
-    private val dataList: ArrayList<Track>,
-    private val songClick: SongClick
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return SongsViewHolder(
-            SongItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            ), context
-        )
+class SongsAdapter @Inject constructor(@ApplicationContext private val context: Context) :
+    ListAdapter<Track>() {
+
+    override fun onBindListItem(listItemHolder: ListItemHolder, item: Track) {
+        listItemHolder.apply {
+            songName = item.title
+            artist = item.artist
+
+            setDefaultImageRes(item.album_id.getThumbnailUri())
+        }
     }
+    override fun convertDataToListData(items: List<Track>) =
+        ListData.fromSongs(items)
 
-    @SuppressLint("Range")
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as SongsViewHolder).onBind(dataList, position, songClick)
-    }
-
-    override fun getItemCount(): Int = dataList.size
 }

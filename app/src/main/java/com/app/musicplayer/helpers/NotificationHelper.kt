@@ -16,9 +16,9 @@ import com.app.musicplayer.extentions.notificationManager
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.receivers.ControlActionsListener
 import com.app.musicplayer.receivers.NotificationDismissedReceiver
-import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.ui.activities.MainActivity
 import com.app.musicplayer.utils.*
+
 
 class NotificationHelper(
     private val context: Context,
@@ -40,7 +40,7 @@ class NotificationHelper(
         var usesChronometer = false
         var ongoing = false
         if (isPlaying) {
-            postTime = System.currentTimeMillis() - (MusicService.mPlayer?.currentPosition ?: 0)
+//            postTime = System.currentTimeMillis() - (MusicService.mPlayer?.currentPosition ?: 0)
             showWhen = true
             usesChronometer = true
             ongoing = true
@@ -57,23 +57,23 @@ class NotificationHelper(
         val previousAction = NotificationCompat.Action.Builder(
             R.drawable.ic_previous,
             context.getString(R.string.previous),
-            getIntent(PREVIOUS)
+            getControlsIntent(PREVIOUS)
         ).build()
         val nextAction = NotificationCompat.Action.Builder(
             R.drawable.ic_next,
             context.getString(R.string.next),
-            getIntent(NEXT)
+            getControlsIntent(NEXT)
         ).build()
         val playPauseIcon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
         val playPauseAction = NotificationCompat.Action.Builder(
             playPauseIcon,
             context.getString(R.string.playpause),
-            getIntent(PLAYPAUSE)
+            getControlsIntent(PLAYPAUSE)
         ).build()
         val dismissAction = NotificationCompat.Action.Builder(
             R.drawable.ic_cross,
             context.getString(R.string.dismiss),
-            getIntent(DISMISS)
+            getControlsIntent(DISMISS)
         ).build()
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
@@ -82,11 +82,12 @@ class NotificationHelper(
             .setSmallIcon(R.drawable.ic_music)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setWhen(postTime)
-            .setShowWhen(showWhen)
-            .setUsesChronometer(usesChronometer)
+//            .setWhen(postTime)
+//            .setShowWhen(showWhen)
+//            .setUsesChronometer(usesChronometer)
             .setContentIntent(getContentIntent())
-            .setOngoing(ongoing)
+//            .setOngoing(ongoing)
+            .setAutoCancel(false)
             .setChannelId(NOTIFICATION_CHANNEL)
             .setCategory(Notification.CATEGORY_SERVICE)
             .setStyle(
@@ -116,7 +117,7 @@ class NotificationHelper(
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun getIntent(action: String): PendingIntent {
+    private fun getControlsIntent(action: String): PendingIntent {
         val intent = Intent(context, ControlActionsListener::class.java)
         intent.action = action
         return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -124,7 +125,7 @@ class NotificationHelper(
 
     companion object {
         private const val NOTIFICATION_CHANNEL = "music_channel"
-        const val NOTIFICATION_ID = 12
+        const val NOTIFICATION_ID = 1
 
         @RequiresApi(Build.VERSION_CODES.O)
         private fun createNotificationChannel(

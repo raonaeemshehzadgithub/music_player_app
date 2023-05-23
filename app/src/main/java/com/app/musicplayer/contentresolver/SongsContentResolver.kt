@@ -27,7 +27,7 @@ class SongsContentResolver(context: Context, songId: Long? = null) :
         MediaStore.Audio.Media.DURATION,
         MediaStore.Audio.Media.DATA,
         MediaStore.Audio.Media.DATA,
-        MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.ALBUM_ID,
         MediaStore.Audio.Media.BUCKET_DISPLAY_NAME
     )
     override val selectionArgs: Array<String>? = null
@@ -39,7 +39,7 @@ class SongsContentResolver(context: Context, songId: Long? = null) :
         duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION),
         path = cursor.getStringValue(MediaStore.Audio.Media.DATA),
         thumbnail = cursor.getStringValue(MediaStore.Audio.Media.DATA),
-        album = cursor.getStringValue(MediaStore.Audio.Media.ALBUM),
+        album_id = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID),
         folderName = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME)
     )
 }

@@ -1,5 +1,6 @@
 package com.app.musicplayer.utils
 
+import android.net.Uri
 import android.os.Build
 import android.os.Looper
 import androidx.annotation.ChecksSdkIntAtLeast
@@ -15,8 +16,16 @@ const val BROADCAST_STATUS = PATH + "BROADCAST_STATUS"
 const val INIT_PATH = PATH + "INIT_PATH"
 const val INIT = PATH + "INIT"
 const val FINISH_IF_NOT_PLAYING = PATH + "FINISH_IF_NOT_PLAYING"
-const val NOTIFICATION_DISMISSED = PATH+"NOTIFICATION_DISMISSED"
+const val NOTIFICATION_DISMISSED = PATH + "NOTIFICATION_DISMISSED"
+const val CURRENT_POSITION_ACTION = PATH + "PROGRESS_POSITION"
+const val PLAY_PAUSE_ACTION = PATH + "PLAY_PAUSE"
+const val SET_PROGRESS = PATH + "SET_PROGRESS"
 
+const val GET_CURRENT_POSITION = "track_position"
+const val GET_TRACK_DURATION = "track_duration"
+const val PLAY_PAUSE = "play_pause"
+const val COMPLETE = "complete"
+const val PROGRESS = "progress"
 const val GENERIC_PERMISSION_HANDLER = 1
 
 const val PERMISSION_READ_STORAGE = 2
@@ -32,17 +41,22 @@ const val RESTART_PLAYER = "RESTART_PLAYER"
 const val TRACK_ID = "track_id"
 const val TRACK_ID_SERVICE = "track_id_service"
 
+val artworkUri = Uri.parse("content://media/external/audio/albumart")
+
 fun getPermissionToRequest() =
     if (isTiramisuPlus()) PERMISSION_READ_MEDIA_AUDIOS else PERMISSION_WRITE_STORAGE
 
 //check if device is running on Android 11 or higher
 fun isRPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
 //check if device is running on Android 10 or higher
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
 fun isQPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
 //check if device is running on Android 12 or higher
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
 fun isTiramisuPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
 //check if device is running on Android 8 or higher (for notification)
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.O)
 fun isOreoPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O

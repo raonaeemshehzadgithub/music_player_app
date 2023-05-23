@@ -13,8 +13,8 @@ android {
         applicationId "com.app.musicplayer"
         minSdk 21
         targetSdk 33
-        versionCode 6
-        versionName "1.6"
+        versionCode 7
+        versionName "1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -78,6 +78,6 @@ dependencies {
     // gson
     implementation 'com.google.code.gson:gson:2.10'
 
-//    //Click-Hover
-//    implementation 'com.github.realpacific:click-shrink-effect:2.0'
+    //Click-Hover
+    implementation 'com.github.realpacific:click-shrink-effect:2.0'
 }

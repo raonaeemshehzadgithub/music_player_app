@@ -13,11 +13,11 @@ class MediaSessionCallback(private val service: MusicService) : MediaSessionComp
     }
 
     override fun onPlay() {
-        service.resumeTrack()
+//        service.resumeTrack()
     }
 
     override fun onPause() {
-        service.pauseTrack()
+//        service.pauseTrack()
     }
 
     override fun onSkipToNext() {

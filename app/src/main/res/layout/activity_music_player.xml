@@ -82,8 +82,8 @@
             <ImageView
                 android:layout_width="@dimen/thumbnail_width"
                 android:layout_height="@dimen/thumbnail_height"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher_app_round"
+                android:scaleType="center"
+                android:src="@drawable/player"
                 tools:ignore="MissingConstraints" />
         </androidx.cardview.widget.CardView>
 
@@ -162,7 +162,8 @@
         <SeekBar
             android:id="@+id/seek_bar"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:max="100"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/total_duration"
             app:layout_constraintStart_toEndOf="@+id/played_duration"

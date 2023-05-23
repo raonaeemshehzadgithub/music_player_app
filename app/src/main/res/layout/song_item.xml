@@ -11,10 +11,8 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="@dimen/margin_10"
-        android:backgroundTint="@android:color/transparent"
         app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toStartOf="@+id/song_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,8 +22,9 @@
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="center"
-            android:src="@mipmap/ic_launcher_app" />
+            android:scaleType="centerCrop"
+            android:background="@color/pink"
+            android:src="@drawable/ic_music" />
     </androidx.cardview.widget.CardView>
 
     <TextView

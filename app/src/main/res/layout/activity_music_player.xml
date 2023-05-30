@@ -80,10 +80,12 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:id="@+id/thumbnail"
                 android:layout_width="@dimen/thumbnail_width"
                 android:layout_height="@dimen/thumbnail_height"
-                android:scaleType="center"
-                android:src="@drawable/player"
+                android:background="@color/pink"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_music"
                 tools:ignore="MissingConstraints" />
         </androidx.cardview.widget.CardView>
 
@@ -126,7 +128,7 @@
             android:background="@drawable/selection_ripple_bg"
             android:padding="@dimen/padding_5"
             android:src="@drawable/ic_unfavourite"
-            app:layout_constraintBottom_toTopOf="@+id/seek_bar"
+            app:layout_constraintBottom_toTopOf="@+id/progress_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/song_data"
@@ -147,40 +149,52 @@
             app:layout_constraintTop_toTopOf="@+id/un_favourite"
             tools:ignore="MissingConstraints" />
 
-        <TextView
-            android:id="@+id/played_duration"
-            style="@style/NormalText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/padding_20"
-            android:text="00:00"
-            app:layout_constraintBottom_toBottomOf="@id/seek_bar"
-            app:layout_constraintEnd_toStartOf="@id/seek_bar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/seek_bar" />
-
-        <SeekBar
-            android:id="@+id/seek_bar"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/progress_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:max="100"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/total_duration"
-            app:layout_constraintStart_toEndOf="@+id/played_duration"
             app:layout_constraintTop_toBottomOf="@+id/un_favourite"
-            />
-
-        <TextView
-            android:id="@+id/total_duration"
-            style="@style/NormalText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/padding_20"
-            android:text="03:00"
-            app:layout_constraintBottom_toBottomOf="@id/seek_bar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/seek_bar"
-            app:layout_constraintTop_toTopOf="@id/seek_bar" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <TextView
+                android:id="@+id/played_duration"
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/padding_20"
+                android:text="00:00"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/total_duration"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+            <SeekBar
+                android:id="@+id/seek_bar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="100"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginHorizontal="@dimen/margin_70"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/total_duration"
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/padding_20"
+                android:text="03:00"
+                app:layout_constraintStart_toEndOf="@+id/played_duration"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -209,8 +223,7 @@
             android:id="@+id/previous_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/selection_ripple_bg"
-            android:padding="@dimen/padding_5"
+            android:padding="@dimen/padding_10"
             android:src="@drawable/ic_previous"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/play_pause"
@@ -222,8 +235,7 @@
             android:id="@+id/play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/selection_ripple_bg"
-            android:padding="@dimen/padding_5"
+            android:padding="@dimen/padding_10"
             android:src="@drawable/ic_pause"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/next_song"
@@ -235,8 +247,7 @@
             android:id="@+id/next_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/selection_ripple_bg"
-            android:padding="@dimen/padding_5"
+            android:padding="@dimen/padding_10"
             android:src="@drawable/ic_next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/refresh"

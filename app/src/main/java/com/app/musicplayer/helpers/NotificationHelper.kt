@@ -13,23 +13,28 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.notificationManager
+import com.app.musicplayer.interator.songs.SongsInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.receivers.ControlActionsListener
 import com.app.musicplayer.receivers.NotificationDismissedReceiver
 import com.app.musicplayer.ui.activities.MainActivity
+import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.utils.*
+import javax.inject.Inject
 
 
 class NotificationHelper(
     private val context: Context,
     private val mediaSessionToken: MediaSessionCompat.Token
 ) {
-
+    @Inject
+    lateinit var songsInteractor: SongsInteractor
     private var notificationManager = context.notificationManager
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun createPlayerNotification(
-        track: Track,
+        trackTitle:String?,
+        trackArtist:String?,
         isPlaying: Boolean,
         largeIcon: Bitmap?,
         callback: (Notification) -> Unit
@@ -77,8 +82,8 @@ class NotificationHelper(
         ).build()
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
-            .setContentTitle(track.title)
-            .setContentText(track.artist)
+            .setContentTitle(trackTitle)
+            .setContentText(trackArtist)
             .setSmallIcon(R.drawable.ic_music)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_MAX)

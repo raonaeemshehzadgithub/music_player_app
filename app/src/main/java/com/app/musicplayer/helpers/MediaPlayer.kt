@@ -9,7 +9,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 
-class MediaPlayerHolder @Inject constructor(@ApplicationContext private val context: Context) : MediaPlayer.OnErrorListener,MediaPlayer.OnSeekCompleteListener {
+object MediaPlayer :
+    MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener {
     private var player: MediaPlayer? = null
 
     private var trackCompleteCallback: (String) -> Unit = {}
@@ -21,17 +22,14 @@ class MediaPlayerHolder @Inject constructor(@ApplicationContext private val cont
         player = MediaPlayer()
     }
 
-    fun setupTrack(track: Track?) {
+    fun setupTrack(context: Context, path: String) {
         initMediaPlayerIfNeeded()
-
+        player?.reset() ?: return
         try {
-            track?.path?.let { path ->
-                player?.apply {
-                    reset()
-                    setDataSource(context.applicationContext, Uri.fromFile(File(path)))
-                    prepare()
-                    start()
-                }
+            player?.apply {
+                setDataSource(context, Uri.fromFile(File(path)))
+                prepare()
+                start()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -72,7 +70,7 @@ class MediaPlayerHolder @Inject constructor(@ApplicationContext private val cont
         }
     }
 
-    fun seekTo(position:Int){
+    fun seekTo(position: Int) {
         if (isPlaying()) {
             player?.seekTo(position)
         }

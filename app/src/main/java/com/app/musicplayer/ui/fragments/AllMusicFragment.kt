@@ -6,7 +6,7 @@ import com.app.musicplayer.models.Track
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.SongsAdapter
 import com.app.musicplayer.ui.viewstates.SongsViewState
-import com.app.musicplayer.utils.TRACK_ID
+import com.app.musicplayer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -21,9 +21,10 @@ class AllMusicFragment : ListFragment<Track, SongsViewState>() {
         super.onSetup()
         viewState.apply {
             showItemEvent.observe(this@AllMusicFragment) { event ->
-                event.ifNew?.let { track ->
+                event.ifNew?.let { combinedData ->
                     startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
-                        putExtra(TRACK_ID, track.id)
+                        putExtra(TRACK_ID, combinedData.track.id)
+                        putExtra(POSITION, combinedData.position)
                     })
                 }
             }

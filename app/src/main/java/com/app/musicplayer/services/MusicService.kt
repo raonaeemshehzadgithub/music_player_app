@@ -4,24 +4,29 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.media.session.MediaButtonReceiver
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getColoredBitmap
 import com.app.musicplayer.extentions.hasPermission
-import com.app.musicplayer.helpers.MediaPlayerHolder
+import com.app.musicplayer.helpers.MediaPlayer.completePlayer
+import com.app.musicplayer.helpers.MediaPlayer.getCurrentPosition
+import com.app.musicplayer.helpers.MediaPlayer.getTrackDuration
+import com.app.musicplayer.helpers.MediaPlayer.isPlaying
+import com.app.musicplayer.helpers.MediaPlayer.pauseTrack
+import com.app.musicplayer.helpers.MediaPlayer.playTrack
+import com.app.musicplayer.helpers.MediaPlayer.releasePlayer
+import com.app.musicplayer.helpers.MediaPlayer.seekTo
+import com.app.musicplayer.helpers.MediaPlayer.setupTrack
 import com.app.musicplayer.helpers.MediaSessionCallback
 import com.app.musicplayer.helpers.NotificationHelper
 import com.app.musicplayer.helpers.NotificationHelper.Companion.NOTIFICATION_ID
 import com.app.musicplayer.interator.songs.SongsInteractor
 import com.app.musicplayer.models.Track
-import com.app.musicplayer.repository.songs.SongsRepository
 import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.getPermissionToRequest
 import com.app.musicplayer.utils.isQPlus
@@ -37,9 +42,10 @@ class MusicService : Service() {
     @Inject
     lateinit var songsInteractor: SongsInteractor
 
-    private var mediaPlayer: MediaPlayerHolder? = null
     var timer: ScheduledExecutorService? = null
-    val intentControl = Intent(CURRENT_POSITION_ACTION)
+    val intentControl = Intent(PROGRESS_CONTROLS_ACTION)
+    private var mProgressHandler = Handler()
+    private var positionTrack: Int = 0
 
     companion object {
         private const val PROGRESS_UPDATE_INTERVAL = 1000L
@@ -47,9 +53,10 @@ class MusicService : Service() {
         var mCurrTrack: Track? = null
         private var mCurrTrackCover: Bitmap? = null
         private var mMediaSession: MediaSessionCompat? = null
-
+        var songsList = ArrayList<Track>()
     }
 
+    private var currentTrackId: Long = 0L
     private val notificationHandler = Handler()
     private var notificationHelper: NotificationHelper? = null
 
@@ -58,7 +65,6 @@ class MusicService : Service() {
         super.onCreate()
         createMediaSession()
 
-        mediaPlayer = MediaPlayerHolder(this)
         notificationHelper = NotificationHelper.createInstance(context = this, mMediaSession!!)
         startForegroundAndNotify()
     }
@@ -72,18 +78,16 @@ class MusicService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        songsInteractor.querySong(intent!!.getLongExtra(TRACK_ID_SERVICE, 0L)) { track ->
-            mCurrTrack = track
-        }
         if (!isQPlus() && !hasPermission(getPermissionToRequest())) {
             return START_NOT_STICKY
         }
 
-        val action = intent.action
+        val action = intent?.action
         when (action) {
             INIT -> handleInit(intent)
             PLAYPAUSE -> handlePlayPause()
-            NEXT -> handleNext()
+            NEXT -> handleNextPrevious(true)
+            PREVIOUS -> handleNextPrevious(false)
             SET_PROGRESS -> handleSetProgress(intent)
             DISMISS -> dismissNotification()
         }
@@ -95,61 +99,57 @@ class MusicService : Service() {
     }
 
     private fun dismissNotification() {
-        if (mediaPlayer?.isPlaying() == true) {
-            mediaPlayer?.pauseTrack{
-                if (!it) {
-                    intentControl.putExtra(PLAY_PAUSE, false)
-                    sendBroadcast(intentControl)
-                }
-            }
+        if (isPlaying()) {
+            releasePlayer()
         }
         stopForegroundAndNotification()
+        val dismissIntent = Intent(DISMISS_PLAYER_ACTION)
+        dismissIntent.putExtra(DISMISS_PLAYER, true)
+        sendBroadcast(dismissIntent)
     }
 
     private fun handleSetProgress(intent: Intent) {
-        mediaPlayer?.seekTo(intent.getIntExtra(PROGRESS, mediaPlayer?.getCurrentPosition()!!))
-//        mediaPlayer?.playTrack()
+        seekTo(intent.getIntExtra(PROGRESS, getCurrentPosition()!!))
     }
 
-    private fun handleNext() {
+    private fun handleNextPrevious(isNext: Boolean) {
+        if (isNext && positionTrack != songsList.size.minus(1)) {
+            positionTrack++
+        } else if (!isNext && positionTrack != 0) {
+            positionTrack--
+        }
+        currentTrackId = songsList[positionTrack].id
+        val nextPreviousIntent = Intent(NEXT_PREVIOUS_ACTION)
+        nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, currentTrackId)
+        sendBroadcast(nextPreviousIntent)
+        setupTrack(applicationContext, songsList[positionTrack].path)
+        handleProgressHandler(isPlaying())
     }
 
     private fun handlePlayPause() {
-        if (mediaPlayer!!.isPlaying()) {
-            mediaPlayer?.pauseTrack {
+        val playPauseIntent = Intent(PLAY_PAUSE_ACTION)
+        if (isPlaying()) {
+            pauseTrack {
                 if (!it) {
-                    intentControl.putExtra(PLAY_PAUSE, false)
+                    playPauseIntent.putExtra(PLAY_PAUSE, false)
                 }
             }
         } else {
-            mediaPlayer?.playTrack {
+            playTrack {
                 if (it) {
                     intentControl.putExtra(PLAY_PAUSE, true)
                 }
             }
         }
-        sendBroadcast(intentControl)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun trackStateChanged(isPlaying: Boolean, notify: Boolean) {
-        handleProgressHandler(isPlaying)
-        if (notify) {
-            startForegroundAndNotify()
-        }
+        sendBroadcast(playPauseIntent)
     }
 
     private fun handleInit(intent: Intent) {
-        songsInteractor.querySong(intent.getLongExtra(TRACK_ID_SERVICE, 0L)) { track ->
-            mediaPlayer?.setupTrack(track)
-            handleProgressHandler(mediaPlayer!!.isPlaying())
-            mediaPlayer?.completePlayer { COMPLETE ->
-                mediaPlayer?.releasePlayer()
-                intentControl.putExtra(COMPLETE, COMPLETE)
-                sendBroadcast(intentControl)
-                stopForeground(true)
-                stopSelf()
-            }
+        positionTrack = intent.getIntExtra(POSITION, 0)
+        setupTrack(applicationContext, songsList[positionTrack].path)
+        handleProgressHandler(isPlaying())
+        completePlayer { COMPLETE ->
+//            handleNextPrevious(true)
         }
     }
 
@@ -157,15 +157,12 @@ class MusicService : Service() {
     private fun startForegroundAndNotify() {
         notificationHandler.removeCallbacksAndMessages(null)
         notificationHandler.postDelayed({
-            if (mCurrTrackCover?.isRecycled == true) {
-                mCurrTrackCover = resources.getColoredBitmap(R.drawable.ic_music, R.color.purple)
-            }
-
-            //create notification
-            mCurrTrack?.let {
+            mCurrTrackCover = resources.getColoredBitmap(R.drawable.ic_music, R.color.purple)
+            songsInteractor.querySong(currentTrackId) { track ->
                 notificationHelper?.createPlayerNotification(
-                    track = it,
-                    isPlaying = mediaPlayer!!.isPlaying(),
+                    trackTitle = track?.title,
+                    trackArtist = track?.artist,
+                    isPlaying = isPlaying(),
                     largeIcon = mCurrTrackCover,
                 ) {
                     notificationHelper?.notify(NOTIFICATION_ID, it)
@@ -187,13 +184,32 @@ class MusicService : Service() {
     }
 
     private fun handleProgressHandler(isPlaying: Boolean) {
-
+//        if (isPlaying) {
+//            mProgressHandler.post(object : Runnable {
+//                override fun run() {
+//                    if (isPlaying()) {
+//                        val position = getCurrentPosition()
+//                        val duration = getTrackDuration()
+//                        intentControl.putExtra(GET_TRACK_DURATION, duration)
+//                        intentControl.putExtra(GET_CURRENT_POSITION, position)
+//                        sendBroadcast(intentControl)
+//                    }
+//                    mProgressHandler.removeCallbacksAndMessages(null)
+//                    mProgressHandler.postDelayed(
+//                        this,
+//                        (PROGRESS_UPDATE_INTERVAL / mPlaybackSpeed).toLong()
+//                    )
+//                }
+//            })
+//        } else {
+//            mProgressHandler.removeCallbacksAndMessages(null)
+//        }
         if (isPlaying) {
             timer = Executors.newScheduledThreadPool(1)
             timer?.scheduleAtFixedRate({
-                if (mediaPlayer!!.isPlaying()) {
-                    val position = mediaPlayer!!.getCurrentPosition()
-                    val duration = mediaPlayer?.getTrackDuration()
+                if (isPlaying()) {
+                    val position = getCurrentPosition()
+                    val duration = getTrackDuration()
                     intentControl.putExtra(GET_TRACK_DURATION, duration)
                     intentControl.putExtra(GET_CURRENT_POSITION, position)
                     sendBroadcast(intentControl)

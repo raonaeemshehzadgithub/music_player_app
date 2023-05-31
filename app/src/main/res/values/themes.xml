@@ -48,8 +48,40 @@
         <item name="android:textSize">@dimen/text_size_16</item>
     </style>
 
-    <style name="callHistoryTab">
-        <item name="android:background">@color/white</item>
+    <style name="TabLayoutBg">
+        <item name="tabSelectedTextColor">@color/black</item>
+    </style>
+
+    <style name="BackIcon">
+        <item name="android:src">@drawable/ic_back</item>
+    </style>
+
+    <style name="MenuIcon">
+        <item name="android:src">@drawable/ic_menu</item>
+    </style>
+
+    <style name="UnFavouriteIcon">
+        <item name="android:src">@drawable/ic_unfavourite</item>
+    </style>
+
+    <style name="AddIcon">
+        <item name="android:src">@drawable/ic_add</item>
+    </style>
+
+    <style name="ShuffleIcon">
+        <item name="android:src">@drawable/ic_shuffle</item>
+    </style>
+
+    <style name="PreviousIcon">
+        <item name="android:src">@drawable/ic_previous</item>
+    </style>
+
+    <style name="NextIcon">
+        <item name="android:src">@drawable/ic_next</item>
+    </style>
+
+    <style name="RefreshIcon">
+        <item name="android:src">@drawable/ic_refresh</item>
     </style>
 
     <style name="ContentTextBlack" parent="">

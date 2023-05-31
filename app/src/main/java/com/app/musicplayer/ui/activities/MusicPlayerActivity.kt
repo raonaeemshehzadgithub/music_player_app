@@ -30,10 +30,11 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     var track: Track? = null
     override val viewState: MusicPlayerViewState by viewModels()
     override val contentView: View by lazy { binding.root }
-    val intentProgressDurationFilter = IntentFilter(PROGRESS_CONTROLS_ACTION)
-    val intentNextPrevious = IntentFilter(NEXT_PREVIOUS_ACTION)
-    val intentPlayPause = IntentFilter(PLAY_PAUSE_ACTION)
-    val intentDismiss = IntentFilter(DISMISS_PLAYER_ACTION)
+    private val intentProgressDurationFilter = IntentFilter(PROGRESS_CONTROLS_ACTION)
+    private val intentNextPrevious = IntentFilter(NEXT_PREVIOUS_ACTION)
+    private val intentPlayPause = IntentFilter(PLAY_PAUSE_ACTION)
+    private val intentDismiss = IntentFilter(DISMISS_PLAYER_ACTION)
+    private val intentComplete = IntentFilter(TRACK_COMPLETE_ACTION)
 
     companion object {
 //        var songsList = ArrayList<Track>()
@@ -49,24 +50,27 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                     binding.seekBar.progress = position
                     setUpSeekbar()
                     binding.playedDuration.text = formatMillisToHMS(position.toLong())
-
-
-                    val complete = intent.getStringExtra(COMPLETE)
-                    if (complete == COMPLETE) {
-//                        finish()
-                    }
                 }
-                NEXT_PREVIOUS_ACTION-> {
-                    if ((intent.getLongExtra(NEXT_PREVIOUS_TRACK_ID, 0L))!=0L){
+
+                NEXT_PREVIOUS_ACTION -> {
+                    if ((intent.getLongExtra(NEXT_PREVIOUS_TRACK_ID, 0L)) != 0L) {
                         updateTrackInfo(intent.getLongExtra(NEXT_PREVIOUS_TRACK_ID, 0L))
                     }
                 }
-                DISMISS_PLAYER_ACTION->{
+
+                DISMISS_PLAYER_ACTION -> {
                     if (intent.getBooleanExtra(DISMISS_PLAYER, false)) {
                         finish()
                     }
                 }
-                PLAY_PAUSE_ACTION->{
+
+                TRACK_COMPLETE_ACTION -> {
+                    if (intent.getBooleanExtra(TRACK_COMPLETED, false)) {
+                        binding.nextSong.performClick()
+                    }
+                }
+
+                PLAY_PAUSE_ACTION -> {
                     when (intent.getBooleanExtra(PLAY_PAUSE, true)) {
                         true -> binding.playPause.setImageDrawable(
                             ContextCompat.getDrawable(
@@ -109,17 +113,18 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
             startService(this)
         }
     }
+
     override fun onResume() {
         super.onResume()
     }
 
-    private fun updateTrackInfo(id:Long) {
+    private fun updateTrackInfo(id: Long) {
         songsInteractor.querySong(id) { track ->
             binding.songName.text = track?.title
             binding.artistName.text = track?.artist
             binding.totalDuration.text = track?.let { formatMillisToHMS(it.duration) }
             Glide.with(this@MusicPlayerActivity).load(track?.album_id?.getThumbnailUri())
-                .error(R.drawable.ic_music).into(binding.thumbnail)
+                .placeholder(R.drawable.ic_music).into(binding.thumbnail)
         }
     }
 
@@ -151,6 +156,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         binding.playPause.setOnClickListener { sendIntent(PLAYPAUSE) }
         binding.nextSong.setOnClickListener { sendIntent(NEXT) }
         binding.previousSong.setOnClickListener { sendIntent(PREVIOUS) }
+        binding.refreshSong.setOnClickListener { sendIntent(REFRESH) }
     }
 
     override fun onDestroy() {
@@ -158,10 +164,12 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         unregisterReceiver(playerReceiver)
         sendIntent(FINISH_IF_NOT_PLAYING)
     }
+
     private fun registerReceivers() {
         registerReceiver(playerReceiver, intentProgressDurationFilter)
         registerReceiver(playerReceiver, intentNextPrevious)
         registerReceiver(playerReceiver, intentPlayPause)
         registerReceiver(playerReceiver, intentDismiss)
+        registerReceiver(playerReceiver, intentComplete)
     }
 }

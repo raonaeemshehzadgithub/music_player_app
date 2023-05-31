@@ -22,8 +22,8 @@
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
             android:background="@color/pink"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_music" />
     </androidx.cardview.widget.CardView>
 
@@ -55,10 +55,10 @@
 
     <ImageView
         android:id="@+id/un_favourite"
+        style="@style/UnFavouriteIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_10"
-        android:src="@drawable/ic_unfavourite"
         app:layout_constraintBottom_toBottomOf="@id/thumbnail_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/song_name"

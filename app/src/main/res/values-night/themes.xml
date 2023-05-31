@@ -14,4 +14,80 @@
         <!-- Customize your theme here. -->
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
     </style>
+
+    <style name="AppNameText">
+        <item name="android:textSize">@dimen/text_size_20</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="NormalText">
+        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="PlaylistNameText">
+        <item name="android:textSize">@dimen/text_size_16</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="ImagesCountText">
+        <item name="android:textSize">@dimen/text_size_13</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textStyle">normal</item>
+        <item name="fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="TextTabMusic">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">@dimen/text_size_16</item>
+    </style>
+
+    <style name="TabLayoutBg">
+        <item name="tabSelectedTextColor">@color/white</item>
+    </style>
+
+    <style name="BackIcon">
+        <item name="android:src">@drawable/ic_back_white</item>
+    </style>
+
+    <style name="MenuIcon">
+        <item name="android:src">@drawable/ic_menu_white</item>
+    </style>
+
+    <style name="UnFavouriteIcon">
+        <item name="android:src">@drawable/ic_unfavourite_white</item>
+    </style>
+
+    <style name="AddIcon">
+        <item name="android:src">@drawable/ic_add_white</item>
+    </style>
+
+    <style name="ShuffleIcon">
+        <item name="android:src">@drawable/ic_shuffle_white</item>
+    </style>
+
+    <style name="PreviousIcon">
+        <item name="android:src">@drawable/ic_previous_white</item>
+    </style>
+
+    <style name="NextIcon">
+        <item name="android:src">@drawable/ic_next_white</item>
+    </style>
+
+    <style name="RefreshIcon">
+        <item name="android:src">@drawable/ic_refresh_white</item>
+    </style>
+
+    <style name="ContentTextBlack" parent="">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">@dimen/text_size_14</item>
+    </style>
 </resources>

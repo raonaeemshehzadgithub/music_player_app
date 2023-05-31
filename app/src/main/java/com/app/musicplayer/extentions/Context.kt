@@ -109,9 +109,3 @@ fun formatMillisToHMS(milliseconds: Long): String {
 
 val Context.notificationManager: NotificationManager
     get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-fun calculateMusicProgress(currentPosition: Float): Float {
-    val totalDuration = 1000.0f // Total duration of the music (in milliseconds)
-    val progress = currentPosition / totalDuration
-    return progress.coerceIn(0f, 1f)
-}

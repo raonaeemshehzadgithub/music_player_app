@@ -12,7 +12,7 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/music_tabs"
-        style="@style/callHistoryTab"
+        style="@style/TabLayoutBg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/fragment_calls_view_pager"
@@ -22,7 +22,6 @@
         app:tabGravity="fill"
         app:tabIndicatorFullWidth="false"
         app:tabMode="auto"
-        app:tabSelectedTextColor="@color/black"
         app:tabTextAppearance="@style/TextTabMusic"
         app:tabTextColor="@color/default_gray"
         tools:ignore="NotSibling" />

@@ -137,7 +137,7 @@ class MusicService : Service() {
         } else {
             playTrack {
                 if (it) {
-                    intentControl.putExtra(PLAY_PAUSE, true)
+                    playPauseIntent.putExtra(PLAY_PAUSE, true)
                 }
             }
         }
@@ -146,10 +146,16 @@ class MusicService : Service() {
 
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
+        currentTrackId = songsList[positionTrack].id
         setupTrack(applicationContext, songsList[positionTrack].path)
         handleProgressHandler(isPlaying())
-        completePlayer { COMPLETE ->
-//            handleNextPrevious(true)
+        completePlayer { completed ->
+            if (completed == COMPLETE_CALLBACK) {
+                val completeIntent = Intent(TRACK_COMPLETE_ACTION)
+                completeIntent.putExtra(TRACK_COMPLETED, true)
+                sendBroadcast(completeIntent)
+            }
+
         }
     }
 
@@ -160,8 +166,8 @@ class MusicService : Service() {
             mCurrTrackCover = resources.getColoredBitmap(R.drawable.ic_music, R.color.purple)
             songsInteractor.querySong(currentTrackId) { track ->
                 notificationHelper?.createPlayerNotification(
-                    trackTitle = track?.title,
-                    trackArtist = track?.artist,
+                    trackTitle = track?.title ?: "Song",
+                    trackArtist = track?.artist ?: "Artist",
                     isPlaying = isPlaying(),
                     largeIcon = mCurrTrackCover,
                 ) {

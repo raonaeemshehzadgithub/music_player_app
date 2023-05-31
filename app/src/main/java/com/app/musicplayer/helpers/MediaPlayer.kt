@@ -3,11 +3,8 @@ package com.app.musicplayer.helpers
 import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
-import com.app.musicplayer.models.Track
-import com.app.musicplayer.utils.COMPLETE
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.app.musicplayer.utils.COMPLETE_CALLBACK
 import java.io.File
-import javax.inject.Inject
 
 object MediaPlayer :
     MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener {
@@ -79,7 +76,7 @@ object MediaPlayer :
     fun completePlayer(trackCompleteCallback: (String) -> Unit) {
         this.trackCompleteCallback = trackCompleteCallback
         player?.setOnCompletionListener {
-            trackCompleteCallback(COMPLETE)
+//            trackCompleteCallback(COMPLETE_CALLBACK)
         }
     }
 

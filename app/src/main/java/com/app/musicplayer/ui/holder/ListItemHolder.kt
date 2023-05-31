@@ -24,7 +24,7 @@ open class ListItemHolder(protected val binding: SongItemBinding) :
         }
 
     fun setDefaultImageRes(photoUri: String) {
-        Glide.with(context).load(Uri.parse(photoUri)).error(R.drawable.ic_music)
+        Glide.with(context).load(Uri.parse(photoUri)).placeholder(R.drawable.ic_music)
             .into(binding.thumbnail)
     }
     fun setOnItemClick(onItemClickListener: View.OnClickListener) {

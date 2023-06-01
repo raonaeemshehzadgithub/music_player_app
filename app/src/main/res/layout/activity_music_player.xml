@@ -70,11 +70,11 @@
         tools:ignore="MissingConstraints">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/song_thumbnail"
+            android:id="@+id/thack_thumbnail"
             android:layout_width="@dimen/thumbnail_width"
             android:layout_height="@dimen/thumbnail_height"
             app:cardCornerRadius="150dp"
-            app:layout_constraintBottom_toTopOf="@+id/song_data"
+            app:layout_constraintBottom_toTopOf="@+id/track_data"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -91,16 +91,16 @@
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/song_data"
+            android:id="@+id/track_data"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/un_favourite"
+            app:layout_constraintBottom_toTopOf="@+id/favourite_track"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/song_thumbnail">
+            app:layout_constraintTop_toBottomOf="@+id/thack_thumbnail">
 
             <TextView
-                android:id="@+id/song_name"
+                android:id="@+id/track_name"
                 style="@style/AppNameText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                 android:maxLines="2"
                 android:paddingStart="@dimen/padding_20"
                 android:paddingEnd="@dimen/padding_20"
-                android:text="@string/song_name"
+                android:text="@string/track_name"
                 app:layout_constraintBottom_toTopOf="@+id/artist_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -126,12 +126,12 @@
                 android:text="@string/artist_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/song_name" />
+                app:layout_constraintTop_toBottomOf="@+id/track_name" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
-            android:id="@+id/un_favourite"
-            style="@style/UnFavouriteIcon"
+            android:id="@+id/favourite_track"
+            style="@style/FavouriteIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_26"
@@ -140,22 +140,22 @@
             app:layout_constraintBottom_toTopOf="@+id/progress_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/song_data"
+            app:layout_constraintTop_toBottomOf="@+id/track_data"
             tools:ignore="MissingConstraints" />
 
         <ImageView
-            android:id="@+id/add_playlist"
+            android:id="@+id/add_to_playlist"
             style="@style/AddIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_20"
             android:background="@drawable/selection_ripple_bg"
             android:padding="@dimen/padding_5"
-            app:layout_constraintBottom_toBottomOf="@id/un_favourite"
+            app:layout_constraintBottom_toBottomOf="@id/favourite_track"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toEndOf="@+id/un_favourite"
-            app:layout_constraintTop_toTopOf="@+id/un_favourite"
+            app:layout_constraintStart_toEndOf="@+id/favourite_track"
+            app:layout_constraintTop_toTopOf="@+id/favourite_track"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -165,7 +165,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/un_favourite">
+            app:layout_constraintTop_toBottomOf="@+id/favourite_track">
 
             <TextView
                 android:id="@+id/played_duration"
@@ -219,7 +219,7 @@
         tools:ignore="MissingConstraints">
 
         <ImageView
-            android:id="@+id/shuffle"
+            android:id="@+id/shuffle_track"
             style="@style/ShuffleIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -230,43 +230,43 @@
             tools:ignore="MissingConstraints" />
 
         <ImageView
-            android:id="@+id/previous_song"
+            android:id="@+id/previous_track"
             style="@style/PreviousIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_10"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/play_pause"
-            app:layout_constraintStart_toEndOf="@+id/shuffle"
+            app:layout_constraintEnd_toStartOf="@+id/play_pause_track"
+            app:layout_constraintStart_toEndOf="@+id/shuffle_track"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
 
         <ImageView
-            android:id="@+id/play_pause"
+            android:id="@+id/play_pause_track"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_10"
             android:src="@drawable/ic_pause"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/next_song"
-            app:layout_constraintStart_toEndOf="@+id/previous_song"
+            app:layout_constraintEnd_toStartOf="@+id/next_track"
+            app:layout_constraintStart_toEndOf="@+id/previous_track"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
 
         <ImageView
-            android:id="@+id/next_song"
+            android:id="@+id/next_track"
             style="@style/NextIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_10"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/refreshSong"
-            app:layout_constraintStart_toEndOf="@+id/play_pause"
+            app:layout_constraintEnd_toStartOf="@+id/repeat_track"
+            app:layout_constraintStart_toEndOf="@+id/play_pause_track"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
 
         <ImageView
-            android:id="@+id/refreshSong"
+            android:id="@+id/repeat_track"
             style="@style/RefreshIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

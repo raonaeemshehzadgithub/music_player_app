@@ -3,7 +3,7 @@ package com.app.musicplayer.ui.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.app.musicplayer.databinding.SongItemBinding
+import com.app.musicplayer.databinding.TrackItemBinding
 import com.app.musicplayer.models.ListData
 import com.app.musicplayer.ui.holder.ListItemHolder
 
@@ -20,7 +20,7 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ListItemHolder>() {
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ListItemHolder(
-        SongItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        TrackItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
 
     override fun onBindViewHolder(holder: ListItemHolder, position: Int) {

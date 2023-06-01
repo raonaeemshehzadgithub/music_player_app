@@ -4,18 +4,18 @@ import android.content.Intent
 import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
-import com.app.musicplayer.ui.adapters.SongsAdapter
-import com.app.musicplayer.ui.viewstates.SongsViewState
+import com.app.musicplayer.ui.adapters.TracksAdapter
+import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AllMusicFragment : ListFragment<Track, SongsViewState>() {
-    override val viewState: SongsViewState by activityViewModels()
+class AllMusicFragment : ListFragment<Track, TracksViewState>() {
+    override val viewState: TracksViewState by activityViewModels()
 
     @Inject
-    override lateinit var listAdapter: SongsAdapter
+    override lateinit var listAdapter: TracksAdapter
 
     override fun onSetup() {
         super.onSetup()

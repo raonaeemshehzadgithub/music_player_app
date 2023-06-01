@@ -9,14 +9,14 @@ import com.app.musicplayer.extentions.getLongValue
 import com.app.musicplayer.extentions.getStringValue
 import com.app.musicplayer.models.Track
 
-class SongsContentResolver(context: Context, songId: Long? = null) :
+class TracksContentResolver(context: Context, trackId: Long? = null) :
     BaseContentResolver<Track>(context) {
     override val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
     override val selection by lazy {
         SelectionBuilder()
             .addNotNull(MediaStore.Audio.Media.DISPLAY_NAME)
-            .addSelection(MediaStore.Audio.Media._ID, songId)
+            .addSelection(MediaStore.Audio.Media._ID, trackId)
             .build()
     }
     override val sortOrder: String = MediaStore.Audio.Media.DATE_ADDED + " ASC"

@@ -1,7 +1,7 @@
 package com.app.musicplayer.di.factory.livedata
 
-import com.app.musicplayer.interator.livedata.SongsLiveData
+import com.app.musicplayer.interator.livedata.TracksLiveData
 
 interface LiveDataFactory {
-    fun getSongsLiveData(songId: Long?=null): SongsLiveData
+    fun getTracksLiveData(trackId: Long?=null): TracksLiveData
 }

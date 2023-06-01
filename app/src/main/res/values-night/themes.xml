@@ -60,8 +60,8 @@
         <item name="android:src">@drawable/ic_menu_white</item>
     </style>
 
-    <style name="UnFavouriteIcon">
-        <item name="android:src">@drawable/ic_unfavourite_white</item>
+    <style name="FavouriteIcon">
+        <item name="android:src">@drawable/ic_favourite_white</item>
     </style>
 
     <style name="AddIcon">
@@ -81,7 +81,7 @@
     </style>
 
     <style name="RefreshIcon">
-        <item name="android:src">@drawable/ic_refresh_white</item>
+        <item name="android:src">@drawable/ic_repeat_white</item>
     </style>
 
     <style name="ContentTextBlack" parent="">

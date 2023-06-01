@@ -1,7 +1,7 @@
 package com.app.musicplayer.di.factory.contentresolver
 
-import com.app.musicplayer.contentresolver.SongsContentResolver
+import com.app.musicplayer.contentresolver.TracksContentResolver
 
 interface ContentResolverFactory {
-    fun getSongsContentResolver(contactId: Long? = null) : SongsContentResolver
+    fun getTracksContentResolver(trackId: Long? = null) : TracksContentResolver
 }

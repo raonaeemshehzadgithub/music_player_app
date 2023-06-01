@@ -12,10 +12,11 @@ import androidx.core.content.ContextCompat
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
 import com.app.musicplayer.extentions.*
-import com.app.musicplayer.interator.songs.SongsInteractor
+import com.app.musicplayer.helpers.PreferenceHelper
+import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService
-import com.app.musicplayer.services.MusicService.Companion.songsList
+import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.MusicPlayerViewState
 import com.app.musicplayer.utils.*
@@ -26,6 +27,10 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
+
+    @Inject
+    lateinit var pref: PreferenceHelper
+
     private val binding by lazy { ActivityMusicPlayerBinding.inflate(layoutInflater) }
     var track: Track? = null
     override val viewState: MusicPlayerViewState by viewModels()
@@ -37,7 +42,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     private val intentComplete = IntentFilter(TRACK_COMPLETE_ACTION)
 
     companion object {
-//        var songsList = ArrayList<Track>()
+//        var tracksList = ArrayList<Track>()
     }
 
     var playerReceiver = object : BroadcastReceiver() {
@@ -66,20 +71,20 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
                 TRACK_COMPLETE_ACTION -> {
                     if (intent.getBooleanExtra(TRACK_COMPLETED, false)) {
-                        binding.nextSong.performClick()
+                        binding.nextTrack.performClick()
                     }
                 }
 
                 PLAY_PAUSE_ACTION -> {
                     when (intent.getBooleanExtra(PLAY_PAUSE, true)) {
-                        true -> binding.playPause.setImageDrawable(
+                        true -> binding.playPauseTrack.setImageDrawable(
                             ContextCompat.getDrawable(
                                 this@MusicPlayerActivity,
                                 R.drawable.ic_pause
                             )
                         )
 
-                        false -> binding.playPause.setImageDrawable(
+                        false -> binding.playPauseTrack.setImageDrawable(
                             ContextCompat.getDrawable(
                                 this@MusicPlayerActivity,
                                 R.drawable.ic_play
@@ -92,16 +97,16 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     }
 
     @Inject
-    lateinit var songsInteractor: SongsInteractor
+    lateinit var tracksInteractor: TracksInteractor
 
     override fun onSetup() {
-        clickListenersAndShrinks()
+        setUpButtons()
         registerReceivers()
         updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
         viewState.apply {
             itemsChangedEvent.observe(this@MusicPlayerActivity) { event ->
                 event.ifNew?.let {
-                    songsList = it as ArrayList<Track>
+                    tracksList = it as ArrayList<Track>
                 }
             }
             getItemsObservable { it.observe(this@MusicPlayerActivity, viewState::onItemsChanged) }
@@ -119,8 +124,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     }
 
     private fun updateTrackInfo(id: Long) {
-        songsInteractor.querySong(id) { track ->
-            binding.songName.text = track?.title
+        tracksInteractor.queryTrack(id) { track ->
+            binding.trackName.text = track?.title
             binding.artistName.text = track?.artist
             binding.totalDuration.text = track?.let { formatMillisToHMS(it.duration) }
             Glide.with(this@MusicPlayerActivity).load(track?.album_id?.getThumbnailUri())
@@ -148,15 +153,22 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         })
     }
 
-    private fun clickListenersAndShrinks() {
-        binding.playPause.applyClickShrink()
-        binding.nextSong.applyClickShrink()
-        binding.previousSong.applyClickShrink()
+    private fun setUpButtons() {
+        binding.playPauseTrack.applyClickShrink()
+        binding.nextTrack.applyClickShrink()
+        binding.previousTrack.applyClickShrink()
         binding.back.setOnClickListener { finish() }
-        binding.playPause.setOnClickListener { sendIntent(PLAYPAUSE) }
-        binding.nextSong.setOnClickListener { sendIntent(NEXT) }
-        binding.previousSong.setOnClickListener { sendIntent(PREVIOUS) }
-        binding.refreshSong.setOnClickListener { sendIntent(REFRESH) }
+        binding.playPauseTrack.setOnClickListener { sendIntent(PLAYPAUSE) }
+        binding.nextTrack.setOnClickListener { sendIntent(NEXT) }
+        binding.previousTrack.setOnClickListener { sendIntent(PREVIOUS) }
+        binding.repeatTrack.setOnClickListener { repeatTrackSettings() }
+        binding.shuffleTrack.setOnClickListener {  }
+    }
+
+    private fun repeatTrackSettings() {
+
+        pref.repeatTrack = REPEAT_TRACK_ON
+        binding.repeatTrack.setBackgroundColor(ContextCompat.getColor(this,R.color.purple))
     }
 
     override fun onDestroy() {

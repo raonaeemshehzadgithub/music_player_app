@@ -13,12 +13,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.notificationManager
-import com.app.musicplayer.interator.songs.SongsInteractor
-import com.app.musicplayer.models.Track
+import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.receivers.ControlActionsListener
 import com.app.musicplayer.receivers.NotificationDismissedReceiver
 import com.app.musicplayer.ui.activities.MainActivity
-import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.utils.*
 import javax.inject.Inject
 
@@ -28,7 +26,7 @@ class NotificationHelper(
     private val mediaSessionToken: MediaSessionCompat.Token
 ) {
     @Inject
-    lateinit var songsInteractor: SongsInteractor
+    lateinit var tracksInteractor: TracksInteractor
     private var notificationManager = context.notificationManager
 
     @RequiresApi(Build.VERSION_CODES.M)

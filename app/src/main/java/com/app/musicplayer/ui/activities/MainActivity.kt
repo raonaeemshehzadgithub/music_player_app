@@ -2,7 +2,6 @@ package com.app.musicplayer.ui.activities
 
 import android.Manifest
 import android.os.Build
-import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -11,15 +10,15 @@ import com.app.musicplayer.databinding.ActivityMainBinding
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.fragments.*
-import com.app.musicplayer.ui.viewstates.SongsViewState
+import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity<SongsViewState>() {
+class MainActivity : BaseActivity<TracksViewState>() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    override val viewState: SongsViewState by viewModels()
+    override val viewState: TracksViewState by viewModels()
     override val contentView: View by lazy { binding.root }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

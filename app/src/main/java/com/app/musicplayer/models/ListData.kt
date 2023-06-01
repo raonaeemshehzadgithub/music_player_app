@@ -4,10 +4,10 @@ data class ListData<DataType>(
     var items: List<DataType> = arrayListOf()
 ) {
     companion object {
-        fun fromSongs(
-            songs: List<Track>
+        fun fromTracks(
+            tracks: List<Track>
         ): ListData<Track> {
-            return ListData(songs)
+            return ListData(tracks)
         }
     }
 }

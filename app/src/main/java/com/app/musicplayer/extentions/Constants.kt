@@ -9,7 +9,7 @@ private const val PATH = "com.app.musicplayer.action."
 const val DISMISS = PATH + "DISMISS"
 const val FINISH = PATH + "FINISH"
 const val PREVIOUS = PATH + "PREVIOUS"
-const val REFRESH = PATH + "REFRESH"
+const val REPEAT = PATH + "REPEAT"
 const val PAUSE = PATH + "PAUSE"
 const val PLAYPAUSE = PATH + "PLAYPAUSE"
 const val NEXT = PATH + "NEXT"
@@ -31,6 +31,7 @@ const val GET_TRACK_DURATION = "track_duration"
 const val PLAY_PAUSE = "play_pause"
 const val COMPLETE_CALLBACK = "complete"
 const val PROGRESS = "progress"
+const val REPEAT_TRACK_ON = "repeat_on"
 const val GENERIC_PERMISSION_HANDLER = 1
 
 const val PERMISSION_READ_STORAGE = 2
@@ -40,7 +41,7 @@ const val PERMISSION_POST_NOTIFICATIONS = 5
 const val OPEN_SETTINGS = 6
 
 const val POSITION = "position"
-const val SERIALIZED_LIST = "song_list"
+const val SERIALIZED_LIST = "track_list"
 const val TRACK = "track"
 const val RESTART_PLAYER = "RESTART_PLAYER"
 const val TRACK_ID = "track_id"

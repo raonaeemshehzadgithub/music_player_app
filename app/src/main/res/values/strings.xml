@@ -4,7 +4,7 @@
     <string name="playlist_name">Playlist name</string>
     <string name="_10_songs">10 Songs</string>
     <string name="now_playing">Now playing</string>
-    <string name="song_name">Song</string>
+    <string name="track_name">Track</string>
     <string name="artist_name">Artist</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>

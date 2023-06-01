@@ -4,12 +4,12 @@ import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactoryImpl
 import com.app.musicplayer.di.factory.livedata.LiveDataFactory
 import com.app.musicplayer.di.factory.livedata.LiveDataFactoryImpl
-import com.app.musicplayer.interator.songs.SongsInteractor
-import com.app.musicplayer.interator.songs.SongsInteractorImpl
+import com.app.musicplayer.interator.tracks.TracksInteractor
+import com.app.musicplayer.interator.tracks.TracksInteractorImpl
 import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.interator.string.StringsInteratorImpl
-import com.app.musicplayer.repository.songs.SongsRepository
-import com.app.musicplayer.repository.songs.SongsRepositoryImpl
+import com.app.musicplayer.repository.tracks.TracksRepository
+import com.app.musicplayer.repository.tracks.TracksRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -29,13 +29,13 @@ class AppModule {
     interface BindModule {
 
         @Binds
-        fun bindsSongsInteractor(songsInteractorImpl: SongsInteractorImpl): SongsInteractor
+        fun bindsTracksInteractor(tracksInteractorImpl: TracksInteractorImpl): TracksInteractor
 
         @Binds
         fun bindsContentResolverFactory(contentResolverFactoryImpl: ContentResolverFactoryImpl): ContentResolverFactory
 
         @Binds
-        fun bindsSongsRepository(songsRepositoryImpl: SongsRepositoryImpl): SongsRepository
+        fun bindsTracksRepository(tracksRepositoryImpl: TracksRepositoryImpl): TracksRepository
 
         @Binds
         fun bindsLiveDataFactory(liveDataFactoryImpl: LiveDataFactoryImpl): LiveDataFactory

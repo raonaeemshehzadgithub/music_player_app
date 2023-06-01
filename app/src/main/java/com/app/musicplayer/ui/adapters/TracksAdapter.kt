@@ -8,18 +8,18 @@ import com.app.musicplayer.ui.holder.ListItemHolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class SongsAdapter @Inject constructor(@ApplicationContext private val context: Context) :
+class TracksAdapter @Inject constructor(@ApplicationContext private val context: Context) :
     ListAdapter<Track>() {
 
     override fun onBindListItem(listItemHolder: ListItemHolder, item: Track) {
         listItemHolder.apply {
-            songName = item.title
+            trackName = item.title
             artist = item.artist
 
             setDefaultImageRes(item.album_id.getThumbnailUri())
         }
     }
     override fun convertDataToListData(items: List<Track>) =
-        ListData.fromSongs(items)
+        ListData.fromTracks(items)
 
 }

@@ -25,7 +25,7 @@ import com.app.musicplayer.helpers.MediaPlayer.setupTrack
 import com.app.musicplayer.helpers.MediaSessionCallback
 import com.app.musicplayer.helpers.NotificationHelper
 import com.app.musicplayer.helpers.NotificationHelper.Companion.NOTIFICATION_ID
-import com.app.musicplayer.interator.songs.SongsInteractor
+import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.getPermissionToRequest
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class MusicService : Service() {
 
     @Inject
-    lateinit var songsInteractor: SongsInteractor
+    lateinit var tracksInteractor: TracksInteractor
 
     var timer: ScheduledExecutorService? = null
     val intentControl = Intent(PROGRESS_CONTROLS_ACTION)
@@ -53,7 +53,7 @@ class MusicService : Service() {
         var mCurrTrack: Track? = null
         private var mCurrTrackCover: Bitmap? = null
         private var mMediaSession: MediaSessionCompat? = null
-        var songsList = ArrayList<Track>()
+        var tracksList = ArrayList<Track>()
     }
 
     private var currentTrackId: Long = 0L
@@ -113,16 +113,16 @@ class MusicService : Service() {
     }
 
     private fun handleNextPrevious(isNext: Boolean) {
-        if (isNext && positionTrack != songsList.size.minus(1)) {
+        if (isNext && positionTrack != tracksList.size.minus(1)) {
             positionTrack++
         } else if (!isNext && positionTrack != 0) {
             positionTrack--
         }
-        currentTrackId = songsList[positionTrack].id
+        currentTrackId = tracksList[positionTrack].id
         val nextPreviousIntent = Intent(NEXT_PREVIOUS_ACTION)
         nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, currentTrackId)
         sendBroadcast(nextPreviousIntent)
-        setupTrack(applicationContext, songsList[positionTrack].path)
+        setupTrack(applicationContext, tracksList[positionTrack].path)
         handleProgressHandler(isPlaying())
     }
 
@@ -146,8 +146,8 @@ class MusicService : Service() {
 
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
-        currentTrackId = songsList[positionTrack].id
-        setupTrack(applicationContext, songsList[positionTrack].path)
+        currentTrackId = tracksList[positionTrack].id
+        setupTrack(applicationContext, tracksList[positionTrack].path)
         handleProgressHandler(isPlaying())
         completePlayer { completed ->
             if (completed == COMPLETE_CALLBACK) {
@@ -164,9 +164,9 @@ class MusicService : Service() {
         notificationHandler.removeCallbacksAndMessages(null)
         notificationHandler.postDelayed({
             mCurrTrackCover = resources.getColoredBitmap(R.drawable.ic_music, R.color.purple)
-            songsInteractor.querySong(currentTrackId) { track ->
+            tracksInteractor.queryTrack(currentTrackId) { track ->
                 notificationHelper?.createPlayerNotification(
-                    trackTitle = track?.title ?: "Song",
+                    trackTitle = track?.title ?: "Track",
                     trackArtist = track?.artist ?: "Artist",
                     isPlaying = isPlaying(),
                     largeIcon = mCurrTrackCover,

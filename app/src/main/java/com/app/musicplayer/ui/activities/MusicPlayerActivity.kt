@@ -30,7 +30,6 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
     @Inject
     lateinit var pref: PreferenceHelper
-
     private val binding by lazy { ActivityMusicPlayerBinding.inflate(layoutInflater) }
     var track: Track? = null
     override val viewState: MusicPlayerViewState by viewModels()
@@ -40,10 +39,6 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     private val intentPlayPause = IntentFilter(PLAY_PAUSE_ACTION)
     private val intentDismiss = IntentFilter(DISMISS_PLAYER_ACTION)
     private val intentComplete = IntentFilter(TRACK_COMPLETE_ACTION)
-
-    companion object {
-//        var tracksList = ArrayList<Track>()
-    }
 
     var playerReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -135,10 +130,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
     private fun setUpSeekbar() {
         binding.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            override fun onStartTrackingTouch(seekbar: SeekBar) {
-
-            }
-
+            override fun onProgressChanged(seekbar: SeekBar?, progress: Int, p2: Boolean) {}
+            override fun onStartTrackingTouch(seekbar: SeekBar) {}
             override fun onStopTrackingTouch(seekbar: SeekBar) {
                 Intent(this@MusicPlayerActivity, MusicService::class.java).apply {
                     putExtra(PROGRESS, seekbar.progress)
@@ -146,10 +139,6 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                     startService(this)
                 }
             }
-
-            override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
-            }
-
         })
     }
 
@@ -157,18 +146,43 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         binding.playPauseTrack.applyClickShrink()
         binding.nextTrack.applyClickShrink()
         binding.previousTrack.applyClickShrink()
+        binding.back.applyClickShrink()
+        binding.repeatTrack.applyClickShrink()
+        binding.shuffleTrack.applyClickShrink()
         binding.back.setOnClickListener { finish() }
         binding.playPauseTrack.setOnClickListener { sendIntent(PLAYPAUSE) }
         binding.nextTrack.setOnClickListener { sendIntent(NEXT) }
         binding.previousTrack.setOnClickListener { sendIntent(PREVIOUS) }
-        binding.repeatTrack.setOnClickListener { repeatTrackSettings() }
-        binding.shuffleTrack.setOnClickListener {  }
+        binding.repeatTrack.setOnClickListener { repeatTrack() }
+        binding.shuffleTrack.setOnClickListener { shuffleTrack() }
     }
 
-    private fun repeatTrackSettings() {
+    private fun repeatTrack() {
+        when (pref.repeatTrack) {
+            REPEAT_TRACK_OFF -> {
+                pref.repeatTrack = REPEAT_TRACK_ON
+                binding.repeatTrack.setSelectedTint(context = this)
+            }
 
-        pref.repeatTrack = REPEAT_TRACK_ON
-        binding.repeatTrack.setBackgroundColor(ContextCompat.getColor(this,R.color.purple))
+            REPEAT_TRACK_ON -> {
+                pref.repeatTrack = REPEAT_TRACK_OFF
+                binding.repeatTrack.setUnSelectedTint(context = this)
+            }
+        }
+    }
+
+    private fun shuffleTrack() {
+        when (pref.shuffleTrack) {
+            SHUFFLE_TRACK_OFF -> {
+                pref.shuffleTrack = SHUFFLE_TRACK_ON
+                binding.shuffleTrack.setSelectedTint(context = this)
+            }
+
+            SHUFFLE_TRACK_ON -> {
+                pref.shuffleTrack = SHUFFLE_TRACK_OFF
+                binding.shuffleTrack.setUnSelectedTint(context = this)
+            }
+        }
     }
 
     override fun onDestroy() {

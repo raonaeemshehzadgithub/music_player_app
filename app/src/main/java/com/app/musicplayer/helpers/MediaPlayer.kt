@@ -3,11 +3,14 @@ package com.app.musicplayer.helpers
 import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
+import com.app.musicplayer.services.MusicService
+import com.app.musicplayer.services.MusicService.Companion.isTrackCompleted
 import com.app.musicplayer.utils.COMPLETE_CALLBACK
 import java.io.File
+import javax.inject.Inject
 
 object MediaPlayer :
-    MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener {
+    MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,MediaPlayer.OnCompletionListener {
     private var player: MediaPlayer? = null
 
     private var trackCompleteCallback: (String) -> Unit = {}
@@ -86,20 +89,17 @@ object MediaPlayer :
         player = null
     }
 
-//    override fun onCompletion(player: MediaPlayer) {
-//        player.stop()
-//        player.release()
-//        musicService.stopSelf()
-//    }
-
     override fun onError(p0: MediaPlayer?, p1: Int, p2: Int): Boolean {
-
         player?.reset()
         return false
     }
 
     override fun onSeekComplete(p0: MediaPlayer?) {
 
+    }
+
+    override fun onCompletion(mediaPlayer: MediaPlayer?) {
+        isTrackCompleted = true
     }
 
 }

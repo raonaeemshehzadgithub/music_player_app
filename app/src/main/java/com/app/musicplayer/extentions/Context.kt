@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -45,6 +46,11 @@ fun createWaveform(): IntArray {
         values[i] = newValue
     }
     return values
+}
+
+fun Context.isDarkMode(): Boolean {
+    val darkModeFlag = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return darkModeFlag == Configuration.UI_MODE_NIGHT_YES
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)

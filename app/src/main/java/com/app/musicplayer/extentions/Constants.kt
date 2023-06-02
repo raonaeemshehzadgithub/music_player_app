@@ -32,6 +32,9 @@ const val PLAY_PAUSE = "play_pause"
 const val COMPLETE_CALLBACK = "complete"
 const val PROGRESS = "progress"
 const val REPEAT_TRACK_ON = "repeat_on"
+const val REPEAT_TRACK_OFF = "repeat_off"
+const val SHUFFLE_TRACK_ON = "repeat_on"
+const val SHUFFLE_TRACK_OFF = "repeat_off"
 const val GENERIC_PERMISSION_HANDLER = 1
 
 const val PERMISSION_READ_STORAGE = 2

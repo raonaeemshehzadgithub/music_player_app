@@ -54,6 +54,7 @@ class MusicService : Service() {
         private var mCurrTrackCover: Bitmap? = null
         private var mMediaSession: MediaSessionCompat? = null
         var tracksList = ArrayList<Track>()
+        var isTrackCompleted:Boolean = false
     }
 
     private var currentTrackId: Long = 0L
@@ -126,7 +127,7 @@ class MusicService : Service() {
         handleProgressHandler(isPlaying())
     }
 
-    private fun handlePlayPause() {
+    fun handlePlayPause() {
         val playPauseIntent = Intent(PLAY_PAUSE_ACTION)
         if (isPlaying()) {
             pauseTrack {
@@ -226,6 +227,8 @@ class MusicService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        mMediaSession?.isActive = false
+        mMediaSession = null
         stopForeground(true)
         stopSelf()
     }

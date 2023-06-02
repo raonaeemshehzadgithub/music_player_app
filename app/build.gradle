@@ -6,14 +6,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        debug {
-            storeFile file('/home/waleed/Documents/release/release.keystore')
-            keyAlias 'Greentouch1956'
-            storePassword 'Ari@8455871956'
-            keyPassword 'Ari@8455871956'
-        }
-    }
     namespace 'com.app.musicplayer'
     compileSdk 33
 
@@ -21,8 +13,8 @@ android {
         applicationId "com.app.musicplayer"
         minSdk 21
         targetSdk 33
-        versionCode 7
-        versionName "1.7"
+        versionCode 8
+        versionName "1.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

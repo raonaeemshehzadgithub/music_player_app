@@ -28,6 +28,19 @@ abstract class BaseContentResolver<ItemType>(@ApplicationContext private val con
             .sortOrder(if (sortOrder == "") null else sortOrder)
             .build()
 
+    val finalUri: Uri
+        get() = if (_filter?.isNotEmpty() == true) {
+            Uri.withAppendedPath(filterUri, _filter)
+        } else {
+            uri
+        }
+
+    open var filter: String?
+        get() = _filter
+        set(value) {
+            _filter = if (value == "") null else value
+        }
+
     private fun queryCursor() =
         _ioContentResolver
             .get()
@@ -50,7 +63,7 @@ abstract class BaseContentResolver<ItemType>(@ApplicationContext private val con
 
     fun queryItems() = convertCursorToItems(queryCursor())
 
-    fun queryItems(callback:(List<ItemType>)->Unit):Disposable =
+    fun queryItems(callback: (List<ItemType>) -> Unit): Disposable =
         queryCursor { callback.invoke(convertCursorToItems(it)) }
 
     private fun observeCursor(observer: (Cursor?) -> Unit): Disposable =
@@ -79,6 +92,7 @@ abstract class BaseContentResolver<ItemType>(@ApplicationContext private val con
 
 
     abstract val uri: Uri
+    abstract val filterUri: Uri?
     abstract val selection: String?
     abstract val sortOrder: String?
     abstract val projection: Array<String>

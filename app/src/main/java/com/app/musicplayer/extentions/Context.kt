@@ -10,6 +10,9 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
@@ -46,6 +49,20 @@ fun createWaveform(): IntArray {
         values[i] = newValue
     }
     return values
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+fun Context.showKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager?
+    inputMethodManager!!.toggleSoftInputFromWindow(
+        view.applicationWindowToken,
+        InputMethodManager.SHOW_FORCED,
+        0
+    )
 }
 
 fun Context.isDarkMode(): Boolean {

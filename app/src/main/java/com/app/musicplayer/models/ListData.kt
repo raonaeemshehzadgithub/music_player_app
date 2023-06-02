@@ -9,5 +9,11 @@ data class ListData<DataType>(
         ): ListData<Track> {
             return ListData(tracks)
         }
+
+        fun fromAlbums(
+            albums: List<Album>
+        ): ListData<Album> {
+            return ListData(albums)
+        }
     }
 }

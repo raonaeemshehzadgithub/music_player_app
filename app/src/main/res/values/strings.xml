@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Music Player</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="playlist_name">Playlist name</string>
+    <string name="album_name">Album name</string>
     <string name="_10_songs">10 Songs</string>
     <string name="now_playing">Now playing</string>
     <string name="track_name">Track</string>
@@ -12,4 +12,5 @@
     <string name="dismiss">Dismiss</string>
     <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
     <string name="no_audio_files_detected_make_sure_you_have_music_files_on_your_device">No audio files detected. Make sure you have music files on your device.</string>
+    <string name="search_here">Search Here</string>
 </resources>

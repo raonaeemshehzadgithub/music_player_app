@@ -6,40 +6,73 @@
     android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/padding_15"
-        android:paddingVertical="@dimen/padding_15">
+        android:paddingVertical="@dimen/padding_15"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/move_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selection_ripple_bg"
+            android:padding="@dimen/padding_5"
+            android:src="@drawable/ic_back"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/search_input"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/search_input"
+            style="@style/SearchEditTextStyle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_50"
+            android:layout_marginStart="@dimen/margin_13"
+            android:hint="@string/search_here"
+            android:inputType="textPersonName"
+            android:paddingStart="@dimen/padding_15"
+            android:paddingTop="@dimen/padding_13"
+            android:paddingEnd="@dimen/padding_15"
+            android:paddingBottom="@dimen/padding_13"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/move_back"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/title"
             style="@style/AppNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:text="@string/app_name"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/search"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="MissingConstraints"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins"
-            android:text="@string/app_name" />
+            tools:ignore="MissingConstraints" />
 
         <ImageView
             android:id="@+id/search"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/menu"
-            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_8"
             android:background="@drawable/selection_ripple_bg"
             android:padding="@dimen/padding_5"
-            android:src="@drawable/ic_search" />
+            android:src="@drawable/ic_search"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/menu"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/menu"

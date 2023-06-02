@@ -1,6 +1,7 @@
 package com.app.musicplayer.di.factory.contentresolver
 
 import android.content.Context
+import com.app.musicplayer.contentresolver.AlbumsContentResolver
 import com.app.musicplayer.contentresolver.TracksContentResolver
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -8,5 +9,8 @@ import javax.inject.Inject
 class ContentResolverFactoryImpl @Inject constructor(@ApplicationContext private val context: Context) :
     ContentResolverFactory {
     override fun getTracksContentResolver(trackId: Long?): TracksContentResolver =
-        TracksContentResolver(context,trackId)
+        TracksContentResolver(context, trackId)
+
+    override fun getAlbumsContentResolver(albumId: Long?): AlbumsContentResolver =
+        AlbumsContentResolver(context, albumId)
 }

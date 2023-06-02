@@ -16,6 +16,14 @@ abstract class ContentProviderLiveData<ContentResolver : BaseContentResolver<T>,
         }
     }
 
+    var filter: String?
+        get() = contentResolver.filter
+        @Synchronized
+        set(value) {
+            contentResolver.filter = value
+            onActive()
+        }
+
     override fun onActive() {
         detachObserver()
         attachObserver()

@@ -6,6 +6,7 @@ import com.app.musicplayer.core.utils.DataLiveEvent
 import com.app.musicplayer.ui.base.BaseViewState
 
 abstract class ListViewState<ItemType>:BaseViewState() {
+    var filter = MutableLiveData<String>()
     val itemsChangedEvent = DataLiveEvent<List<ItemType>>()
     val itemChangedEvent = DataLiveEvent<Int>()
     val _onItemClickListener = DataLiveEvent<ItemType>()
@@ -20,5 +21,8 @@ abstract class ListViewState<ItemType>:BaseViewState() {
     open fun setOnItemClickListener(item: ItemType, position: Int) {
         itemChangedEvent.call(position)
         _onItemClickListener.call(item)
+    }
+    open fun onFilterChanged(filter: String?) {
+        this.filter.value = filter
     }
 }

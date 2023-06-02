@@ -3,21 +3,25 @@ package com.app.musicplayer.contentresolver
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import android.provider.CallLog
 import android.provider.MediaStore
 import com.app.musicplayer.core.SelectionBuilder
 import com.app.musicplayer.extentions.getLongValue
 import com.app.musicplayer.extentions.getStringValue
 import com.app.musicplayer.models.Track
 
-class TracksContentResolver(context: Context, trackId: Long? = null) :
+class TracksContentResolver(context: Context,private  val trackId: Long? = null, private  val name: String? = null) :
     BaseContentResolver<Track>(context) {
     override val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    override val filterUri: Uri? = null
 
-    override val selection by lazy {
-        SelectionBuilder()
-            .addNotNull(MediaStore.Audio.Media.DISPLAY_NAME)
-            .addSelection(MediaStore.Audio.Media._ID, trackId)
-            .build()
+    override val selection: String get() {
+        val selection = if (trackId != null)
+        SelectionBuilder().addSelection(MediaStore.Audio.Media._ID, trackId)
+        else
+            SelectionBuilder().addSelection(MediaStore.Audio.Media.DISPLAY_NAME, name)
+        filter?.let { selection.addString("(${MediaStore.Audio.Media.DISPLAY_NAME} LIKE '%$filter%')") }
+        return selection.build()
     }
     override val sortOrder: String = MediaStore.Audio.Media.DATE_ADDED + " ASC"
     override val projection: Array<String> = arrayOf(

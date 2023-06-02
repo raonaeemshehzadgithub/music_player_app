@@ -18,7 +18,7 @@ import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.base.BaseActivity
-import com.app.musicplayer.ui.viewstates.MusicPlayerViewState
+import com.app.musicplayer.ui.viewstates.player.MusicPlayerViewState
 import com.app.musicplayer.utils.*
 import com.bumptech.glide.Glide
 import com.realpacific.clickshrinkeffect.applyClickShrink

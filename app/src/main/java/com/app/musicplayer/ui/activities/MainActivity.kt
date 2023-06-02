@@ -7,25 +7,34 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.app.musicplayer.databinding.ActivityMainBinding
+import com.app.musicplayer.extentions.beGone
+import com.app.musicplayer.extentions.beVisible
+import com.app.musicplayer.extentions.hideKeyboard
+import com.app.musicplayer.extentions.onTextChangeListener
+import com.app.musicplayer.extentions.showKeyboard
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.fragments.*
-import com.app.musicplayer.ui.viewstates.TracksViewState
+import com.app.musicplayer.ui.viewstates.alltracks.TracksViewState
+import com.app.musicplayer.ui.viewstates.main.MainViewState
 import com.app.musicplayer.utils.*
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity<TracksViewState>() {
+class MainActivity : BaseActivity<MainViewState>() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    override val viewState: TracksViewState by viewModels()
     override val contentView: View by lazy { binding.root }
+    override val viewState: MainViewState by viewModels()
+    private val tracksViewState:TracksViewState by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onSetup() {
         setUpPermission()
         viewState.apply {
-
+            binding.toolbar.searchInput.onTextChangeListener {
+                tracksViewState.onFilterChanged(it)
+            }
         }
     }
 
@@ -34,6 +43,7 @@ class MainActivity : BaseActivity<TracksViewState>() {
         handleMediaPermissions { success ->
             if (success) {
                 setUpViewPager()
+                setUpClicks()
             } else {
                 ActivityCompat.requestPermissions(
                     this, arrayOf(
@@ -44,6 +54,35 @@ class MainActivity : BaseActivity<TracksViewState>() {
                 )
             }
         }
+    }
+
+    private fun setUpClicks() {
+        binding.toolbar.search.setOnClickListener {
+            showSearch()
+        }
+        binding.toolbar.moveBack.setOnClickListener {
+            hideSearch()
+        }
+    }
+
+    private fun showSearch() {
+        showKeyboard()
+        binding.toolbar.title.beGone()
+        binding.toolbar.menu.beGone()
+        binding.toolbar.search.beGone()
+        binding.toolbar.moveBack.beVisible()
+        binding.toolbar.searchInput.beVisible()
+        binding.toolbar.searchInput.requestFocus()
+    }
+
+    private fun hideSearch() {
+        hideKeyboard()
+        binding.toolbar.title.beVisible()
+        binding.toolbar.menu.beVisible()
+        binding.toolbar.search.beVisible()
+        binding.toolbar.moveBack.beGone()
+        binding.toolbar.searchInput.beGone()
+        binding.toolbar.searchInput.text = null
     }
 
     private fun setUpViewPager() {

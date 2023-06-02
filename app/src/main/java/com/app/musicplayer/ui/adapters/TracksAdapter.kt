@@ -13,6 +13,7 @@ class TracksAdapter @Inject constructor(@ApplicationContext private val context:
 
     override fun onBindListItem(listItemHolder: ListItemHolder, item: Track) {
         listItemHolder.apply {
+            isFavoriteIconShown(true)
             trackName = item.title
             artist = item.artist
 

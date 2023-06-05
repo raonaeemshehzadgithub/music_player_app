@@ -5,7 +5,7 @@ import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.TracksAdapter
-import com.app.musicplayer.ui.viewstates.alltracks.TracksViewState
+import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

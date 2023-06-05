@@ -12,6 +12,8 @@ import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.interator.string.StringsInteratorImpl
 import com.app.musicplayer.repository.albums.AlbumsRepository
 import com.app.musicplayer.repository.albums.AlbumsRepositoryImpl
+import com.app.musicplayer.repository.artists.ArtistsRepository
+import com.app.musicplayer.repository.artists.ArtistsRepositoryImpl
 import com.app.musicplayer.repository.tracks.TracksRepository
 import com.app.musicplayer.repository.tracks.TracksRepositoryImpl
 import dagger.Binds
@@ -46,6 +48,9 @@ class AppModule {
 
         @Binds
         fun bindsAlbumsRepository(albumsRepositoryImpl: AlbumsRepositoryImpl): AlbumsRepository
+
+        @Binds
+        fun bindsArtistsRepository(artistsRepositoryImpl: ArtistsRepositoryImpl): ArtistsRepository
 
         @Binds
         fun bindsLiveDataFactory(liveDataFactoryImpl: LiveDataFactoryImpl): LiveDataFactory

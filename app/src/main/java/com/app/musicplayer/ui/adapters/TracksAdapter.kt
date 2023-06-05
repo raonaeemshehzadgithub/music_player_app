@@ -14,10 +14,12 @@ class TracksAdapter @Inject constructor(@ApplicationContext private val context:
     override fun onBindListItem(listItemHolder: ListItemHolder, item: Track) {
         listItemHolder.apply {
             isFavoriteIconShown(true)
+            isListItemShown(true)
+            isArtistItemShown(false)
             trackName = item.title
             artist = item.artist
 
-            setDefaultImageRes(item.album_id.getThumbnailUri())
+            item.album_id?.let { setTrackThumbnail(it.getThumbnailUri()) }
         }
     }
     override fun convertDataToListData(items: List<Track>) =

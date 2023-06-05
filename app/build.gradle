@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -13,8 +15,8 @@ android {
         applicationId "com.app.musicplayer"
         minSdk 21
         targetSdk 33
-        versionCode 8
-        versionName "1.8"
+        versionCode 10
+        versionName "1.10"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -74,6 +76,10 @@ dependencies {
 
 //    //Waveform
 //    implementation 'com.github.alexei-frolo:WaveformSeekBar:1.1'
+
+    //crashlytics
+    implementation 'com.google.firebase:firebase-crashlytics-ktx:18.3.7'
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
 
     // gson
     implementation 'com.google.code.gson:gson:2.10'

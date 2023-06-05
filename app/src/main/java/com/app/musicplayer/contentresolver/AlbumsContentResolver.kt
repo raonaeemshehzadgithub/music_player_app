@@ -27,7 +27,7 @@ class AlbumsContentResolver(context: Context, private  val albumId: Long? = null
         MediaStore.Audio.Albums._ID,
         MediaStore.Audio.Albums.ALBUM_ID,
         MediaStore.Audio.Albums.ALBUM,
-        MediaStore.Audio.Albums.ALBUM,
+        MediaStore.Audio.Albums.NUMBER_OF_SONGS,
         MediaStore.Audio.Albums.ARTIST
     )
     override val selectionArgs: Array<String>? = null
@@ -36,7 +36,7 @@ class AlbumsContentResolver(context: Context, private  val albumId: Long? = null
         id = cursor.getLongValue(MediaStore.Audio.Albums._ID),
         albumId = cursor.getLongValue(MediaStore.Audio.Albums.ALBUM_ID),
         albumTitle = cursor.getStringValue(MediaStore.Audio.Albums.ALBUM),
-        trackCount = cursor.getStringValue(MediaStore.Audio.Albums.ALBUM),
+        trackCount = cursor.getStringValue(MediaStore.Audio.Albums.NUMBER_OF_SONGS),
         artist = cursor.getStringValue(MediaStore.Audio.Albums.ARTIST)
     )
 }

@@ -3,6 +3,7 @@ package com.app.musicplayer.di.factory.livedata
 import android.content.Context
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.interator.livedata.AlbumsLiveData
+import com.app.musicplayer.interator.livedata.ArtistsLiveData
 import com.app.musicplayer.interator.livedata.TracksLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -18,4 +19,7 @@ class LiveDataFactoryImpl @Inject constructor(
 
     override fun getAlbumsLiveData(albumId: Long?): AlbumsLiveData =
         AlbumsLiveData(context, albumId, contentResolverFactory)
+
+    override fun getArtistsLiveData(artistId: Long?): ArtistsLiveData =
+        ArtistsLiveData(context, artistId, contentResolverFactory)
 }

@@ -1,20 +1,27 @@
 package com.app.musicplayer.ui.fragments
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.app.musicplayer.R
+import androidx.fragment.app.activityViewModels
+import com.app.musicplayer.extentions.toast
+import com.app.musicplayer.models.Artist
+import com.app.musicplayer.ui.adapters.ArtistsAdapter
+import com.app.musicplayer.ui.viewstates.ArtistsViewState
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class ArtistsFragment : Fragment() {
+@AndroidEntryPoint
+class ArtistsFragment : ListFragment<Artist, ArtistsViewState>() {
+    override val viewState: ArtistsViewState by activityViewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_artists, container, false)
+    @Inject
+    override lateinit var listAdapter: ArtistsAdapter
+
+    override fun onSetup() {
+        super.onSetup()
+        viewState.apply {
+            showItemEvent.observe(this@ArtistsFragment) { event ->
+                event.ifNew?.let { artist ->
+                }
+            }
+        }
     }
-
 }

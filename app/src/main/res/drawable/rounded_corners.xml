@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <stroke android:radius="50dp" /> <!-- Set the radius value to half the width/height of the image for a perfect circle -->
+    <stroke android:radius="50dp" />
 </shape>

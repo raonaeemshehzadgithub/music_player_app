@@ -7,13 +7,11 @@ import com.app.musicplayer.extentions.beVisibleIf
 import com.app.musicplayer.ui.adapters.ListAdapter
 import com.app.musicplayer.ui.base.BaseFragment
 import com.app.musicplayer.ui.list.ListViewState
-import com.app.musicplayer.ui.viewstates.album.AlbumsViewState
-import com.app.musicplayer.ui.viewstates.alltracks.TracksViewState
+import com.app.musicplayer.ui.viewstates.TracksViewState
 
 abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragment<VS>() {
     protected val binding by lazy { ItemsBinding.inflate(layoutInflater) }
     override val contentView by lazy { binding.root }
-    private val tracksViewState: TracksViewState by activityViewModels()
     abstract val listAdapter: ListAdapter<ItemType>
 
     override fun onSetup() {

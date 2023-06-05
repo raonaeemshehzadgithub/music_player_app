@@ -2,11 +2,10 @@ package com.app.musicplayer.models
 
 data class Track(
     val id: Long,
-    val title: String,
-    val artist: String?,
-    val duration: Long,
-    val path: String,
-    var thumbnail: String,
-    var album_id: String,
-    var folderName:String
-):java.io.Serializable
+    val title: String? = null,
+    val artist: String? = null,
+    val duration: Long? = null,
+    val path: String? = null,
+    var album_id: String? = null,
+    var folderName: String? = null
+) : java.io.Serializable

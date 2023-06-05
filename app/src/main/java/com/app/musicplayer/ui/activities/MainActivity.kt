@@ -15,8 +15,8 @@ import com.app.musicplayer.extentions.showKeyboard
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.fragments.*
-import com.app.musicplayer.ui.viewstates.alltracks.TracksViewState
-import com.app.musicplayer.ui.viewstates.main.MainViewState
+import com.app.musicplayer.ui.viewstates.TracksViewState
+import com.app.musicplayer.ui.viewstates.MainViewState
 import com.app.musicplayer.utils.*
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +26,7 @@ class MainActivity : BaseActivity<MainViewState>() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     override val contentView: View by lazy { binding.root }
     override val viewState: MainViewState by viewModels()
-    private val tracksViewState:TracksViewState by viewModels()
+    private val tracksViewState: TracksViewState by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onSetup() {

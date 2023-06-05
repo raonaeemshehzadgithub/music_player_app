@@ -1,9 +1,7 @@
 package com.app.musicplayer.ui.holder
 
-import android.graphics.Color
 import android.net.Uri
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ListItemBinding
@@ -26,17 +24,35 @@ open class ListItemHolder(protected val binding: ListItemBinding) :
             binding.artistName.text = value
         }
 
+    var artistTitle: String?
+        get() = binding.artistTitle.text.toString()
+        set(value) {
+            binding.artistTitle.text = value
+        }
+
+    fun isListItemShown(check: Boolean) {
+        binding.listContainer.beVisibleIf(check)
+    }
+    fun isArtistItemShown(check: Boolean) {
+        binding.artistContainer.beVisibleIf(check)
+    }
     fun isFavoriteIconShown(check: Boolean) {
         binding.favouriteTrack.beVisibleIf(check)
     }
 
-    fun setDefaultAlbumRes() {
-        binding.thumbnail.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_album))
+    fun setAlbumThumbnail(albumUri: String) {
+        Glide.with(context).load(Uri.parse(albumUri)).placeholder(R.drawable.ic_album)
+            .into(binding.thumbnail)
     }
 
-    fun setDefaultImageRes(photoUri: String) {
-        Glide.with(context).load(Uri.parse(photoUri)).placeholder(R.drawable.ic_music_purple)
+    fun setTrackThumbnail(trackUri: String) {
+        Glide.with(context).load(Uri.parse(trackUri)).placeholder(R.drawable.ic_music_purple)
             .into(binding.thumbnail)
+    }
+
+    fun setArtistThumbnail(artistUri: String) {
+        Glide.with(context).load(Uri.parse(artistUri)).placeholder(R.drawable.ic_album)
+            .into(binding.artistThumbnail)
     }
 
     fun setOnItemClick(onItemClickListener: View.OnClickListener) {

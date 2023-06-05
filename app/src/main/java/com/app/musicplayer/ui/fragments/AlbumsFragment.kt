@@ -3,7 +3,7 @@ package com.app.musicplayer.ui.fragments
 import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.models.Album
 import com.app.musicplayer.ui.adapters.AlbumsAdapter
-import com.app.musicplayer.ui.viewstates.album.AlbumsViewState
+import com.app.musicplayer.ui.viewstates.AlbumsViewState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -18,7 +18,6 @@ class AlbumsFragment : ListFragment<Album, AlbumsViewState>() {
         viewState.apply {
             showItemEvent.observe(this@AlbumsFragment) { event ->
                 event.ifNew?.let { album ->
-
                 }
             }
         }

@@ -123,7 +123,7 @@ class MusicService : Service() {
         val nextPreviousIntent = Intent(NEXT_PREVIOUS_ACTION)
         nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, currentTrackId)
         sendBroadcast(nextPreviousIntent)
-        setupTrack(applicationContext, tracksList[positionTrack].path)
+        setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
         handleProgressHandler(isPlaying())
     }
 
@@ -148,7 +148,7 @@ class MusicService : Service() {
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
         currentTrackId = tracksList[positionTrack].id
-        setupTrack(applicationContext, tracksList[positionTrack].path)
+        setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
         handleProgressHandler(isPlaying())
         completePlayer { completed ->
             if (completed == COMPLETE_CALLBACK) {

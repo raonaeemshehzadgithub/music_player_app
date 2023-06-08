@@ -3,13 +3,17 @@ package com.app.musicplayer.helpers
 import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.DeadObjectException
+import android.util.Log
 import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.services.MusicService.Companion.isTrackCompleted
 import com.app.musicplayer.utils.COMPLETE_CALLBACK
+import com.app.musicplayer.utils.REPEAT_TRACK_ON
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 
-object MediaPlayer :
+class MediaPlayer @Inject constructor(@ApplicationContext private val context: Context) :
     MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,MediaPlayer.OnCompletionListener {
     private var player: MediaPlayer? = null
 
@@ -79,7 +83,7 @@ object MediaPlayer :
     fun completePlayer(trackCompleteCallback: (String) -> Unit) {
         this.trackCompleteCallback = trackCompleteCallback
         player?.setOnCompletionListener {
-//            trackCompleteCallback(COMPLETE_CALLBACK)
+            trackCompleteCallback(COMPLETE_CALLBACK)
         }
     }
 
@@ -99,7 +103,19 @@ object MediaPlayer :
     }
 
     override fun onCompletion(mediaPlayer: MediaPlayer?) {
-        isTrackCompleted = true
+    }
+
+    fun resetTrack() {
+        try {
+            if (!isPlaying()) {
+                player?.seekTo(0)
+                player?.start()
+            }
+        } catch (e: DeadObjectException) {
+            Log.wtf("DeadObjectException error",e.toString())
+            // Handle the DeadObjectException appropriately
+            // This could involve reconnecting to the media player service or taking other necessary actions.
+        }
     }
 
 }

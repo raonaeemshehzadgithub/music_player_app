@@ -24,4 +24,9 @@ class ArtistsViewState @Inject constructor(
         super.setOnItemClickListener(item, position)
         showItemEvent.call(item)
     }
+
+    override fun onFilterChanged(filter: String?) {
+        super.onFilterChanged(filter)
+        artistsLiveData.filter = filter
+    }
 }

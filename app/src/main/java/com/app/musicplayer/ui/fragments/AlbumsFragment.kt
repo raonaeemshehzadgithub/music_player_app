@@ -1,6 +1,8 @@
 package com.app.musicplayer.ui.fragments
 
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.models.Album
 import com.app.musicplayer.ui.adapters.AlbumsAdapter
 import com.app.musicplayer.ui.viewstates.AlbumsViewState
@@ -10,6 +12,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AlbumsFragment : ListFragment<Album, AlbumsViewState>() {
     override val viewState: AlbumsViewState by activityViewModels()
+    override val manager: RecyclerView.LayoutManager = LinearLayoutManager(activity?.applicationContext)
+
     @Inject
     override lateinit var listAdapter: AlbumsAdapter
 

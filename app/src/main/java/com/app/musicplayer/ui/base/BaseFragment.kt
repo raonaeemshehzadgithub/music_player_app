@@ -6,16 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.app.musicplayer.R
 import javax.inject.Inject
 
 abstract class BaseFragment<out VM : BaseViewState> : Fragment(), BaseView<VM> {
 
     private var _onFinishListener: () -> Unit = {}
-    lateinit var linearLayoutManager: RecyclerView.LayoutManager
     @Inject
     lateinit var baseActivity: BaseActivity<*>
 
@@ -26,7 +22,6 @@ abstract class BaseFragment<out VM : BaseViewState> : Fragment(), BaseView<VM> {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        linearLayoutManager = LinearLayoutManager(activity?.applicationContext)
         onSetup()
         viewState.apply {
             attach()
@@ -61,5 +56,6 @@ abstract class BaseFragment<out VM : BaseViewState> : Fragment(), BaseView<VM> {
     }
 
     abstract val contentView: View?
+    abstract val manager: RecyclerView.LayoutManager
     abstract override val viewState: VM
 }

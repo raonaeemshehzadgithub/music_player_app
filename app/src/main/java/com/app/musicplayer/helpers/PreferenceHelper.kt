@@ -36,7 +36,7 @@ class PreferenceHelper @Inject constructor(@ApplicationContext private val conte
             editor.apply()
         }
 
-            fun clearPreference() {
+    fun clearPreference() {
         editor.clear()
         editor.apply()
     }

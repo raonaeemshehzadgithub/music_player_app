@@ -2,32 +2,31 @@ package com.app.musicplayer.ui.base
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
+import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getPermissionString
 import com.app.musicplayer.extentions.hasPermission
-import com.app.musicplayer.extentions.sendIntent
 import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.utils.*
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -36,6 +35,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     abstract override val viewState: VM
     abstract val contentView: View?
     lateinit var linearLayoutManager: RecyclerView.LayoutManager
+    private var playerMenuCallBack: (String) -> Unit = {}
 
     @Inject
     lateinit var disposables: CompositeDisposable
@@ -110,6 +110,38 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
 
     fun moveBack() {
         finish()
+    }
+
+    fun playerMenu(
+        menu_btn: ImageView, menuCallBack: (String) -> Unit
+    ) {
+        this.playerMenuCallBack = menuCallBack
+        val wrapper: Context = ContextThemeWrapper(this, R.style.popUpMenuMain)
+        val popupMenuSelected = PopupMenu(wrapper, menu_btn)
+        popupMenuSelected.inflate(R.menu.player_menu)
+        popupMenuSelected.gravity = Gravity.END
+        popupMenuSelected.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.share_track -> {
+                    playerMenuCallBack(SHARE_TRACK)
+                }
+
+                R.id.set_track_as -> {
+                    playerMenuCallBack(SET_TRACK_AS)
+                }
+
+                R.id.delete_track -> {
+                    playerMenuCallBack(DELETE_TRACK)
+                }
+
+                R.id.settings -> {
+                    playerMenuCallBack(SETTINGS)
+                }
+            }
+            true
+        }
+        popupMenuSelected.show()
+
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

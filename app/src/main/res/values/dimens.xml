@@ -3,6 +3,7 @@
     <dimen name="thumbnail_width">150dp</dimen>
     <dimen name="thumbnail_height">150dp</dimen>
     <dimen name="height_50">50dp</dimen>
+    <dimen name="height_43">43dp</dimen>
     <dimen name="height_width_90">90dp</dimen>
 
     <dimen name="padding_3">3dp</dimen>

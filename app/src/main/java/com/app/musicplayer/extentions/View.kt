@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.app.musicplayer.R
+import com.app.musicplayer.utils.SHORT_ANIMATION_DURATION
 
 fun View.beInvisibleIf(beInvisible: Boolean) = if (beInvisible) beInvisible() else beVisible()
 
@@ -18,6 +19,13 @@ fun View.beVisible() { visibility = View.VISIBLE }
 
 fun View.beGone() { visibility = View.GONE }
 
+fun View.fadeIn() {
+    animate().alpha(1f).setDuration(SHORT_ANIMATION_DURATION).withStartAction { beVisible() }.start()
+}
+
+fun View.fadeOut() {
+    animate().alpha(0f).setDuration(SHORT_ANIMATION_DURATION).withEndAction { beGone() }.start()
+}
 fun ImageView.setSelectedTint(context:Context){
     this.setColorFilter(ContextCompat.getColor(context, R.color.purple))
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/share_track"
+        android:title="Share"
+        app:showAsAction="never"/>
+    <item android:id="@+id/set_track_as"
+        android:title="Set as"
+        app:showAsAction="never"/>
+    <item android:id="@+id/delete_track"
+        android:title="Delete"
+        app:showAsAction="never"/>
+    <item android:id="@+id/settings"
+        android:title="Settings"
+        app:showAsAction="never"/>
+</menu>

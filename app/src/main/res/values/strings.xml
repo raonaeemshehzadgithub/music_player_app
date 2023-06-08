@@ -11,6 +11,6 @@
     <string name="playpause">PlayPause</string>
     <string name="dismiss">Dismiss</string>
     <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
-    <string name="no_audio_files_detected_make_sure_you_have_music_files_on_your_device">No audio files detected. Make sure you have music files on your device.</string>
+    <string name="no_audio_files_detected_make_sure_you_have_music_files_on_your_device">No media files detected. Make sure you have media files on your device.</string>
     <string name="search_here">Search Here</string>
 </resources>

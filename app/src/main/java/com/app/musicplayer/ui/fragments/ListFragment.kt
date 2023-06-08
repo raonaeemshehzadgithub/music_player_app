@@ -1,13 +1,11 @@
 package com.app.musicplayer.ui.fragments
 
 import android.util.Log
-import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.databinding.ItemsBinding
 import com.app.musicplayer.extentions.beVisibleIf
 import com.app.musicplayer.ui.adapters.ListAdapter
 import com.app.musicplayer.ui.base.BaseFragment
 import com.app.musicplayer.ui.list.ListViewState
-import com.app.musicplayer.ui.viewstates.TracksViewState
 
 abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragment<VS>() {
     protected val binding by lazy { ItemsBinding.inflate(layoutInflater) }
@@ -16,7 +14,7 @@ abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragme
 
     override fun onSetup() {
         binding.tracksRv.apply {
-            this.layoutManager = linearLayoutManager
+            this.layoutManager = manager
             this.adapter = listAdapter
         }
         viewState.apply {
@@ -24,7 +22,7 @@ abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragme
 
             itemsChangedEvent.observe(this@ListFragment) { event ->
                 event.ifNew?.let {
-                    Log.wtf("TRACKS_LIST",it.toString())
+                    Log.wtf("LIST",it.toString())
                     listAdapter.items = it
                     showEmpty(listAdapter.items.isEmpty())
                 }
@@ -46,6 +44,7 @@ abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragme
             empty.emptyImage.beVisibleIf(isShow)
             empty.emptyText.beVisibleIf(isShow)
             tracksRv.beVisibleIf(!isShow)
+//            currentTrackBar.currentTrackBar.beVisibleIf(!isShow)
         }
     }
 

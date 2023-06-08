@@ -33,25 +33,27 @@ open class ListItemHolder(protected val binding: ListItemBinding) :
     fun isListItemShown(check: Boolean) {
         binding.listContainer.beVisibleIf(check)
     }
+
     fun isArtistItemShown(check: Boolean) {
         binding.artistContainer.beVisibleIf(check)
     }
-    fun isFavoriteIconShown(check: Boolean) {
-        binding.favouriteTrack.beVisibleIf(check)
+
+    fun isMenuIconShown(check: Boolean) {
+        binding.menuTrack.beVisibleIf(check)
     }
 
     fun setAlbumThumbnail(albumUri: String) {
-        Glide.with(context).load(Uri.parse(albumUri)).placeholder(R.drawable.ic_album)
+        Glide.with(context).load(Uri.parse(albumUri)).placeholder(R.drawable.ic_album_update)
             .into(binding.thumbnail)
     }
 
     fun setTrackThumbnail(trackUri: String) {
-        Glide.with(context).load(Uri.parse(trackUri)).placeholder(R.drawable.ic_music_purple)
+        Glide.with(context).load(Uri.parse(trackUri)).placeholder(R.drawable.ic_music_update)
             .into(binding.thumbnail)
     }
 
     fun setArtistThumbnail(artistUri: String) {
-        Glide.with(context).load(Uri.parse(artistUri)).placeholder(R.drawable.ic_album)
+        Glide.with(context).load(Uri.parse(artistUri)).placeholder(R.drawable.ic_artist_update)
             .into(binding.artistThumbnail)
     }
 

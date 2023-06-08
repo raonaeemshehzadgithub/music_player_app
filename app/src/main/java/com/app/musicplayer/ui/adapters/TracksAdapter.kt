@@ -2,6 +2,7 @@ package com.app.musicplayer.ui.adapters
 
 import android.content.Context
 import com.app.musicplayer.extentions.getThumbnailUri
+import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.models.ListData
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.ui.holder.ListItemHolder
@@ -13,11 +14,11 @@ class TracksAdapter @Inject constructor(@ApplicationContext private val context:
 
     override fun onBindListItem(listItemHolder: ListItemHolder, item: Track) {
         listItemHolder.apply {
-            isFavoriteIconShown(true)
+            isMenuIconShown(true)
             isListItemShown(true)
             isArtistItemShown(false)
             trackName = item.title
-            artist = item.artist
+            artist = item.artist?.isUnknownString()
 
             item.album_id?.let { setTrackThumbnail(it.getThumbnailUri()) }
         }

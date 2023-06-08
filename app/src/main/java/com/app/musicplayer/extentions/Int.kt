@@ -1,5 +1,6 @@
 package com.app.musicplayer.extentions
 
+import com.app.musicplayer.services.MusicService
 import java.util.*
 
 fun Int.getFormattedDuration(forceShowHours: Boolean = false): String {
@@ -17,4 +18,12 @@ fun Int.getFormattedDuration(forceShowHours: Boolean = false): String {
     sb.append(String.format(Locale.getDefault(), "%02d", minutes))
     sb.append(":").append(String.format(Locale.getDefault(), "%02d", seconds))
     return sb.toString()
+}
+
+fun Int.shuffleTrack(): Int {
+    val shufflePosition = mutableListOf<Int>().apply {
+        addAll(0 until this@shuffleTrack)
+        shuffle()
+    }
+    return shufflePosition.indexOf(MusicService.positionTrack)
 }

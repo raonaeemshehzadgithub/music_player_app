@@ -35,8 +35,7 @@ class TracksContentResolver(
         MediaStore.Audio.Media.ARTIST,
         MediaStore.Audio.Media.DURATION,
         MediaStore.Audio.Media.DATA,
-        MediaStore.Audio.Media.ALBUM_ID,
-        MediaStore.Audio.Media.BUCKET_DISPLAY_NAME
+        MediaStore.Audio.Media.ALBUM_ID
     )
     override val selectionArgs: Array<String>? = null
 
@@ -46,7 +45,6 @@ class TracksContentResolver(
         artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST),
         duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION),
         path = cursor.getStringValue(MediaStore.Audio.Media.DATA),
-        album_id = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID),
-        folderName = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME)
+        album_id = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID)
     )
 }

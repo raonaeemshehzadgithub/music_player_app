@@ -5,10 +5,5 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.AllMusicFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="@dimen/padding_5"
-        android:id="@+id/playlist_rv"/>
 
 </FrameLayout>

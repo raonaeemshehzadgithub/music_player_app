@@ -33,8 +33,12 @@ const val COMPLETE_CALLBACK = "complete"
 const val PROGRESS = "progress"
 const val REPEAT_TRACK_ON = "repeat_on"
 const val REPEAT_TRACK_OFF = "repeat_off"
-const val SHUFFLE_TRACK_ON = "repeat_on"
-const val SHUFFLE_TRACK_OFF = "repeat_off"
+const val SHUFFLE_TRACK_ON = "shuffle_on"
+const val SHUFFLE_TRACK_OFF = "shuffle_off"
+const val SHARE_TRACK = "share_track"
+const val SET_TRACK_AS = "set_as"
+const val DELETE_TRACK = "delete_track"
+const val SETTINGS = "settings"
 const val GENERIC_PERMISSION_HANDLER = 1
 
 const val PERMISSION_READ_STORAGE = 2
@@ -51,6 +55,7 @@ const val TRACK_ID = "track_id"
 const val NEXT_PREVIOUS_TRACK_ID = "next_prev_track_id"
 const val TRACK_COMPLETED = "track_complete"
 const val TRACK_ID_SERVICE = "track_id_service"
+const val SHORT_ANIMATION_DURATION = 150L
 
 val artworkUri = Uri.parse("content://media/external/audio/albumart")
 

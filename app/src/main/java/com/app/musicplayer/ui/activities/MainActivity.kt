@@ -15,6 +15,8 @@ import com.app.musicplayer.extentions.showKeyboard
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.fragments.*
+import com.app.musicplayer.ui.viewstates.AlbumsViewState
+import com.app.musicplayer.ui.viewstates.ArtistsViewState
 import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.ui.viewstates.MainViewState
 import com.app.musicplayer.utils.*
@@ -27,6 +29,8 @@ class MainActivity : BaseActivity<MainViewState>() {
     override val contentView: View by lazy { binding.root }
     override val viewState: MainViewState by viewModels()
     private val tracksViewState: TracksViewState by viewModels()
+    private val albumsViewState: AlbumsViewState by viewModels()
+    private val artistsViewState: ArtistsViewState by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onSetup() {
@@ -34,6 +38,8 @@ class MainActivity : BaseActivity<MainViewState>() {
         viewState.apply {
             binding.toolbar.searchInput.onTextChangeListener {
                 tracksViewState.onFilterChanged(it)
+                albumsViewState.onFilterChanged(it)
+                artistsViewState.onFilterChanged(it)
             }
         }
     }

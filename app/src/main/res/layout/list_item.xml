@@ -19,6 +19,7 @@
             android:layout_height="50dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_music"
+            android:layout_marginStart="@dimen/margin_5"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/track_name"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +36,7 @@
             android:maxLines="1"
             android:text="@string/track_name"
             app:layout_constraintBottom_toTopOf="@+id/artist_name"
-            app:layout_constraintEnd_toStartOf="@+id/favourite_track"
+            app:layout_constraintEnd_toStartOf="@+id/menu_track"
             app:layout_constraintStart_toEndOf="@+id/thumbnail"
             app:layout_constraintTop_toTopOf="@id/thumbnail" />
 
@@ -47,16 +48,16 @@
             android:layout_marginStart="@dimen/margin_20"
             android:text="@string/artist_name"
             app:layout_constraintBottom_toBottomOf="@id/thumbnail"
-            app:layout_constraintEnd_toStartOf="@+id/favourite_track"
+            app:layout_constraintEnd_toStartOf="@+id/menu_track"
             app:layout_constraintStart_toEndOf="@id/thumbnail"
             app:layout_constraintTop_toBottomOf="@+id/track_name" />
 
         <ImageView
-            android:id="@+id/favourite_track"
-            style="@style/FavouriteIcon"
+            android:id="@+id/menu_track"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_10"
+            android:src="@drawable/ic_menu_more"
+            android:padding="@dimen/padding_5"
             app:layout_constraintBottom_toBottomOf="@id/thumbnail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/track_name"
@@ -88,6 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
+                android:background="@color/white"
                 android:src="@mipmap/ic_launcher" />
         </androidx.cardview.widget.CardView>
 

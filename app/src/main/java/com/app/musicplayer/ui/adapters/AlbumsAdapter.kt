@@ -1,8 +1,6 @@
 package com.app.musicplayer.ui.adapters
 
 import android.content.Context
-import android.net.Uri
-import android.provider.MediaStore
 import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.models.Album
 import com.app.musicplayer.models.ListData
@@ -15,7 +13,7 @@ class AlbumsAdapter @Inject constructor(@ApplicationContext private val context:
 
     override fun onBindListItem(listItemHolder: ListItemHolder, item: Album) {
         listItemHolder.apply {
-            isFavoriteIconShown(false)
+            isMenuIconShown(false)
             isListItemShown(true)
             isArtistItemShown(false)
             trackName = item.albumTitle

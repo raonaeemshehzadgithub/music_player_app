@@ -6,6 +6,8 @@ import com.app.musicplayer.di.factory.livedata.LiveDataFactory
 import com.app.musicplayer.di.factory.livedata.LiveDataFactoryImpl
 import com.app.musicplayer.interator.albums.AlbumsInteractorImpl
 import com.app.musicplayer.interator.albums.AlbumsInterator
+import com.app.musicplayer.interator.player.PlayerInteractor
+import com.app.musicplayer.interator.player.PlayerInteractorImpl
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.interator.tracks.TracksInteractorImpl
 import com.app.musicplayer.interator.string.StringsInteractor
@@ -39,6 +41,9 @@ class AppModule {
 
         @Binds
         fun bindsAlbumsInteractor(albumsInteractorImpl: AlbumsInteractorImpl): AlbumsInterator
+
+        @Binds
+        fun bindsPlayersInteractor(playerInteractorImpl: PlayerInteractorImpl): PlayerInteractor
 
         @Binds
         fun bindsContentResolverFactory(contentResolverFactoryImpl: ContentResolverFactoryImpl): ContentResolverFactory

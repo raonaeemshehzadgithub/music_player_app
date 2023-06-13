@@ -82,7 +82,7 @@ class NotificationHelper(
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
             .setContentTitle(trackTitle)
             .setContentText(trackArtist)
-            .setSmallIcon(R.drawable.ic_music)
+            .setSmallIcon(R.drawable.ic_music_app)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_MAX)
 //            .setWhen(postTime)

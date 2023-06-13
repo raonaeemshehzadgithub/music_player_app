@@ -6,6 +6,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ActivityMainBinding
 import com.app.musicplayer.extentions.beGone
 import com.app.musicplayer.extentions.beVisible
@@ -72,9 +73,8 @@ class MainActivity : BaseActivity<MainViewState>() {
     }
 
     private fun showSearch() {
-        showKeyboard()
+        showKeyboard(binding.toolbar.searchInput)
         binding.toolbar.title.beGone()
-        binding.toolbar.menu.beGone()
         binding.toolbar.search.beGone()
         binding.toolbar.moveBack.beVisible()
         binding.toolbar.searchInput.beVisible()
@@ -84,7 +84,6 @@ class MainActivity : BaseActivity<MainViewState>() {
     private fun hideSearch() {
         hideKeyboard()
         binding.toolbar.title.beVisible()
-        binding.toolbar.menu.beVisible()
         binding.toolbar.search.beVisible()
         binding.toolbar.moveBack.beGone()
         binding.toolbar.searchInput.beGone()
@@ -104,19 +103,23 @@ class MainActivity : BaseActivity<MainViewState>() {
         ) { tab, position ->
             when (position) {
                 0 -> {
-                    tab.text = "All Music"
+                    tab.text = getString(R.string.all_songs)
                 }
+
                 1 -> {
-                    tab.text = "Albums"
+                    tab.text = getString(R.string.albums)
                 }
+
                 2 -> {
-                    tab.text = "Artists"
+                    tab.text = getString(R.string.artists)
                 }
+
                 3 -> {
-                    tab.text = "Recently Played"
+                    tab.text = getString(R.string.recently_played)
                 }
+
                 4 -> {
-                    tab.text = "My Favourites"
+                    tab.text = getString(R.string.my_favorites)
                 }
             }
         }.attach()

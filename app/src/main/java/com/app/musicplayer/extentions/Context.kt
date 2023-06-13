@@ -10,12 +10,12 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import com.app.musicplayer.R
 import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.isOnMainThread

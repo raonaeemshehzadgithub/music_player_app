@@ -16,8 +16,8 @@ class AlbumsAdapter @Inject constructor(@ApplicationContext private val context:
             isMenuIconShown(false)
             isListItemShown(true)
             isArtistItemShown(false)
-            trackName = item.albumTitle
-            artist = "${item.trackCount} listed"
+            trackName = item.albumTitle ?: ""
+            artist = "${item.trackCount ?: ""} listed"
 
             setAlbumThumbnail(item.albumId.toString().getThumbnailUri())
         }

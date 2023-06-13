@@ -17,12 +17,13 @@ class TracksAdapter @Inject constructor(@ApplicationContext private val context:
             isMenuIconShown(true)
             isListItemShown(true)
             isArtistItemShown(false)
-            trackName = item.title
-            artist = item.artist?.isUnknownString()
+            trackName = item.title ?: ""
+            artist = item.artist?.isUnknownString() ?: ""
 
-            item.album_id?.let { setTrackThumbnail(it.getThumbnailUri()) }
+            setTrackThumbnail(item.album_id?.getThumbnailUri() ?: "")
         }
     }
+
     override fun convertDataToListData(items: List<Track>) =
         ListData.fromTracks(items)
 

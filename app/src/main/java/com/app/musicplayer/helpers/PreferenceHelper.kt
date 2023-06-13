@@ -3,6 +3,7 @@ package com.app.musicplayer.helpers
 import android.content.Context
 import android.content.SharedPreferences
 import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.REPEAT_TRACK
+import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.SET_RINGTONE
 import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.SHUFFLE_TRACK
 import com.app.musicplayer.utils.*
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -16,6 +17,7 @@ class PreferenceHelper @Inject constructor(@ApplicationContext private val conte
     object PreferenceVariable {
         const val REPEAT_TRACK = "repeat_track"
         const val SHUFFLE_TRACK = "shuffle_track"
+        const val SET_RINGTONE = "set_ringtone"
     }
 
     init {
@@ -33,6 +35,13 @@ class PreferenceHelper @Inject constructor(@ApplicationContext private val conte
         get() = appPrefs.getString(SHUFFLE_TRACK, SHUFFLE_TRACK_OFF)
         set(shuffleTrack) {
             editor.putString(SHUFFLE_TRACK, shuffleTrack)
+            editor.apply()
+        }
+
+    var setRingtone: String?
+        get() = appPrefs.getString(SET_RINGTONE, PHONE_RINGTONE)
+        set(shuffleTrack) {
+            editor.putString(SET_RINGTONE, shuffleTrack)
             editor.apply()
         }
 

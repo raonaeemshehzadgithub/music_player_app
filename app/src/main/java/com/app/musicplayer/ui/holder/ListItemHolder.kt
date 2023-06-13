@@ -43,17 +43,17 @@ open class ListItemHolder(protected val binding: ListItemBinding) :
     }
 
     fun setAlbumThumbnail(albumUri: String) {
-        Glide.with(context).load(Uri.parse(albumUri)).placeholder(R.drawable.ic_album_update)
+        Glide.with(context).load(Uri.parse(albumUri)).placeholder(R.drawable.ic_album)
             .into(binding.thumbnail)
     }
 
     fun setTrackThumbnail(trackUri: String) {
-        Glide.with(context).load(Uri.parse(trackUri)).placeholder(R.drawable.ic_music_update)
+        Glide.with(context).load(Uri.parse(trackUri)).placeholder(R.drawable.ic_music)
             .into(binding.thumbnail)
     }
 
     fun setArtistThumbnail(artistUri: String) {
-        Glide.with(context).load(Uri.parse(artistUri)).placeholder(R.drawable.ic_artist_update)
+        Glide.with(context).load(Uri.parse(artistUri)).placeholder(R.drawable.ic_artist)
             .into(binding.artistThumbnail)
     }
 

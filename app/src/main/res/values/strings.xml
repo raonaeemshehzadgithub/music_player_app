@@ -13,4 +13,22 @@
     <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
     <string name="no_audio_files_detected_make_sure_you_have_music_files_on_your_device">No media files detected. Make sure you have media files on your device.</string>
     <string name="search_here">Search Here</string>
+    <string name="all_songs">All Songs</string>
+    <string name="albums">Albums</string>
+    <string name="artists">Artists</string>
+    <string name="recently_played">Recently Played</string>
+    <string name="my_favorites">My Favorites</string>
+    <string name="set_as">Set as</string>
+    <string name="phone_ringtone">Phone Ringtone</string>
+    <string name="alarm_tone">Alarm tone</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="set_ringtone">Set Ringtone</string>
+    <string name="dialog_message_set_ringtone">Allow Music Player to modify audio settings</string>
+    <string name="x_has_been_set_as_ringtone">Set %1$s as your ringtone.</string>
+    <string name="music_settings">Music Settings</string>
+    <string name="ab_repeat_function">AB Repeat Function</string>
+    <string name="eq_sound_style">EQ Sound Style</string>
+    <string name="variable_speed_playback">Variable Speed Playback</string>
+    <string name="stop_playing_at_regular_intervals">Stop Playing at regular Intervals</string>
 </resources>

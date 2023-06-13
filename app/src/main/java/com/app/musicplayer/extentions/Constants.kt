@@ -35,11 +35,15 @@ const val REPEAT_TRACK_ON = "repeat_on"
 const val REPEAT_TRACK_OFF = "repeat_off"
 const val SHUFFLE_TRACK_ON = "shuffle_on"
 const val SHUFFLE_TRACK_OFF = "shuffle_off"
+const val PHONE_RINGTONE = "Phone Ringtone"
+const val ALARM_RINGTONE = "Alarm tone"
 const val SHARE_TRACK = "share_track"
 const val SET_TRACK_AS = "set_as"
 const val DELETE_TRACK = "delete_track"
 const val SETTINGS = "settings"
+const val DONE = "done"
 const val GENERIC_PERMISSION_HANDLER = 1
+const val DELETE_TRACK_CODE = 21
 
 const val PERMISSION_READ_STORAGE = 2
 const val PERMISSION_WRITE_STORAGE = 3
@@ -48,9 +52,6 @@ const val PERMISSION_POST_NOTIFICATIONS = 5
 const val OPEN_SETTINGS = 6
 
 const val POSITION = "position"
-const val SERIALIZED_LIST = "track_list"
-const val TRACK = "track"
-const val RESTART_PLAYER = "RESTART_PLAYER"
 const val TRACK_ID = "track_id"
 const val NEXT_PREVIOUS_TRACK_ID = "next_prev_track_id"
 const val TRACK_COMPLETED = "track_complete"

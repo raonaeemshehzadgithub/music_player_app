@@ -22,7 +22,6 @@ abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragme
 
             itemsChangedEvent.observe(this@ListFragment) { event ->
                 event.ifNew?.let {
-                    Log.wtf("LIST",it.toString())
                     listAdapter.items = it
                     showEmpty(listAdapter.items.isEmpty())
                 }

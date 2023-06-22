@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.media.session.MediaButtonReceiver
 import com.app.musicplayer.R
@@ -16,16 +15,15 @@ import com.app.musicplayer.extentions.getColoredBitmap
 import com.app.musicplayer.extentions.hasPermission
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.shuffleTrack
-import com.app.musicplayer.helpers.MediaPlayer
-//import com.app.musicplayer.helpers.MediaPlayer.completePlayer
-//import com.app.musicplayer.helpers.MediaPlayer.getCurrentPosition
-//import com.app.musicplayer.helpers.MediaPlayer.getTrackDuration
-//import com.app.musicplayer.helpers.MediaPlayer.isPlaying
-//import com.app.musicplayer.helpers.MediaPlayer.pauseTrack
-//import com.app.musicplayer.helpers.MediaPlayer.playTrack
-//import com.app.musicplayer.helpers.MediaPlayer.releasePlayer
-//import com.app.musicplayer.helpers.MediaPlayer.seekTo
-//import com.app.musicplayer.helpers.MediaPlayer.setupTrack
+import com.app.musicplayer.helpers.MediaPlayer.completePlayer
+import com.app.musicplayer.helpers.MediaPlayer.getCurrentPosition
+import com.app.musicplayer.helpers.MediaPlayer.getTrackDuration
+import com.app.musicplayer.helpers.MediaPlayer.isPlaying
+import com.app.musicplayer.helpers.MediaPlayer.pauseTrackk
+import com.app.musicplayer.helpers.MediaPlayer.playTrack
+import com.app.musicplayer.helpers.MediaPlayer.releasePlayer
+import com.app.musicplayer.helpers.MediaPlayer.seekTo
+import com.app.musicplayer.helpers.MediaPlayer.setupTrack
 import com.app.musicplayer.helpers.MediaSessionCallback
 import com.app.musicplayer.helpers.NotificationHelper
 import com.app.musicplayer.helpers.NotificationHelper.Companion.NOTIFICATION_ID
@@ -48,19 +46,15 @@ class MusicService : Service() {
     lateinit var tracksInteractor: TracksInteractor
 
     @Inject
-    lateinit var mediaPlayer: MediaPlayer
-
-    @Inject
     lateinit var pref: PreferenceHelper
+
+//    @Inject
+//    lateinit var mediaPlayer: MediaPlayer
 
     var timer: ScheduledExecutorService? = null
     val intentControl = Intent(PROGRESS_CONTROLS_ACTION)
-    private var mProgressHandler = Handler()
 
     companion object {
-        private const val PROGRESS_UPDATE_INTERVAL = 1000L
-        private var mPlaybackSpeed = 1f
-        var mCurrTrack: Track? = null
         private var mCurrTrackCover: Bitmap? = null
         private var mMediaSession: MediaSessionCompat? = null
         var tracksList = ArrayList<Track>()
@@ -68,7 +62,7 @@ class MusicService : Service() {
         var isTrackCompleted: Boolean = false
     }
 
-    private var currentTrackId: Long = 0L
+//    private var currentTrackId: Long = 0L
     private val notificationHandler = Handler()
     private var notificationHelper: NotificationHelper? = null
 
@@ -103,6 +97,8 @@ class MusicService : Service() {
             SET_PROGRESS -> handleSetProgress(intent)
             DISMISS -> dismissNotification()
         }
+        pref.currentTrackId = tracksList[positionTrack].id?:0L
+        pref.currentTrackPosition = positionTrack
         MediaButtonReceiver.handleIntent(mMediaSession!!, intent)
         if (action != DISMISS && action != FINISH) {
             startForegroundAndNotify()
@@ -111,8 +107,8 @@ class MusicService : Service() {
     }
 
     private fun dismissNotification() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.releasePlayer()
+        if (isPlaying()) {
+            releasePlayer()
         }
         stopForegroundAndNotification()
         val dismissIntent = Intent(DISMISS_PLAYER_ACTION)
@@ -121,7 +117,7 @@ class MusicService : Service() {
     }
 
     private fun handleSetProgress(intent: Intent) {
-        mediaPlayer.seekTo(intent.getIntExtra(PROGRESS, mediaPlayer.getCurrentPosition()!!))
+        seekTo(intent.getIntExtra(PROGRESS, getCurrentPosition()!!))
     }
 
     private fun handleNextPrevious(isNext: Boolean, isShuffle: String) {
@@ -132,16 +128,16 @@ class MusicService : Service() {
         } else if (isShuffle == SHUFFLE_TRACK_ON) {
             positionTrack = tracksList.size.shuffleTrack()
         }
-        currentTrackId = tracksList[positionTrack].id
+        pref.currentTrackId = tracksList[positionTrack].id?:0L
         val nextPreviousIntent = Intent(NEXT_PREVIOUS_ACTION)
-        nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, currentTrackId)
+        nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, pref.currentTrackId)
         sendBroadcast(nextPreviousIntent)
-        mediaPlayer.setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
-        handleProgressHandler(mediaPlayer.isPlaying())
+        setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
+        handleProgressHandler(isPlaying())
     }
 
     private fun handlePlayPause() {
-        if (mediaPlayer.isPlaying()) {
+        if (isPlaying()) {
             pauseTrack()
         } else {
             resumeTrack()
@@ -149,20 +145,20 @@ class MusicService : Service() {
     }
 
     fun pauseTrack() {
-        mediaPlayer.pauseTrack {
+        pauseTrackk {
             if (!it) {
                 val playPauseIntent = Intent(PLAY_PAUSE_ACTION)
-                playPauseIntent.putExtra(PLAY_PAUSE, false)
+                playPauseIntent.putExtra(PLAY_PAUSE_ICON, false)
                 sendBroadcast(playPauseIntent)
             }
         }
     }
 
     fun resumeTrack() {
-        mediaPlayer.playTrack {
+        playTrack {
             if (it) {
                 val playPauseIntent = Intent(PLAY_PAUSE_ACTION)
-                playPauseIntent.putExtra(PLAY_PAUSE, true)
+                playPauseIntent.putExtra(PLAY_PAUSE_ICON, true)
                 sendBroadcast(playPauseIntent)
             }
         }
@@ -170,13 +166,13 @@ class MusicService : Service() {
 
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
-        currentTrackId = tracksList[positionTrack].id
-        mediaPlayer.setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
-        handleProgressHandler(mediaPlayer.isPlaying())
-        mediaPlayer.completePlayer { completed ->
+        pref.currentTrackId = tracksList[positionTrack].id ?: 0L
+        setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
+        handleProgressHandler(isPlaying())
+        completePlayer { completed ->
             if (completed == COMPLETE_CALLBACK) {
                 if (pref.repeatTrack == REPEAT_TRACK_ON) {
-                    mediaPlayer.setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
+                    setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
                 } else if (pref.shuffleTrack == SHUFFLE_TRACK_ON) {
                     handleNextPrevious(isNext = false, isShuffle = SHUFFLE_TRACK_ON)
                 }
@@ -190,11 +186,11 @@ class MusicService : Service() {
         notificationHandler.removeCallbacksAndMessages(null)
         notificationHandler.postDelayed({
             mCurrTrackCover = resources.getColoredBitmap(R.drawable.ic_music, R.color.purple)
-            tracksInteractor.queryTrack(currentTrackId) { track ->
+            tracksInteractor.queryTrack(pref.currentTrackId?:0L) { track ->
                 notificationHelper?.createPlayerNotification(
                     trackTitle = track?.title ?: "Track",
                     trackArtist = track?.artist?.isUnknownString() ?: "Artist",
-                    isPlaying = mediaPlayer.isPlaying(),
+                    isPlaying = isPlaying(),
                     largeIcon = mCurrTrackCover,
                 ) {
                     notificationHelper?.notify(NOTIFICATION_ID, it)
@@ -239,12 +235,15 @@ class MusicService : Service() {
         if (isPlaying) {
             timer = Executors.newScheduledThreadPool(1)
             timer?.scheduleAtFixedRate({
-                if (mediaPlayer.isPlaying()) {
-                    val position = mediaPlayer.getCurrentPosition()
-                    val duration = mediaPlayer.getTrackDuration()
+                if (isPlaying()) {
+                    val position = getCurrentPosition()
+                    val duration = getTrackDuration()
                     intentControl.putExtra(GET_TRACK_DURATION, duration)
                     intentControl.putExtra(GET_CURRENT_POSITION, position)
                     sendBroadcast(intentControl)
+
+                    pref.currentTrackTotalDuration = duration
+                    pref.currentTrackProgress = position
                 }
             }, 10, 10, TimeUnit.MILLISECONDS)
         }

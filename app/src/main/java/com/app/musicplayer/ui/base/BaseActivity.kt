@@ -212,6 +212,16 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         }
     }
 
+    fun handleNotificationPermission(callback: (granted: Boolean) -> Unit) {
+        if (!isTiramisuPlus()) {
+            callback(true)
+        } else {
+            handlePermission(PERMISSION_POST_NOTIFICATIONS) { granted ->
+                callback(granted)
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray

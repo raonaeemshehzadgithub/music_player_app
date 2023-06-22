@@ -1,4 +1,4 @@
-package com.app.musicplayer.ui.viewstates
+﻿package com.app.musicplayer.ui.viewstates
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -27,6 +27,11 @@ class MusicPlayerViewState @Inject constructor(
 
     fun deleteTrack(trackId: Long) {
         playerInteractor.deleteTrack(trackId)
+    }
+    fun queryTrackList(trackList:(List<Track>)->Unit) {
+        playerInteractor.queryTrackList {
+            trackList.invoke(it as List<Track>)
+        }
     }
 
 }

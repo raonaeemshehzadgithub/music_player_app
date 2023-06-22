@@ -1,9 +1,11 @@
 package com.app.musicplayer.ui.fragments
 
 import android.content.Intent
+import android.util.Log
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.TracksAdapter

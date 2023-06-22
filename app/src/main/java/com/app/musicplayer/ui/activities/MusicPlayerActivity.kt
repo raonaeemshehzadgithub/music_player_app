@@ -1,22 +1,19 @@
 package com.app.musicplayer.ui.activities
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
-import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
 import com.app.musicplayer.extentions.*
+import com.app.musicplayer.helpers.OnSwipeTouchListener
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
@@ -29,15 +26,17 @@ import com.app.musicplayer.utils.*
 import com.bumptech.glide.Glide
 import com.realpacific.clickshrinkeffect.applyClickShrink
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.newSingleThreadContext
-import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
     @Inject
+    lateinit var tracksInteractor: TracksInteractor
+
+    @Inject
     lateinit var pref: PreferenceHelper
+
     private val binding by lazy { ActivityMusicPlayerBinding.inflate(layoutInflater) }
     var track: Track? = null
     override val viewState: MusicPlayerViewState by viewModels()
@@ -79,7 +78,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                 }
 
                 PLAY_PAUSE_ACTION -> {
-                    when (intent.getBooleanExtra(PLAY_PAUSE, true)) {
+                    when (intent.getBooleanExtra(PLAY_PAUSE_ICON, true)) {
                         true -> binding.playPauseTrack.setImageDrawable(
                             ContextCompat.getDrawable(
                                 this@MusicPlayerActivity,
@@ -99,31 +98,40 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         }
     }
 
-    @Inject
-    lateinit var tracksInteractor: TracksInteractor
-
     override fun onSetup() {
-        setUpButtons()
-        registerReceivers()
-        updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
-        viewState.apply {
-            itemsChangedEvent.observe(this@MusicPlayerActivity) { event ->
-                event.ifNew?.let {
-                    tracksList = it as ArrayList<Track>
+        handleNotificationPermission { granted ->
+            if (granted) {
+                setUpButtons()
+                registerReceivers()
+                updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
+                viewState.apply {
+                    itemsChangedEvent.observe(this@MusicPlayerActivity) { event ->
+                        event.ifNew?.let {
+                            tracksList = it as ArrayList<Track>
+                        }
+                    }
+                    getItemsObservable {
+                        it.observe(
+                            this@MusicPlayerActivity,
+                            viewState::onItemsChanged
+                        )
+                    }
+                }
+                if (!intent.getBooleanExtra(FROM_MINI_PLAYER, false)) {
+                    Intent(this, MusicService::class.java).apply {
+                        putExtra(TRACK_ID_SERVICE, intent.getLongExtra(TRACK_ID, 0L))
+                        putExtra(POSITION, intent.getIntExtra(POSITION, 0))
+                        action = INIT
+                        startService(this)
+                    }
                 }
             }
-            getItemsObservable { it.observe(this@MusicPlayerActivity, viewState::onItemsChanged) }
-        }
-        Intent(this, MusicService::class.java).apply {
-            putExtra(TRACK_ID_SERVICE, intent.getLongExtra(TRACK_ID, 0L))
-            putExtra(POSITION, intent.getIntExtra(POSITION, 0))
-            action = INIT
-            startService(this)
         }
     }
 
     private fun updateTrackInfo(id: Long) {
         tracksInteractor.queryTrack(id) { track ->
+            binding.trackName.isSelected = true
             binding.trackName.text = track?.title ?: ""
             binding.artistName.text = track?.artist?.isUnknownString() ?: ""
             binding.totalDuration.text = formatMillisToHMS(track?.duration ?: 0L)
@@ -146,6 +154,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         })
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setUpButtons() {
         binding.apply {
             playPauseTrack.applyClickShrink()
@@ -161,8 +170,15 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
             previousTrack.setOnClickListener { sendIntent(PREVIOUS) }
             repeatTrack.setOnClickListener { repeatTrack() }
             shuffleTrack.setOnClickListener { shuffleTrack() }
-            favouriteTrack.setOnClickListener { toast("Under Development") }
+            favouriteTrack.setOnClickListener { }
             playerMenuMore.setOnClickListener { playerMenus() }
+            root.setOnTouchListener(object : OnSwipeTouchListener(this@MusicPlayerActivity) {
+                override fun onSwipeDown() {
+                    super.onSwipeDown()
+                    finish()
+                    overridePendingTransition(0, R.anim.slide_down)
+                }
+            })
         }
         setUpPreferences()
     }
@@ -176,30 +192,31 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
                 DELETE_TRACK -> {
                     if (isRPlus()) {
-                        deleteTrack(tracksList[positionTrack].id)
+                        deleteTrack(tracksList[positionTrack].id ?: 0L)
                     }
                 }
 
-                SETTINGS->{
-                    startActivity(Intent(this@MusicPlayerActivity,SettingsActivity::class.java))
+                SETTINGS -> {
+                    startActivity(Intent(this@MusicPlayerActivity, SettingsActivity::class.java))
                 }
 
                 SET_TRACK_AS -> {
-                    ensureBackgroundThread {
-                        bsSetRingtone {
-                            when (it) {
-                                DONE -> {
-                                    when (pref.setRingtone) {
-                                        PHONE_RINGTONE -> viewState.setRingtone(
-                                            context = this@MusicPlayerActivity,
-                                            trackId = tracksList[positionTrack].id
-                                        )
-                                        ALARM_RINGTONE -> toast("")
-                                    }
-                                }
-                            }
-                        }
-                    }
+//                    ensureBackgroundThread {
+//                        bsSetRingtone {
+//                            when (it) {
+//                                DONE -> {
+//                                    when (pref.setRingtone) {
+//                                        PHONE_RINGTONE -> viewState.setRingtone(
+//                                            context = this@MusicPlayerActivity,
+//                                            trackId = tracksList[positionTrack].id
+//                                        )
+//
+//                                        ALARM_RINGTONE -> toast("")
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
         }
@@ -212,6 +229,10 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         when (pref.shuffleTrack) {
             SHUFFLE_TRACK_ON -> binding.shuffleTrack.setSelectedTint(context = this)
         }
+        binding.seekBar.max = pref.currentTrackTotalDuration?:0
+        binding.seekBar.progress = pref.currentTrackProgress?:0
+        setUpSeekbar()
+        binding.playedDuration.text = pref.currentTrackProgress?.let { formatMillisToHMS(it.toLong()) }
     }
 
     private fun repeatTrack() {

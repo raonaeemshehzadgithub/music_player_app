@@ -1,7 +1,7 @@
 package com.app.musicplayer.models
 
 data class Track(
-    val id: Long,
+    val id: Long?=null,
     val title: String? = null,
     val artist: String? = null,
     val duration: Long? = null,

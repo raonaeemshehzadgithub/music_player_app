@@ -1,6 +1,5 @@
 package com.app.musicplayer.ui.fragments
 
-import android.util.Log
 import com.app.musicplayer.databinding.ItemsBinding
 import com.app.musicplayer.extentions.beVisibleIf
 import com.app.musicplayer.ui.adapters.ListAdapter

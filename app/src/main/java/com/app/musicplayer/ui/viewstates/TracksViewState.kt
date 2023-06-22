@@ -32,4 +32,9 @@ class TracksViewState @Inject constructor(
         super.onFilterChanged(filter)
         tracksLiveData.filter = filter
     }
+    fun queryTrackList(trackList:(List<Track>)->Unit) {
+        tracksInterator.queryTrackList {
+            trackList.invoke(it as List<Track>)
+        }
+    }
 }

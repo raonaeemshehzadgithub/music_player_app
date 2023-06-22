@@ -22,4 +22,10 @@ class TracksInteractorImpl @Inject constructor(
             tracks.let { callback.invoke(tracks.getOrNull(0)) }
         })
     }
+
+    override fun queryTrackList(callback: (List<Track?>) -> Unit) {
+        disposable.add(TracksContentResolver(context).queryItems { tracks ->
+            tracks.let { callback.invoke(tracks) }
+        })
+    }
 }

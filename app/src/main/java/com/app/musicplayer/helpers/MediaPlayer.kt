@@ -5,15 +5,15 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.DeadObjectException
 import android.util.Log
-import com.app.musicplayer.services.MusicService
-import com.app.musicplayer.services.MusicService.Companion.isTrackCompleted
+import com.app.musicplayer.extentions.toast
+import com.app.musicplayer.services.MusicService.Companion.positionTrack
+import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.utils.COMPLETE_CALLBACK
-import com.app.musicplayer.utils.REPEAT_TRACK_ON
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 
-class MediaPlayer @Inject constructor(@ApplicationContext private val context: Context) :
+object MediaPlayer :
     MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,MediaPlayer.OnCompletionListener {
     private var player: MediaPlayer? = null
 
@@ -55,12 +55,7 @@ class MediaPlayer @Inject constructor(@ApplicationContext private val context: C
         playPauseCallback(true)
     }
 
-    fun playNextTrack() {
-        initMediaPlayerIfNeeded()
-        player?.start()
-    }
-
-    fun pauseTrack(playPauseCallback: (Boolean) -> Unit) {
+    fun pauseTrackk(playPauseCallback: (Boolean) -> Unit) {
         this.playPauseCallback = playPauseCallback
         player?.pause()
         playPauseCallback(false)

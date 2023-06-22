@@ -9,4 +9,5 @@ interface TracksInteractor:BaseInterator<TracksInteractor.Listener> {
     fun deleteTrack(trackId: Long)
 
     fun queryTrack(trackId: Long, callback: (Track?) -> Unit)
+    fun queryTrackList(callback: (List<Track?>) -> Unit)
 }

@@ -41,10 +41,10 @@ class TracksContentResolver(
 
     override fun convertCursorToItem(cursor: Cursor) = Track(
         id = cursor.getLongValue(MediaStore.Audio.Media._ID),
-        title = cursor.getStringValue(MediaStore.Audio.Media.DISPLAY_NAME),
-        artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST),
+        title = cursor.getStringValue(MediaStore.Audio.Media.DISPLAY_NAME) ?: "",
+        artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST) ?: "",
         duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION),
-        path = cursor.getStringValue(MediaStore.Audio.Media.DATA),
-        album_id = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID)
+        path = cursor.getStringValue(MediaStore.Audio.Media.DATA) ?: "",
+        album_id = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID) ?: ""
     )
 }

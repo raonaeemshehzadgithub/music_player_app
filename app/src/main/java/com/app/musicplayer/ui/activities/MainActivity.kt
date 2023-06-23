@@ -141,4 +141,8 @@ class MainActivity : BaseActivity<MainViewState>() {
             }
         }
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        prefs.currentTrackId = 0L
+    }
 }

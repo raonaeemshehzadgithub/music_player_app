@@ -3,10 +3,11 @@ package com.app.musicplayer.contentresolver
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
-import android.provider.CallLog
 import android.provider.MediaStore
 import com.app.musicplayer.core.SelectionBuilder
 import com.app.musicplayer.extentions.getLongValue
+import com.app.musicplayer.extentions.preventMessagesAppRecordings
+import com.app.musicplayer.extentions.preventRecorderAppRecordings
 import com.app.musicplayer.extentions.getStringValue
 import com.app.musicplayer.models.Track
 
@@ -26,6 +27,8 @@ class TracksContentResolver(
             else
                 SelectionBuilder().addSelection(MediaStore.Audio.Media.DISPLAY_NAME, name)
             filter?.let { selection.addString("(${MediaStore.Audio.Media.DISPLAY_NAME} LIKE '%$filter%')") }
+            selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${preventMessagesAppRecordings()}%')")
+            selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${preventRecorderAppRecordings()}%')")
             return selection.build()
         }
     override val sortOrder: String = MediaStore.Audio.Media.DATE_ADDED + " ASC"

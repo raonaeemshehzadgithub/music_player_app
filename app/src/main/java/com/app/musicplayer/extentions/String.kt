@@ -4,10 +4,10 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
-import androidx.core.content.ContextCompat.startActivity
-import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.utils.artworkUri
+import java.io.File
 
 fun String.getThumbnailUri(): String {
     val coverUri = ContentUris.withAppendedId(artworkUri, this.toLong())
@@ -27,4 +27,14 @@ fun String.shareTrack(context: Context) {
     shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(this))
     shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this audio file!")
     context.startActivity(Intent.createChooser(shareIntent, "Share Track"))
+}
+fun preventMessagesAppRecordings():String {
+    val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+    val folderPath = File(musicDir, "Messenger/Recorded").absolutePath
+    return folderPath
+}
+fun preventRecorderAppRecordings():String {
+    val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+    val folderPath = File(musicDir, "Recordings").absolutePath
+    return folderPath
 }

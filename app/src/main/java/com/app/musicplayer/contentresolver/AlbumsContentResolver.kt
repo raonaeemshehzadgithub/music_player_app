@@ -7,6 +7,7 @@ import android.provider.MediaStore
 import com.app.musicplayer.core.SelectionBuilder
 import com.app.musicplayer.extentions.getLongValue
 import com.app.musicplayer.extentions.getStringValue
+import com.app.musicplayer.extentions.getStringValueOrNull
 import com.app.musicplayer.models.Album
 
 class AlbumsContentResolver(
@@ -40,8 +41,8 @@ class AlbumsContentResolver(
     override fun convertCursorToItem(cursor: Cursor) = Album(
         id = cursor.getLongValue(MediaStore.Audio.Albums._ID),
         albumId = cursor.getLongValue(MediaStore.Audio.Albums.ALBUM_ID),
-        albumTitle = cursor.getStringValue(MediaStore.Audio.Albums.ALBUM) ?: "",
-        trackCount = cursor.getStringValue(MediaStore.Audio.Albums.NUMBER_OF_SONGS) ?: "",
-        artist = cursor.getStringValue(MediaStore.Audio.Albums.ARTIST) ?: ""
+        albumTitle = cursor.getStringValueOrNull(MediaStore.Audio.Albums.ALBUM) ?: "",
+        trackCount = cursor.getStringValueOrNull(MediaStore.Audio.Albums.NUMBER_OF_SONGS) ?: "",
+        artist = cursor.getStringValueOrNull(MediaStore.Audio.Albums.ARTIST) ?: ""
     )
 }

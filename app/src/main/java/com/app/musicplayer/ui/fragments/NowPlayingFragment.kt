@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import com.app.musicplayer.extentions.beVisible
 import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
+import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.extentions.updatePlayPauseDrawable
 import com.app.musicplayer.helpers.MediaPlayer.isPlaying
 import com.app.musicplayer.helpers.PreferenceHelper
@@ -95,6 +97,7 @@ class NowPlayingFragment : Fragment() {
                 putExtra(POSITION, prefs.currentTrackPosition)
                 putExtra(FROM_MINI_PLAYER, true)
             })
+            requireActivity().overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top)
         }
         binding.playPauseCurrent.setOnClickListener { requireContext().sendIntent(PLAYPAUSE) }
         binding.nextTrackCurrent.setOnClickListener { requireContext().sendIntent(NEXT) }

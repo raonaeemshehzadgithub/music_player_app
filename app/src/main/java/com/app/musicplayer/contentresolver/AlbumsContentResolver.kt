@@ -8,6 +8,8 @@ import com.app.musicplayer.core.SelectionBuilder
 import com.app.musicplayer.extentions.getLongValue
 import com.app.musicplayer.extentions.getStringValue
 import com.app.musicplayer.extentions.getStringValueOrNull
+import com.app.musicplayer.extentions.preventMessagesAppRecordings
+import com.app.musicplayer.extentions.preventRecorderAppRecordings
 import com.app.musicplayer.models.Album
 
 class AlbumsContentResolver(
@@ -26,6 +28,8 @@ class AlbumsContentResolver(
             else
                 SelectionBuilder().addSelection(MediaStore.Audio.Albums.ALBUM, name)
             filter?.let { selection.addString("(${MediaStore.Audio.Albums.ALBUM} LIKE '%$filter%')") }
+            selection.addString("(${MediaStore.Audio.Albums.ALBUM} NOT LIKE '${"Recordings"}%')")
+            selection.addString("(${MediaStore.Audio.Albums.ALBUM} NOT LIKE '${"Recorded"}%')")
             return selection.build()
         }
     override val sortOrder: String? = null

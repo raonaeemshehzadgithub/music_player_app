@@ -22,6 +22,7 @@ import com.app.musicplayer.services.MusicService.Companion.positionTrack
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.MusicPlayerViewState
+import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
 import com.bumptech.glide.Glide
 import com.realpacific.clickshrinkeffect.applyClickShrink
@@ -40,6 +41,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     private val binding by lazy { ActivityMusicPlayerBinding.inflate(layoutInflater) }
     var track: Track? = null
     override val viewState: MusicPlayerViewState by viewModels()
+    private val tracksViewState: TracksViewState by viewModels()
     override val contentView: View by lazy { binding.root }
     private val intentProgressDurationFilter = IntentFilter(PROGRESS_CONTROLS_ACTION)
     private val intentNextPrevious = IntentFilter(NEXT_PREVIOUS_ACTION)

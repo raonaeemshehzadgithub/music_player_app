@@ -11,4 +11,9 @@ class TracksRepositoryImpl @Inject constructor(
     private val contentResolverFactory: ContentResolverFactory
 ) : TracksRepository{
     override fun getTracks(): LiveData<List<Track>> = liveDataFactory.getTracksLiveData()
+    override fun getTracksOfAlbum(albumId: Long?, callback: (List<Track>) -> Unit) {
+        contentResolverFactory.getTracksContentResolver(null,albumId).queryItems{
+            callback.invoke(it)
+        }
+    }
 }

@@ -13,5 +13,5 @@ class TracksLiveData(
     private val trackId: Long? = null,
     private val contentResolverFactory: ContentResolverFactory,
 ) : ContentProviderLiveData<TracksContentResolver, Track>(context) {
-    override val contentResolver by lazy { contentResolverFactory.getTracksContentResolver(trackId) }
+    override val contentResolver by lazy { contentResolverFactory.getTracksContentResolver(trackId,null) }
 }

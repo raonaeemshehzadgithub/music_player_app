@@ -42,7 +42,6 @@ abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragme
             empty.emptyImage.beVisibleIf(isShow)
             empty.emptyText.beVisibleIf(isShow)
             tracksRv.beVisibleIf(!isShow)
-//            currentTrackBar.currentTrackBar.beVisibleIf(!isShow)
         }
     }
 

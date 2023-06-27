@@ -5,7 +5,7 @@ import com.app.musicplayer.contentresolver.ArtistsContentResolver
 import com.app.musicplayer.contentresolver.TracksContentResolver
 
 interface ContentResolverFactory {
-    fun getTracksContentResolver(trackId: Long? = null) : TracksContentResolver
+    fun getTracksContentResolver(trackId: Long? = null, albumId: Long? = null) : TracksContentResolver
     fun getAlbumsContentResolver(albumId: Long? = null) : AlbumsContentResolver
     fun getArtistsContentResolver(artistId: Long? = null) : ArtistsContentResolver
 }

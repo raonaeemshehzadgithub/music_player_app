@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TracksViewState @Inject constructor(
-    tracksRepository: TracksRepository,
+    private val tracksRepository: TracksRepository,
     private val tracksInterator: TracksInteractor
 ) : ListViewState<Track>() {
 
@@ -31,6 +31,12 @@ class TracksViewState @Inject constructor(
     override fun onFilterChanged(filter: String?) {
         super.onFilterChanged(filter)
         tracksLiveData.filter = filter
+    }
+
+    fun getTracksOfAlbum(albumId: Long?, callback: (List<Track>) -> Unit) {
+        tracksRepository.getTracksOfAlbum(albumId){
+            callback.invoke(it)
+        }
     }
     fun queryTrackList(trackList:(List<Track>)->Unit) {
         tracksInterator.queryTrackList {

@@ -14,6 +14,7 @@ import com.app.musicplayer.models.Track
 class TracksContentResolver(
     context: Context,
     private val trackId: Long? = null,
+    private val albumId: Long? = null,
     private val name: String? = null
 ) :
     BaseContentResolver<Track>(context) {
@@ -24,6 +25,8 @@ class TracksContentResolver(
         get() {
             val selection = if (trackId != null)
                 SelectionBuilder().addSelection(MediaStore.Audio.Media._ID, trackId)
+            else if (albumId != null)
+                SelectionBuilder().addSelection(MediaStore.Audio.Media.ALBUM_ID, albumId)
             else
                 SelectionBuilder().addSelection(MediaStore.Audio.Media.DISPLAY_NAME, name)
             filter?.let { selection.addString("(${MediaStore.Audio.Media.DISPLAY_NAME} LIKE '%$filter%')") }

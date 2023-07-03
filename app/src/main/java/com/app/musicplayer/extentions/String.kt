@@ -28,12 +28,12 @@ fun String.shareTrack(context: Context) {
     shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this audio file!")
     context.startActivity(Intent.createChooser(shareIntent, "Share Track"))
 }
-fun preventMessagesAppRecordings():String {
+fun excludeMessagesAppRecordings():String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
     val folderPath = File(musicDir, "Messenger/Recorded").absolutePath
     return folderPath
 }
-fun preventRecorderAppRecordings():String {
+fun excludeRecorderAppRecordings():String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
     val folderPath = File(musicDir, "Recordings").absolutePath
     return folderPath

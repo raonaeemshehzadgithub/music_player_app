@@ -40,8 +40,8 @@ object MediaPlayer :
         }
     }
 
-    fun getCurrentPosition(): Int? {
-        return player?.currentPosition
+    fun getCurrentPosition(): Int {
+        return player?.currentPosition?:0
     }
 
     fun getTrackDuration(): Int? {

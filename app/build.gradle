@@ -8,6 +8,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/home/waleed/Documents/release/release.keystore')
+            keyAlias 'Greentouch1956'
+            storePassword 'Ari@8455871956'
+            keyPassword 'Ari@8455871956'
+        }
+    }
     namespace 'com.app.musicplayer'
     compileSdk 33
 

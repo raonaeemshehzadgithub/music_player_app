@@ -6,10 +6,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.app.musicplayer.core.SelectionBuilder
 import com.app.musicplayer.extentions.getLongValue
-import com.app.musicplayer.extentions.getStringValue
 import com.app.musicplayer.extentions.getStringValueOrNull
-import com.app.musicplayer.extentions.preventMessagesAppRecordings
-import com.app.musicplayer.extentions.preventRecorderAppRecordings
 import com.app.musicplayer.models.Album
 
 class AlbumsContentResolver(

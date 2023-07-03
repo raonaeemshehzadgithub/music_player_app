@@ -6,8 +6,8 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.app.musicplayer.core.SelectionBuilder
 import com.app.musicplayer.extentions.getLongValue
-import com.app.musicplayer.extentions.preventMessagesAppRecordings
-import com.app.musicplayer.extentions.preventRecorderAppRecordings
+import com.app.musicplayer.extentions.excludeMessagesAppRecordings
+import com.app.musicplayer.extentions.excludeRecorderAppRecordings
 import com.app.musicplayer.extentions.getStringValue
 import com.app.musicplayer.models.Track
 
@@ -15,6 +15,7 @@ class TracksContentResolver(
     context: Context,
     private val trackId: Long? = null,
     private val albumId: Long? = null,
+    private val artistId: Long? = null,
     private val name: String? = null
 ) :
     BaseContentResolver<Track>(context) {
@@ -27,11 +28,13 @@ class TracksContentResolver(
                 SelectionBuilder().addSelection(MediaStore.Audio.Media._ID, trackId)
             else if (albumId != null)
                 SelectionBuilder().addSelection(MediaStore.Audio.Media.ALBUM_ID, albumId)
+            else if (artistId != null)
+                SelectionBuilder().addSelection(MediaStore.Audio.Media.ARTIST_ID, artistId)
             else
                 SelectionBuilder().addSelection(MediaStore.Audio.Media.DISPLAY_NAME, name)
             filter?.let { selection.addString("(${MediaStore.Audio.Media.DISPLAY_NAME} LIKE '%$filter%')") }
-            selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${preventMessagesAppRecordings()}%')")
-            selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${preventRecorderAppRecordings()}%')")
+            selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${excludeMessagesAppRecordings()}%')")
+            selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${excludeRecorderAppRecordings()}%')")
             return selection.build()
         }
     override val sortOrder: String = MediaStore.Audio.Media.DATE_ADDED + " ASC"

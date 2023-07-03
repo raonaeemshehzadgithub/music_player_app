@@ -38,6 +38,11 @@ class TracksViewState @Inject constructor(
             callback.invoke(it)
         }
     }
+    fun getTracksOfArtist(artistId: Long?, callback: (List<Track>) -> Unit) {
+        tracksRepository.getTracksOfArtist(artistId){
+            callback.invoke(it)
+        }
+    }
     fun queryTrackList(trackList:(List<Track>)->Unit) {
         tracksInterator.queryTrackList {
             trackList.invoke(it as List<Track>)

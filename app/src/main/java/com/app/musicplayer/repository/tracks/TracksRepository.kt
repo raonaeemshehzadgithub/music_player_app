@@ -7,4 +7,5 @@ interface TracksRepository {
     fun getTracks():LiveData<List<Track>>
 
     fun getTracksOfAlbum(albumId: Long? = null,callback:(List<Track>)->Unit)
+    fun getTracksOfArtist(artistId: Long? = null,callback:(List<Track>)->Unit)
 }

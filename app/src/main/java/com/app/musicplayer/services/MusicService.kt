@@ -117,7 +117,7 @@ class MusicService : Service() {
     }
 
     private fun handleSetProgress(intent: Intent) {
-        seekTo(intent.getIntExtra(PROGRESS, getCurrentPosition()!!))
+        seekTo(intent.getIntExtra(PROGRESS, getCurrentPosition()))
     }
 
     private fun handleNextPrevious(isNext: Boolean, isShuffle: String) {

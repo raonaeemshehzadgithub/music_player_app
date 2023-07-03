@@ -9,8 +9,8 @@ import javax.inject.Inject
 
 class ContentResolverFactoryImpl @Inject constructor(@ApplicationContext private val context: Context) :
     ContentResolverFactory {
-    override fun getTracksContentResolver(trackId: Long?, albumId: Long?): TracksContentResolver =
-        TracksContentResolver(context, trackId,albumId)
+    override fun getTracksContentResolver(trackId: Long?, albumId: Long?, artistId:Long?): TracksContentResolver =
+        TracksContentResolver(context, trackId, albumId, artistId)
 
     override fun getAlbumsContentResolver(albumId: Long?): AlbumsContentResolver =
         AlbumsContentResolver(context, albumId)

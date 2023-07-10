@@ -5,13 +5,8 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.DeadObjectException
 import android.util.Log
-import com.app.musicplayer.extentions.toast
-import com.app.musicplayer.services.MusicService.Companion.positionTrack
-import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.utils.COMPLETE_CALLBACK
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
-import javax.inject.Inject
 
 object MediaPlayer :
     MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,MediaPlayer.OnCompletionListener {

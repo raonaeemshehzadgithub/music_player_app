@@ -13,6 +13,7 @@ import com.app.musicplayer.extentions.beVisible
 import com.app.musicplayer.extentions.hideKeyboard
 import com.app.musicplayer.extentions.onTextChangeListener
 import com.app.musicplayer.extentions.showKeyboard
+import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.ui.adapters.ViewPagerAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.fragments.*

@@ -6,7 +6,7 @@ import com.app.musicplayer.ui.adapters.ListAdapter
 import com.app.musicplayer.ui.base.BaseFragment
 import com.app.musicplayer.ui.list.ListViewState
 
-abstract class ListFragment<ItemType, VS : ListViewState<ItemType>> : BaseFragment<VS>() {
+abstract class ListFragment<ItemType : Any, VS : ListViewState<ItemType>> : BaseFragment<VS>() {
     protected val binding by lazy { ItemsBinding.inflate(layoutInflater) }
     override val contentView by lazy { binding.root }
     abstract val listAdapter: ListAdapter<ItemType>

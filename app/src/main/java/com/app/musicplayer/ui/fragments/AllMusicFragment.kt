@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.models.Track
+import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.TracksAdapter
 import com.app.musicplayer.ui.viewstates.TracksViewState
@@ -17,7 +17,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AllMusicFragment : ListFragment<Track, TracksViewState>() {
     override val viewState: TracksViewState by activityViewModels()
-    override val manager: RecyclerView.LayoutManager = LinearLayoutManager(activity?.applicationContext)
+    override val manager: RecyclerView.LayoutManager =
+        LinearLayoutManager(activity?.applicationContext)
 
     @Inject
     override lateinit var listAdapter: TracksAdapter
@@ -25,6 +26,9 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
     override fun onSetup() {
         super.onSetup()
         viewState.apply {
+            getTrackList { trList ->
+                tracksList = trList as ArrayList<Track>
+            }
             showItemEvent.observe(this@AllMusicFragment) { event ->
                 event.ifNew?.let { trackCombinedData ->
                     startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
@@ -33,6 +37,13 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                     })
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewState.getTrackList { trList ->
+            tracksList = trList as ArrayList<Track>
         }
     }
 }

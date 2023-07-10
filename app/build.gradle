@@ -7,13 +7,28 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 
+def getEnvProperty(propertyName) {
+    def envFile = new File(project.rootDir, '.env')
+    def properties = new Properties()
+    if (envFile.exists()) {
+        properties.load(envFile.newDataInputStream())
+    }
+    return properties.getProperty(propertyName) ?: error("ENV property not found.")
+}
+
 android {
     signingConfigs {
         debug {
-            storeFile file('/home/waleed/Documents/release/release.keystore')
-            keyAlias 'Greentouch1956'
-            storePassword 'Ari@8455871956'
-            keyPassword 'Ari@8455871956'
+            storeFile file(getEnvProperty('STORE_FILE_PATH'))
+            storePassword getEnvProperty('KEY_PASSWORD')
+            keyAlias getEnvProperty('KEY_ALIAS')
+            keyPassword getEnvProperty('KEY_PASSWORD')
+        }
+        release {
+            storeFile file(getEnvProperty('STORE_FILE_PATH'))
+            storePassword getEnvProperty('KEY_PASSWORD')
+            keyAlias getEnvProperty('KEY_ALIAS')
+            keyPassword getEnvProperty('KEY_PASSWORD')
         }
     }
     namespace 'com.app.musicplayer'
@@ -23,8 +38,8 @@ android {
         applicationId "com.app.musicplayer"
         minSdk 21
         targetSdk 33
-        versionCode 16
-        versionName "1.16"
+        versionCode 18
+        versionName "1.18"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,6 +48,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -94,4 +110,10 @@ dependencies {
 
     //Click-Hover
     implementation 'com.github.realpacific:click-shrink-effect:2.0'
+
+    // room database library
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
 }

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,13 +18,9 @@ import com.app.musicplayer.extentions.beVisible
 import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
-import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.extentions.updatePlayPauseDrawable
-import com.app.musicplayer.helpers.MediaPlayer.isPlaying
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.tracks.TracksInteractor
-import com.app.musicplayer.models.Track
-import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
@@ -116,9 +111,9 @@ class NowPlayingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewState.queryTrackList { trList ->
-            tracksList = trList as ArrayList<Track>
-        }
+//        viewState.queryTrackList { trList ->
+//            tracksList = trList as ArrayList<Track>
+//        }
         updatePlayPauseDrawable(binding.playPauseCurrent,requireContext())
         if (prefs.currentTrackId != 0L) {
             binding.root.beVisible()

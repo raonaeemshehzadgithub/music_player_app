@@ -39,6 +39,14 @@ fun ImageView.setUnSelectedTint(context:Context){
     }
 }
 
+fun ImageView.updateFavoriteIcon(context: Context,isFav:Boolean) {
+    if (isFav) {
+        this.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite))
+    } else {
+        this.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite_border))
+    }
+}
+
 fun updatePlayPauseDrawable(playPauseIcon:ImageView,context: Context) {
     if (MediaPlayer.isPlaying()) {
         playPauseIcon.setImageDrawable(

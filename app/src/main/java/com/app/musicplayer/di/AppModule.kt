@@ -1,5 +1,9 @@
 package com.app.musicplayer.di
 
+import android.content.Context
+import androidx.room.Room
+import com.app.musicplayer.db.MusicDB
+import com.app.musicplayer.db.dao.TrackDao
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactoryImpl
 import com.app.musicplayer.di.factory.livedata.LiveDataFactory
@@ -18,12 +22,15 @@ import com.app.musicplayer.repository.artists.ArtistsRepository
 import com.app.musicplayer.repository.artists.ArtistsRepositoryImpl
 import com.app.musicplayer.repository.tracks.TracksRepository
 import com.app.musicplayer.repository.tracks.TracksRepositoryImpl
+import com.app.musicplayer.utils.ROOM_DB_NAME
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.reactivex.disposables.CompositeDisposable
+import javax.inject.Singleton
 
 @Module(includes = [AppModule.BindModule::class])
 @InstallIn(SingletonComponent::class)
@@ -31,6 +38,13 @@ class AppModule {
 
     @Provides
     fun provideDisposable(): CompositeDisposable = CompositeDisposable()
+
+    @Provides
+    @Singleton
+    fun provideRoomDb(@ApplicationContext context: Context): MusicDB {
+        return Room.databaseBuilder(context,MusicDB::class.java, ROOM_DB_NAME)
+            .fallbackToDestructiveMigration().build()
+    }
 
     @Module
     @InstallIn(SingletonComponent::class)

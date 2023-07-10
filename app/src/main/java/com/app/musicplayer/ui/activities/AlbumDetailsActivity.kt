@@ -8,13 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.musicplayer.databinding.ActivityAlbumDetailsBinding
 import com.app.musicplayer.extentions.beVisibleIf
 import com.app.musicplayer.extentions.toast
+import com.app.musicplayer.models.Track
+import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.adapters.TracksAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.TracksViewState
-import com.app.musicplayer.utils.ALBUM_ID
-import com.app.musicplayer.utils.ALBUM_TITLE
-import com.app.musicplayer.utils.POSITION
-import com.app.musicplayer.utils.TRACK_ID
+import com.app.musicplayer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -28,18 +27,18 @@ class AlbumDetailsActivity : BaseActivity<TracksViewState>() {
 
     override fun onSetup() {
         onSetupViews()
-        Log.wtf("album id", intent.getLongExtra(ALBUM_ID, 0L).toString())
         viewState.apply {
             getTracksOfAlbum(intent.getLongExtra(ALBUM_ID, 0L)){
                 tracksAdapter.items = it
                 showEmpty(tracksAdapter.items.isEmpty())
+                tracksList = it as ArrayList<Track>
             }
             showItemEvent.observe(this@AlbumDetailsActivity) { event ->
                 event.ifNew?.let { trackCombinedData ->
-//                    startActivity(Intent(this@AlbumDetailsActivity, MusicPlayerActivity::class.java).apply {
-//                        putExtra(TRACK_ID, trackCombinedData.track.id)
-//                        putExtra(POSITION, trackCombinedData.position)
-//                    })
+                    startActivity(Intent(this@AlbumDetailsActivity, MusicPlayerActivity::class.java).apply {
+                        putExtra(TRACK_ID, trackCombinedData.track.id)
+                        putExtra(POSITION, trackCombinedData.position)
+                    })
                 }
             }
 //            itemsChangedEvent.observe(this@AlbumDetailsActivity) { event ->
@@ -64,7 +63,7 @@ class AlbumDetailsActivity : BaseActivity<TracksViewState>() {
         binding.moveBack.setOnClickListener { finish() }
     }
 
-    protected open fun showEmpty(isShow: Boolean) {
+    private fun showEmpty(isShow: Boolean) {
         binding.apply {
             empty.emptyImage.beVisibleIf(isShow)
             empty.emptyText.beVisibleIf(isShow)

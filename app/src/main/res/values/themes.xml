@@ -98,7 +98,7 @@
     </style>
 
     <style name="FavouriteIcon">
-        <item name="android:src">@drawable/ic_favourite</item>
+        <item name="android:src">@drawable/ic_favorite_border</item>
     </style>
 
     <style name="AddIcon">

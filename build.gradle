@@ -2,6 +2,7 @@
 buildscript {
     ext.lifecycle_version = "2.5.1"
     ext.hilt_version = "2.44.1"
+    ext.room_version = "2.4.3"
     repositories {
         google()
         mavenCentral()

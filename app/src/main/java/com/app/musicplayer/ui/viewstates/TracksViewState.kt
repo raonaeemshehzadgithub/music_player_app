@@ -1,6 +1,7 @@
 package com.app.musicplayer.ui.viewstates
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.app.musicplayer.core.utils.DataLiveEvent
 import com.app.musicplayer.interator.livedata.TracksLiveData
 import com.app.musicplayer.interator.tracks.TracksInteractor
@@ -9,6 +10,8 @@ import com.app.musicplayer.models.Track
 import com.app.musicplayer.repository.tracks.TracksRepository
 import com.app.musicplayer.ui.list.ListViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,9 +46,15 @@ class TracksViewState @Inject constructor(
             callback.invoke(it)
         }
     }
-    fun queryTrackList(trackList:(List<Track>)->Unit) {
+    fun getTrackList(trackList:(List<Track>)->Unit) {
         tracksInterator.queryTrackList {
             trackList.invoke(it as List<Track>)
         }
+    }
+    fun fetchRecentTrackList():LiveData<List<Track>> {
+        return tracksRepository.fetchRecentTrack()
+    }
+    fun fetchFavoriteTrackList():LiveData<List<Track>> {
+        return tracksRepository.fetchFavoriteTrack()
     }
 }

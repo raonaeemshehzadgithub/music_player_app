@@ -2,17 +2,21 @@
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.app.musicplayer.interator.livedata.TracksLiveData
 import com.app.musicplayer.interator.player.PlayerInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.repository.tracks.TracksRepository
 import com.app.musicplayer.ui.list.ListViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class MusicPlayerViewState @Inject constructor(
-    tracksRepository: TracksRepository,
+    private val tracksRepository: TracksRepository,
     private val playerInteractor: PlayerInteractor
 ) : ListViewState<Track>() {
 
@@ -32,6 +36,35 @@ class MusicPlayerViewState @Inject constructor(
         playerInteractor.queryTrackList {
             trackList.invoke(it as List<Track>)
         }
+    }
+    fun insertRecentTrack(track: Track) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tracksRepository.insertRecentTrack(track)
+        }
+    }
+    fun removeFavoriteTrack(trackId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tracksRepository.removeFavoriteTrack(trackId)
+        }
+    }
+    fun insertFavoriteTrack(track: Track) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tracksRepository.insertFavoriteTrack(track)
+        }
+    }
+    fun fetchFavoriteTrackList():LiveData<List<Track>> {
+        return tracksRepository.fetchFavoriteTrack()
+    }
+    suspend fun fetchFavorites():List<Track>? {
+        return withContext(Dispatchers.IO) {
+            val trackList = tracksRepository.fetchFavorites()
+            trackList.ifEmpty {
+                null
+            }
+        }
+    }
+    fun isFavorite(context: Context):Boolean {
+        return tracksRepository.isFavorite(context)
     }
 
 }

@@ -11,6 +11,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import androidx.media.session.MediaButtonReceiver
 import com.app.musicplayer.R
+import com.app.musicplayer.db.MusicDB
 import com.app.musicplayer.extentions.getColoredBitmap
 import com.app.musicplayer.extentions.hasPermission
 import com.app.musicplayer.extentions.isUnknownString
@@ -34,6 +35,9 @@ import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.getPermissionToRequest
 import com.app.musicplayer.utils.isQPlus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -48,9 +52,6 @@ class MusicService : Service() {
     @Inject
     lateinit var pref: PreferenceHelper
 
-//    @Inject
-//    lateinit var mediaPlayer: MediaPlayer
-
     var timer: ScheduledExecutorService? = null
     val intentControl = Intent(PROGRESS_CONTROLS_ACTION)
 
@@ -62,7 +63,7 @@ class MusicService : Service() {
         var isTrackCompleted: Boolean = false
     }
 
-//    private var currentTrackId: Long = 0L
+    //    private var currentTrackId: Long = 0L
     private val notificationHandler = Handler()
     private var notificationHelper: NotificationHelper? = null
 
@@ -97,8 +98,12 @@ class MusicService : Service() {
             SET_PROGRESS -> handleSetProgress(intent)
             DISMISS -> dismissNotification()
         }
-        pref.currentTrackId = tracksList[positionTrack].id?:0L
-        pref.currentTrackPosition = positionTrack
+        if (tracksList.size > positionTrack && tracksList.size != positionTrack) {
+            //check if index is in the list
+            pref.currentTrackId = tracksList[positionTrack].id ?: 0L
+            pref.currentTrackPosition = positionTrack
+        }
+
         MediaButtonReceiver.handleIntent(mMediaSession!!, intent)
         if (action != DISMISS && action != FINISH) {
             startForegroundAndNotify()
@@ -128,7 +133,8 @@ class MusicService : Service() {
         } else if (isShuffle == SHUFFLE_TRACK_ON) {
             positionTrack = tracksList.size.shuffleTrack()
         }
-        pref.currentTrackId = tracksList[positionTrack].id?:0L
+        if (tracksList.size <= positionTrack) return
+        pref.currentTrackId = tracksList[positionTrack].id ?: 0L
         val nextPreviousIntent = Intent(NEXT_PREVIOUS_ACTION)
         nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, pref.currentTrackId)
         sendBroadcast(nextPreviousIntent)

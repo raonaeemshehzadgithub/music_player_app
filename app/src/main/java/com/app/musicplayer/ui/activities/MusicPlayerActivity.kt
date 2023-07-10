@@ -10,11 +10,11 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
 import com.app.musicplayer.extentions.*
 import com.app.musicplayer.helpers.OnSwipeTouchListener
-import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService
@@ -22,11 +22,11 @@ import com.app.musicplayer.services.MusicService.Companion.positionTrack
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.MusicPlayerViewState
-import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
 import com.bumptech.glide.Glide
 import com.realpacific.clickshrinkeffect.applyClickShrink
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,13 +35,9 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     @Inject
     lateinit var tracksInteractor: TracksInteractor
 
-    @Inject
-    lateinit var pref: PreferenceHelper
-
     private val binding by lazy { ActivityMusicPlayerBinding.inflate(layoutInflater) }
     var track: Track? = null
     override val viewState: MusicPlayerViewState by viewModels()
-    private val tracksViewState: TracksViewState by viewModels()
     override val contentView: View by lazy { binding.root }
     private val intentProgressDurationFilter = IntentFilter(PROGRESS_CONTROLS_ACTION)
     private val intentNextPrevious = IntentFilter(NEXT_PREVIOUS_ACTION)
@@ -106,19 +102,19 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                 setUpButtons()
                 registerReceivers()
                 updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
-                viewState.apply {
-                    itemsChangedEvent.observe(this@MusicPlayerActivity) { event ->
-                        event.ifNew?.let {
-                            tracksList = it as ArrayList<Track>
-                        }
-                    }
-                    getItemsObservable {
-                        it.observe(
-                            this@MusicPlayerActivity,
-                            viewState::onItemsChanged
-                        )
-                    }
-                }
+//                viewState.apply {
+//                    itemsChangedEvent.observe(this@MusicPlayerActivity) { event ->
+//                        event.ifNew?.let {
+//                            tracksList = it as ArrayList<Track>
+//                        }
+//                    }
+//                    getItemsObservable {
+//                        it.observe(
+//                            this@MusicPlayerActivity,
+//                            viewState::onItemsChanged
+//                        )
+//                    }
+//                }
                 if (!intent.getBooleanExtra(FROM_MINI_PLAYER, false)) {
                     Intent(this, MusicService::class.java).apply {
                         putExtra(TRACK_ID_SERVICE, intent.getLongExtra(TRACK_ID, 0L))
@@ -127,6 +123,9 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                         startService(this)
                     }
                 }
+//                tracksInteractor.queryTrack(prefs.currentTrackId?:0L){
+//                    it?.let { it1 -> viewState.insertRecentTrack(it1) }
+//                }
             }
         }
     }
@@ -139,6 +138,17 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
             binding.totalDuration.text = formatMillisToHMS(track?.duration ?: 0L)
             Glide.with(this@MusicPlayerActivity).load(track?.album_id?.getThumbnailUri() ?: "")
                 .placeholder(R.drawable.ic_music).into(binding.thumbnail)
+        }
+        lifecycleScope.launch {
+            viewState.fetchFavorites().let { list ->
+                tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) {
+                    if (list?.contains(it) == true) {
+                        binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, true)
+                    } else {
+                        binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, false)
+                    }
+                }
+            }
         }
     }
 
@@ -172,8 +182,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
             previousTrack.setOnClickListener { sendIntent(PREVIOUS) }
             repeatTrack.setOnClickListener { repeatTrack() }
             shuffleTrack.setOnClickListener { shuffleTrack() }
-            favouriteTrack.setOnClickListener { }
             playerMenuMore.setOnClickListener { playerMenus() }
+            favouriteTrack.setOnClickListener { favoriteTrack() }
             root.setOnTouchListener(object : OnSwipeTouchListener(this@MusicPlayerActivity) {
                 override fun onSwipeDown() {
                     super.onSwipeDown()
@@ -225,32 +235,51 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     }
 
     private fun setUpPreferences() {
-        when (pref.repeatTrack) {
+        when (prefs.repeatTrack) {
             REPEAT_TRACK_ON -> binding.repeatTrack.setSelectedTint(context = this)
         }
-        when (pref.shuffleTrack) {
+        when (prefs.shuffleTrack) {
             SHUFFLE_TRACK_ON -> binding.shuffleTrack.setSelectedTint(context = this)
         }
-        binding.seekBar.max = pref.currentTrackTotalDuration?:0
-        binding.seekBar.progress = pref.currentTrackProgress?:0
+        binding.seekBar.max = prefs.currentTrackTotalDuration ?: 0
+        binding.seekBar.progress = prefs.currentTrackProgress ?: 0
         setUpSeekbar()
-        binding.playedDuration.text = pref.currentTrackProgress?.let { formatMillisToHMS(it.toLong()) }
+        binding.playedDuration.text =
+            prefs.currentTrackProgress?.let { formatMillisToHMS(it.toLong()) }
+    }
+
+    private fun favoriteTrack() {
+        lifecycleScope.launch {
+            viewState.fetchFavorites().let { list ->
+                tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) {
+                    if (list?.contains(it) == true) {
+                        binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, false)
+                        viewState.removeFavoriteTrack(prefs.currentTrackId ?: 0L)
+                    } else {
+                        binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, true)
+                        tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) { track ->
+                            track?.let { it1 -> viewState.insertFavoriteTrack(it1) }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun repeatTrack() {
         when {
-            pref.shuffleTrack == SHUFFLE_TRACK_ON -> {
-                pref.shuffleTrack = SHUFFLE_TRACK_OFF
+            prefs.shuffleTrack == SHUFFLE_TRACK_ON -> {
+                prefs.shuffleTrack = SHUFFLE_TRACK_OFF
                 binding.shuffleTrack.setUnSelectedTint(context = this)
             }
 
-            pref.repeatTrack == REPEAT_TRACK_OFF -> {
-                pref.repeatTrack = REPEAT_TRACK_ON
+            prefs.repeatTrack == REPEAT_TRACK_OFF -> {
+                prefs.repeatTrack = REPEAT_TRACK_ON
                 binding.repeatTrack.setSelectedTint(context = this)
             }
 
-            pref.repeatTrack == REPEAT_TRACK_ON -> {
-                pref.repeatTrack = REPEAT_TRACK_OFF
+            prefs.repeatTrack == REPEAT_TRACK_ON -> {
+                prefs.repeatTrack = REPEAT_TRACK_OFF
                 binding.repeatTrack.setUnSelectedTint(context = this)
             }
         }
@@ -258,18 +287,18 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
     private fun shuffleTrack() {
         when {
-            pref.repeatTrack == REPEAT_TRACK_ON -> {
-                pref.repeatTrack = REPEAT_TRACK_OFF
+            prefs.repeatTrack == REPEAT_TRACK_ON -> {
+                prefs.repeatTrack = REPEAT_TRACK_OFF
                 binding.repeatTrack.setUnSelectedTint(context = this)
             }
 
-            pref.shuffleTrack == SHUFFLE_TRACK_OFF -> {
-                pref.shuffleTrack = SHUFFLE_TRACK_ON
+            prefs.shuffleTrack == SHUFFLE_TRACK_OFF -> {
+                prefs.shuffleTrack = SHUFFLE_TRACK_ON
                 binding.shuffleTrack.setSelectedTint(context = this)
             }
 
-            pref.shuffleTrack == SHUFFLE_TRACK_ON -> {
-                pref.shuffleTrack = SHUFFLE_TRACK_OFF
+            prefs.shuffleTrack == SHUFFLE_TRACK_ON -> {
+                prefs.shuffleTrack = SHUFFLE_TRACK_OFF
                 binding.shuffleTrack.setUnSelectedTint(context = this)
             }
         }

@@ -5,6 +5,10 @@ import android.os.Build
 import android.os.Looper
 import androidx.annotation.ChecksSdkIntAtLeast
 
+//room db
+const val ROOM_DB_VERSION = 12
+const val ROOM_DB_NAME = "music_player_db"
+
 private const val PATH = "com.app.musicplayer.action."
 const val DISMISS = PATH + "DISMISS"
 const val FINISH = PATH + "FINISH"

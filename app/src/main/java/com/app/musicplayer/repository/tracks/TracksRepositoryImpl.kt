@@ -1,14 +1,20 @@
 package com.app.musicplayer.repository.tracks
 
+import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import com.app.musicplayer.db.MusicDB
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.di.factory.livedata.LiveDataFactory
+import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.models.Track
 import javax.inject.Inject
 
 class TracksRepositoryImpl @Inject constructor(
     private val liveDataFactory: LiveDataFactory,
-    private val contentResolverFactory: ContentResolverFactory
+    private val contentResolverFactory: ContentResolverFactory,
+    private val musicDB: MusicDB,
+    private val pref:PreferenceHelper
 ) : TracksRepository {
     override fun getTracks(): LiveData<List<Track>> = liveDataFactory.getTracksLiveData()
     override fun getTracksOfAlbum(albumId: Long?, callback: (List<Track>) -> Unit) {
@@ -21,4 +27,42 @@ class TracksRepositoryImpl @Inject constructor(
             callback.invoke(it)
         }
     }
+
+    override fun insertRecentTrack(track: Track) {
+        musicDB.getTrackDao().insertRecentTrack(track)
+    }
+
+    override fun fetchRecentTrack(): LiveData<List<Track>> {
+        return musicDB.getTrackDao().fetchTrackList()
+    }
+
+    override fun insertFavoriteTrack(track: Track) {
+        musicDB.getFavoriteDao().insertFavoriteTrack(track)
+    }
+
+    override fun removeFavoriteTrack(trackId: Long) {
+        musicDB.getFavoriteDao().removeFavoriteTrack(trackId)
+    }
+
+    override fun fetchFavoriteTrack(): LiveData<List<Track>> {
+        return musicDB.getFavoriteDao().fetchFavoriteList()
+    }
+
+    override fun fetchFavorites(): List<Track> {
+        return musicDB.getFavoriteDao().fetchFavorites()
+    }
+
+    override fun isFavorite(context:Context): Boolean {
+        var isFav = false
+        musicDB.getFavoriteDao().fetchFavoriteList().observe(context as LifecycleOwner){favoriteList->
+            favoriteList.forEach { track->
+                if (pref.currentTrackId?.equals(track.id) == true) {
+                    isFav = true
+                    return@forEach
+                }
+            }
+        }
+        return isFav
+    }
+
 }

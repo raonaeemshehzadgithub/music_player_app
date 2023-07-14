@@ -8,6 +8,9 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.app.musicplayer.utils.artworkUri
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 fun String.getThumbnailUri(): String {
     val coverUri = ContentUris.withAppendedId(artworkUri, this.toLong())
@@ -37,4 +40,9 @@ fun excludeRecorderAppRecordings():String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
     val folderPath = File(musicDir, "Recordings").absolutePath
     return folderPath
+}
+fun currentDateAndTime():String{
+    val currentTime = Calendar.getInstance().time
+    val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
+    return dateFormat.format(currentTime)
 }

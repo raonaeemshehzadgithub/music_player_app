@@ -90,7 +90,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         } else {
             onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    finish()
+//                    finish()
                 }
             })
         }
@@ -315,7 +315,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == DELETE_TRACK_CODE && resultCode == RESULT_OK) {
+        if (requestCode == DELETE_PLAYING_TRACK && resultCode == RESULT_OK) {
             sendIntent(NEXT)
         }
     }

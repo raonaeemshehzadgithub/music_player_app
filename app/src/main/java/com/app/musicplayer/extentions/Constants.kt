@@ -1,24 +1,22 @@
 package com.app.musicplayer.utils
 
+import android.content.ContentUris
 import android.net.Uri
 import android.os.Build
 import android.os.Looper
+import android.provider.MediaStore
 import androidx.annotation.ChecksSdkIntAtLeast
 
 //room db
-const val ROOM_DB_VERSION = 12
+const val ROOM_DB_VERSION = 18
 const val ROOM_DB_NAME = "music_player_db"
 
 private const val PATH = "com.app.musicplayer.action."
 const val DISMISS = PATH + "DISMISS"
 const val FINISH = PATH + "FINISH"
 const val PREVIOUS = PATH + "PREVIOUS"
-const val REPEAT = PATH + "REPEAT"
-const val PAUSE = PATH + "PAUSE"
 const val PLAYPAUSE = PATH + "PLAYPAUSE"
 const val NEXT = PATH + "NEXT"
-const val BROADCAST_STATUS = PATH + "BROADCAST_STATUS"
-const val INIT_PATH = PATH + "INIT_PATH"
 const val INIT = PATH + "INIT"
 const val FINISH_IF_NOT_PLAYING = PATH + "FINISH_IF_NOT_PLAYING"
 const val NOTIFICATION_DISMISSED = PATH + "NOTIFICATION_DISMISSED"
@@ -46,12 +44,15 @@ const val TRACK_CURRENT_PROGRESS = 0
 const val TRACK_CURRENT_TOTAL_CURRENT = 0
 const val ALARM_RINGTONE = "Alarm tone"
 const val SHARE_TRACK = "share_track"
+const val RENAME_TRACK = "rename_track"
+const val PROPERTIES_TRACK = "properties_track"
 const val SET_TRACK_AS = "set_as"
 const val DELETE_TRACK = "delete_track"
 const val SETTINGS = "settings"
 const val DONE = "done"
 const val GENERIC_PERMISSION_HANDLER = 1
-const val DELETE_TRACK_CODE = 21
+const val DELETE_PLAYING_TRACK = 21
+const val DELETE_TRACK_CODE = 22
 
 const val PERMISSION_READ_STORAGE = 2
 const val PERMISSION_WRITE_STORAGE = 3
@@ -105,4 +106,13 @@ fun ensureBackgroundThread(callback: () -> Unit) {
     } else {
         callback()
     }
+}
+fun getAudioFileContentUri(id: Long): Uri {
+    val baseUri = if (isQPlus()) {
+        MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+    } else {
+        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    }
+
+    return ContentUris.withAppendedId(baseUri, id)
 }

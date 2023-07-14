@@ -1,5 +1,6 @@
 package com.app.musicplayer.models
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -11,5 +12,6 @@ data class Track(
     val artist: String? = null,
     val duration: Long? = null,
     val path: String? = null,
-    var album_id: String? = null
+    @ColumnInfo(name = "album_id")
+    var albumId: String? = null
 ) : java.io.Serializable

@@ -1,7 +1,6 @@
 package com.app.musicplayer.ui.adapters
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.models.ListData
@@ -12,14 +11,6 @@ import javax.inject.Inject
 
 class TracksAdapter @Inject constructor(@ApplicationContext private val context: Context) :
     ListAdapter<Track>() {
-    fun getPositionOfItem(itemId: Long): Int {
-        for ((index, item) in items.withIndex()) {
-            if (item.id == itemId) {
-                return index
-            }
-        }
-        return RecyclerView.NO_POSITION
-    }
     override fun onBindListItem(listItemHolder: ListItemHolder, item: Track) {
         listItemHolder.apply {
             isMenuIconShown(true)
@@ -28,7 +19,7 @@ class TracksAdapter @Inject constructor(@ApplicationContext private val context:
             trackName = item.title ?: ""
             artist = item.artist?.isUnknownString() ?: ""
 
-            setTrackThumbnail(item.album_id?.getThumbnailUri() ?: "")
+            setTrackThumbnail(item.albumId?.getThumbnailUri() ?: "")
         }
     }
 

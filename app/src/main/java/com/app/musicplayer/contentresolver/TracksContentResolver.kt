@@ -31,13 +31,13 @@ class TracksContentResolver(
             else if (artistId != null)
                 SelectionBuilder().addSelection(MediaStore.Audio.Media.ARTIST_ID, artistId)
             else
-                SelectionBuilder().addSelection(MediaStore.Audio.Media.DISPLAY_NAME, name)
-            filter?.let { selection.addString("(${MediaStore.Audio.Media.DISPLAY_NAME} LIKE '%$filter%')") }
+                SelectionBuilder().addSelection(MediaStore.Audio.Media.TITLE, name)
+            filter?.let { selection.addString("(${MediaStore.Audio.Media.TITLE} LIKE '%$filter%')") }
             selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${excludeMessagesAppRecordings()}%')")
             selection.addString("(${MediaStore.Audio.Media.DATA} NOT LIKE '${excludeRecorderAppRecordings()}%')")
             return selection.build()
         }
-    override val sortOrder: String = MediaStore.Audio.Media.DATE_ADDED + " ASC"
+    override val sortOrder: String = MediaStore.Audio.Media.TITLE + " ASC"
     override val projection: Array<String> = arrayOf(
         MediaStore.Audio.Media._ID,
         MediaStore.Audio.Media.DISPLAY_NAME,
@@ -54,6 +54,6 @@ class TracksContentResolver(
         artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST) ?: "",
         duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION),
         path = cursor.getStringValue(MediaStore.Audio.Media.DATA) ?: "",
-        album_id = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID) ?: ""
+        albumId = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID) ?: ""
     )
 }

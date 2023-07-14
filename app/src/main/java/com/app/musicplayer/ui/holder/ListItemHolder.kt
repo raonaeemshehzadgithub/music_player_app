@@ -5,6 +5,8 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ListItemBinding
+import com.app.musicplayer.extentions.beGone
+import com.app.musicplayer.extentions.beInvisible
 import com.app.musicplayer.extentions.beVisibleIf
 import com.bumptech.glide.Glide
 
@@ -34,6 +36,11 @@ open class ListItemHolder(protected val binding: ListItemBinding) :
         binding.listContainer.beVisibleIf(check)
     }
 
+    fun isFavoriteIconShown(check: Boolean) {
+        binding.favoriteTrack.beVisibleIf(check)
+        binding.menuTrack.beInvisible()
+    }
+
     fun isArtistItemShown(check: Boolean) {
         binding.artistContainer.beVisibleIf(check)
     }
@@ -59,5 +66,11 @@ open class ListItemHolder(protected val binding: ListItemBinding) :
 
     fun setOnItemClick(onItemClickListener: View.OnClickListener) {
         itemView.setOnClickListener(onItemClickListener)
+    }
+    fun setOnTrackMenuClick(onItemClickListener: View.OnClickListener) {
+        binding.menuTrack.setOnClickListener(onItemClickListener)
+    }
+    fun setOnTrackFavoriteClick(onItemClickListener: View.OnClickListener) {
+        binding.favoriteTrack.setOnClickListener(onItemClickListener)
     }
 }

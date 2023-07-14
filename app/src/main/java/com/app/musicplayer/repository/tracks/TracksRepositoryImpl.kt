@@ -1,20 +1,17 @@
 package com.app.musicplayer.repository.tracks
 
-import android.content.Context
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.app.musicplayer.db.MusicDB
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.di.factory.livedata.LiveDataFactory
-import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.models.Track
+import com.app.musicplayer.db.entities.RecentTrackEntity
 import javax.inject.Inject
 
 class TracksRepositoryImpl @Inject constructor(
     private val liveDataFactory: LiveDataFactory,
     private val contentResolverFactory: ContentResolverFactory,
-    private val musicDB: MusicDB,
-    private val pref:PreferenceHelper
+    private val musicDB: MusicDB
 ) : TracksRepository {
     override fun getTracks(): LiveData<List<Track>> = liveDataFactory.getTracksLiveData()
     override fun getTracksOfAlbum(albumId: Long?, callback: (List<Track>) -> Unit) {
@@ -28,12 +25,12 @@ class TracksRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun insertRecentTrack(track: Track) {
+    override fun insertRecentTrack(track: RecentTrackEntity) {
         musicDB.getTrackDao().insertRecentTrack(track)
     }
 
-    override fun fetchRecentTrack(): LiveData<List<Track>> {
-        return musicDB.getTrackDao().fetchTrackList()
+    override fun fetchRecentTrack(): LiveData<List<RecentTrackEntity>> {
+        return musicDB.getTrackDao().fetchRecentTrackList()
     }
 
     override fun insertFavoriteTrack(track: Track) {
@@ -51,18 +48,4 @@ class TracksRepositoryImpl @Inject constructor(
     override fun fetchFavorites(): List<Track> {
         return musicDB.getFavoriteDao().fetchFavorites()
     }
-
-    override fun isFavorite(context:Context): Boolean {
-        var isFav = false
-        musicDB.getFavoriteDao().fetchFavoriteList().observe(context as LifecycleOwner){favoriteList->
-            favoriteList.forEach { track->
-                if (pref.currentTrackId?.equals(track.id) == true) {
-                    isFav = true
-                    return@forEach
-                }
-            }
-        }
-        return isFav
-    }
-
 }

@@ -34,6 +34,8 @@ abstract class ListFragment<ItemType : Any, VS : ListViewState<ItemType>> : Base
         }
         listAdapter.apply {
             setOnItemClickListener(viewState::setOnItemClickListener)
+            setOnMenuClickListener(viewState::setOnMenuClickListener)
+            setOnFavoriteClickListener(viewState::setOnFavoriteClickListener)
         }
     }
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Music Player</string>
+    <string name="app_name">Music</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="album_name">Album name</string>
     <string name="_10_songs">10 Songs</string>
@@ -10,6 +10,7 @@
     <string name="previous">Previous</string>
     <string name="playpause">PlayPause</string>
     <string name="dismiss">Dismiss</string>
+    <string name="access_storage_prompt">Please grant access to all your files.</string>
     <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
     <string name="no_audio_files_detected_make_sure_you_have_music_files_on_your_device">No media files detected.</string>
     <string name="search_here">Search Here</string>
@@ -18,6 +19,8 @@
     <string name="artists">Artists</string>
     <string name="recently_played">Recently Played</string>
     <string name="my_favorites">My Favorites</string>
+    <string name="add_favorites">Added to Favorites</string>
+    <string name="remove_favorites">Removed from Favorites</string>
     <string name="set_as">Set as</string>
     <string name="phone_ringtone">Phone Ringtone</string>
     <string name="alarm_tone">Alarm tone</string>
@@ -31,4 +34,5 @@
     <string name="eq_sound_style">EQ Sound Style</string>
     <string name="variable_speed_playback">Variable Speed Playback</string>
     <string name="stop_playing_at_regular_intervals">Stop Playing at regular Intervals</string>
+    <string name="enter_the_name">Enter the name</string>
 </resources>

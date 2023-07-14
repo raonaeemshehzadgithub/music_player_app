@@ -3,7 +3,6 @@ package com.app.musicplayer.di
 import android.content.Context
 import androidx.room.Room
 import com.app.musicplayer.db.MusicDB
-import com.app.musicplayer.db.dao.TrackDao
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactoryImpl
 import com.app.musicplayer.di.factory.livedata.LiveDataFactory

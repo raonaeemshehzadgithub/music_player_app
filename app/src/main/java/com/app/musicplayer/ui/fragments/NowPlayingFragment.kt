@@ -104,7 +104,7 @@ class NowPlayingFragment : Fragment() {
             binding.trackNameCurrent.isSelected = true
             binding.trackNameCurrent.text = track?.title ?: ""
             binding.artistNameCurrent.text = track?.artist?.isUnknownString() ?: ""
-            Glide.with(requireContext()).load(track?.album_id?.getThumbnailUri() ?: "")
+            Glide.with(requireContext()).load(track?.albumId?.getThumbnailUri() ?: "")
                 .placeholder(R.drawable.ic_music).into(binding.trackThumbnail)
         }
     }

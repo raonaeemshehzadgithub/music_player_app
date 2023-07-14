@@ -16,7 +16,7 @@ import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
 import com.app.musicplayer.extentions.*
 import com.app.musicplayer.helpers.OnSwipeTouchListener
 import com.app.musicplayer.interator.tracks.TracksInteractor
-import com.app.musicplayer.models.Track
+import com.app.musicplayer.db.entities.RecentTrackEntity
 import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.services.MusicService.Companion.positionTrack
 import com.app.musicplayer.services.MusicService.Companion.tracksList
@@ -36,7 +36,6 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     lateinit var tracksInteractor: TracksInteractor
 
     private val binding by lazy { ActivityMusicPlayerBinding.inflate(layoutInflater) }
-    var track: Track? = null
     override val viewState: MusicPlayerViewState by viewModels()
     override val contentView: View by lazy { binding.root }
     private val intentProgressDurationFilter = IntentFilter(PROGRESS_CONTROLS_ACTION)
@@ -59,7 +58,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
                 NEXT_PREVIOUS_ACTION -> {
                     if ((intent.getLongExtra(NEXT_PREVIOUS_TRACK_ID, 0L)) != 0L) {
-                        updateTrackInfo(intent.getLongExtra(NEXT_PREVIOUS_TRACK_ID, 0L))
+                        prefs.currentTrackId = intent.getLongExtra(NEXT_PREVIOUS_TRACK_ID, 0L)
+                        updateTrackInfo(prefs.currentTrackId ?: 0L)
                     }
                 }
 
@@ -102,19 +102,6 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                 setUpButtons()
                 registerReceivers()
                 updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
-//                viewState.apply {
-//                    itemsChangedEvent.observe(this@MusicPlayerActivity) { event ->
-//                        event.ifNew?.let {
-//                            tracksList = it as ArrayList<Track>
-//                        }
-//                    }
-//                    getItemsObservable {
-//                        it.observe(
-//                            this@MusicPlayerActivity,
-//                            viewState::onItemsChanged
-//                        )
-//                    }
-//                }
                 if (!intent.getBooleanExtra(FROM_MINI_PLAYER, false)) {
                     Intent(this, MusicService::class.java).apply {
                         putExtra(TRACK_ID_SERVICE, intent.getLongExtra(TRACK_ID, 0L))
@@ -123,30 +110,35 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                         startService(this)
                     }
                 }
-//                tracksInteractor.queryTrack(prefs.currentTrackId?:0L){
-//                    it?.let { it1 -> viewState.insertRecentTrack(it1) }
-//                }
             }
         }
     }
 
-    private fun updateTrackInfo(id: Long) {
-        tracksInteractor.queryTrack(id) { track ->
-            binding.trackName.isSelected = true
-            binding.trackName.text = track?.title ?: ""
-            binding.artistName.text = track?.artist?.isUnknownString() ?: ""
-            binding.totalDuration.text = formatMillisToHMS(track?.duration ?: 0L)
-            Glide.with(this@MusicPlayerActivity).load(track?.album_id?.getThumbnailUri() ?: "")
-                .placeholder(R.drawable.ic_music).into(binding.thumbnail)
+    override fun onPause() {
+        super.onPause()
+        tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) {
+            val recent =
+                RecentTrackEntity(it?.id, it?.title, it?.artist, it?.duration, it?.path, it?.albumId)
+            viewState.insertRecentTrack(recent)
         }
+    }
+
+    private fun updateTrackInfo(id: Long) {
         lifecycleScope.launch {
             viewState.fetchFavorites().let { list ->
-                tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) {
-                    if (list?.contains(it) == true) {
+                tracksInteractor.queryTrack(id) { track ->
+                    if (list?.contains(track) == true) {
                         binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, true)
                     } else {
                         binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, false)
                     }
+                    binding.trackName.isSelected = true
+                    binding.trackName.text = track?.title ?: ""
+                    binding.artistName.text = track?.artist?.isUnknownString() ?: ""
+                    binding.totalDuration.text = formatMillisToHMS(track?.duration ?: 0L)
+                    Glide.with(this@MusicPlayerActivity)
+                        .load(track?.albumId?.getThumbnailUri() ?: "")
+                        .placeholder(R.drawable.ic_music).into(binding.thumbnail)
                 }
             }
         }
@@ -204,7 +196,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
                 DELETE_TRACK -> {
                     if (isRPlus()) {
-                        deleteTrack(tracksList[positionTrack].id ?: 0L)
+                        deleteTrack(DELETE_PLAYING_TRACK,tracksList[positionTrack].id ?: 0L)
                     }
                 }
 
@@ -253,9 +245,11 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
             viewState.fetchFavorites().let { list ->
                 tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) {
                     if (list?.contains(it) == true) {
+                        toast(getString(R.string.remove_favorites))
                         binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, false)
                         viewState.removeFavoriteTrack(prefs.currentTrackId ?: 0L)
                     } else {
+                        toast(getString(R.string.add_favorites))
                         binding.favouriteTrack.updateFavoriteIcon(this@MusicPlayerActivity, true)
                         tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) { track ->
                             track?.let { it1 -> viewState.insertFavoriteTrack(it1) }

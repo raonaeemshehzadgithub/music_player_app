@@ -1,5 +1,6 @@
 package com.app.musicplayer.ui.list
 
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.app.musicplayer.core.utils.DataLiveEvent
@@ -20,6 +21,14 @@ abstract class ListViewState<ItemType>:BaseViewState() {
     }
     open fun setOnItemClickListener(item: ItemType, position: Int) {
         itemChangedEvent.call(position)
+        _onItemClickListener.call(item)
+    }
+    open fun setOnMenuClickListener(item: ItemType,position:Int,view:View) {
+        itemChangedEvent.call(position)
+        _onItemClickListener.call(item)
+    }
+    open fun setOnFavoriteClickListener(item: ItemType) {
+//        itemChangedEvent.call(position)
         _onItemClickListener.call(item)
     }
     open fun onFilterChanged(filter: String?) {

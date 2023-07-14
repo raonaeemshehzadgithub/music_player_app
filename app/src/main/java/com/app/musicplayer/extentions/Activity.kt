@@ -2,13 +2,11 @@ package com.app.musicplayer.extentions
 
 import android.app.Activity
 import android.content.ContentUris
-import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
 import android.view.View
 import androidx.annotation.RequiresApi
-import com.app.musicplayer.services.MusicService
-import com.app.musicplayer.utils.DELETE_TRACK_CODE
+import com.app.musicplayer.utils.DELETE_PLAYING_TRACK
 
 fun Activity.hideKeyboard() {
     hideKeyboard(currentFocus ?: View(this))
@@ -19,9 +17,9 @@ fun Activity.showKeyboard() {
 }
 
 @RequiresApi(Build.VERSION_CODES.R)
-fun Activity.deleteTrack(trackId:Long) {
+fun Activity.deleteTrack(requestCode:Int,trackId:Long) {
     val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val newUri = ContentUris.withAppendedId(uri, trackId)
     val deleteRequest = MediaStore.createDeleteRequest(contentResolver, arrayListOf(newUri)).intentSender
-    startIntentSenderForResult(deleteRequest, DELETE_TRACK_CODE,null, 0, 0, 0)
+    startIntentSenderForResult(deleteRequest, requestCode,null, 0, 0, 0)
 }

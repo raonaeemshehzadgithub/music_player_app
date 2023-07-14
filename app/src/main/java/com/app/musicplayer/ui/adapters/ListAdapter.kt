@@ -1,7 +1,9 @@
 package com.app.musicplayer.ui.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.databinding.ListItemBinding
 import com.app.musicplayer.models.ListData
@@ -11,6 +13,8 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ListItemHolder>() {
 
     private var _data: ListData<ItemType> = ListData()
     private var _onItemClickListener: (ItemType, Int) -> Unit = { _, _ -> }
+    private var _onItemMenuClickListener: (ItemType,Int,View) -> Unit = {_,_,_->}
+    private var _onItemFavoriteClickListener: (ItemType) -> Unit = {}
 
     var items: List<ItemType>
         get() = _data.items
@@ -29,6 +33,12 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ListItemHolder>() {
             setOnItemClick {
                 _onItemClickListener.invoke(dataItem, position)
             }
+            setOnTrackMenuClick{
+                _onItemMenuClickListener.invoke(dataItem,position,it)
+            }
+            setOnTrackFavoriteClick{
+                _onItemFavoriteClickListener.invoke(dataItem)
+            }
             onBindListItem(this, dataItem)
         }
     }
@@ -43,5 +53,11 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ListItemHolder>() {
 
     fun setOnItemClickListener(onItemClickListener: (ItemType, Int) -> Unit) {
         _onItemClickListener = onItemClickListener
+    }
+    fun setOnMenuClickListener(onItemMenuClickListener:(ItemType,Int,View)->Unit){
+        _onItemMenuClickListener = onItemMenuClickListener
+    }
+    fun setOnFavoriteClickListener(onItemFavoriteClickListener:(ItemType)->Unit){
+        _onItemFavoriteClickListener = onItemFavoriteClickListener
     }
 }

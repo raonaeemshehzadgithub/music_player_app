@@ -7,6 +7,9 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.musicplayer.databinding.ActivityArtistDetailsBinding
 import com.app.musicplayer.extentions.beVisibleIf
+import com.app.musicplayer.extentions.deleteTrack
+import com.app.musicplayer.extentions.shareTrack
+import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.adapters.TracksAdapter
@@ -24,6 +27,8 @@ class ArtistDetailsActivity : BaseActivity<TracksViewState>() {
 
     @Inject
     lateinit var tracksAdapter: TracksAdapter
+    @Inject
+    lateinit var tracksInteractor: TracksInteractor
     override fun onSetup() {
         onSetupViews()
         viewState.apply {
@@ -40,6 +45,40 @@ class ArtistDetailsActivity : BaseActivity<TracksViewState>() {
                     })
                 }
             }
+            showMenuEvent.observe(this@ArtistDetailsActivity) { event ->
+                event.ifNew?.let { trackCombinedData ->
+                    trackCombinedData.view?.let {
+                        showTrackMenu(it) { callback ->
+                            when (callback) {
+                                PLAY_TRACK -> {
+                                    startActivity(Intent(this@ArtistDetailsActivity, MusicPlayerActivity::class.java).apply {
+                                        putExtra(TRACK_ID, trackCombinedData.track.id)
+                                        putExtra(POSITION, trackCombinedData.position)
+                                    })
+                                }
+                                SHARE_TRACK -> {
+                                    trackCombinedData.track.path?.shareTrack(this@ArtistDetailsActivity)
+                                }
+                                DELETE_TRACK -> {
+                                    if (isRPlus()) {
+                                        deleteTrack(DELETE_TRACK_CODE, trackCombinedData.track.id ?: 0L)
+                                    }
+                                }
+                                RENAME_TRACK -> {
+                                    showTrackRenameMenu(
+                                        trackCombinedData.track.title ?: ""
+                                    ) { renamedText ->
+                                        tracksInteractor.renameTrack(trackCombinedData, renamedText)
+                                    }
+                                }
+                                PROPERTIES_TRACK->{
+                                    showTrackPropertiesDialog(trackCombinedData)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 //            itemsChangedEvent.observe(this@AlbumDetailsActivity) { event ->
 //                event.ifNew?.let {
 //                    tracksAdapter.items = it
@@ -50,6 +89,7 @@ class ArtistDetailsActivity : BaseActivity<TracksViewState>() {
         }
         tracksAdapter.apply {
             setOnItemClickListener(viewState::setOnItemClickListener)
+            setOnMenuClickListener(viewState::setOnMenuClickListener)
         }
     }
 
@@ -73,5 +113,10 @@ class ArtistDetailsActivity : BaseActivity<TracksViewState>() {
             empty.emptyText.beVisibleIf(isShow)
             artistsRv.beVisibleIf(!isShow)
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 }

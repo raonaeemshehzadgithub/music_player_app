@@ -10,7 +10,7 @@
     <string name="previous">Previous</string>
     <string name="playpause">PlayPause</string>
     <string name="dismiss">Dismiss</string>
-    <string name="access_storage_prompt">Please grant access to all your files.</string>
+    <string name="access_storage_prompt">Please grant access to all your files before modifying the track.</string>
     <string name="access_storage_from_settings">Please grant access to storage from the settings.</string>
     <string name="no_audio_files_detected_make_sure_you_have_music_files_on_your_device">No media files detected.</string>
     <string name="search_here">Search Here</string>

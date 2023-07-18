@@ -55,4 +55,6 @@
 
     <dimen name="ripple_radius_10">10dp</dimen>
     <dimen name="corner_radius_12">12dp</dimen>
+    <dimen name="seek_bar_thickness">3dp</dimen>
+    <dimen name="seek_bar_thumb_size">15dp</dimen>
 </resources>

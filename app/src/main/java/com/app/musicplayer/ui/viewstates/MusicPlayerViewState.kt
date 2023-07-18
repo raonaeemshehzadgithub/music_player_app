@@ -1,5 +1,6 @@
 ﻿package com.app.musicplayer.ui.viewstates
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.app.musicplayer.interator.livedata.TracksLiveData
@@ -30,17 +31,24 @@ class MusicPlayerViewState @Inject constructor(
             tracksRepository.insertRecentTrack(track)
         }
     }
+
     fun removeFavoriteTrack(trackId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             tracksRepository.removeFavoriteTrack(trackId)
         }
     }
+
     fun insertFavoriteTrack(track: Track) {
         viewModelScope.launch(Dispatchers.IO) {
             tracksRepository.insertFavoriteTrack(track)
         }
     }
-    suspend fun fetchFavorites():List<Track>? {
+
+    fun setRingtone(context: Context, trackId: Long) {
+        playerInteractor.setPhoneRingtone(context,trackId)
+    }
+
+    suspend fun fetchFavorites(): List<Track>? {
         return withContext(Dispatchers.IO) {
             val trackList = tracksRepository.fetchFavorites()
             trackList.ifEmpty {

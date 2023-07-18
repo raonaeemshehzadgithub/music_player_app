@@ -141,6 +141,11 @@ class MainActivity : BaseActivity<MainViewState>() {
             }
         }
     }
+
+    override fun onBackPressed() {
+        moveTaskToBack(true)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         prefs.currentTrackId = 0L

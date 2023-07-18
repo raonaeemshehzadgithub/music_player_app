@@ -14,4 +14,6 @@ interface RecentTrackDao {
 
     @Query("select * from RecentTrackEntity order by time_stamp DESC")
     fun fetchRecentTrackList():LiveData<List<RecentTrackEntity>>
+    @Query("delete from RecentTrackEntity where id =:id")
+    fun removeRecentTrack(id:Long)
 }

@@ -5,6 +5,7 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import com.app.musicplayer.contentresolver.TracksContentResolver
@@ -15,6 +16,7 @@ import com.app.musicplayer.models.TrackCombinedData
 import com.app.musicplayer.utils.getAudioFileContentUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.CompositeDisposable
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -46,8 +48,6 @@ class TracksInteractorImpl @Inject constructor(
             put(MediaStore.Audio.Media.TITLE, newTitle.substringAfterLast('.'))
             put(MediaStore.Audio.Media.DISPLAY_NAME, newDisplayName)
         }
-        Log.wtf("1111",oldExtension.toString())
-        Log.wtf("2222", newDisplayName)
         try {
             context.contentResolver.update(
                 getAudioFileContentUri(track.track.id ?: 0L),
@@ -56,6 +56,7 @@ class TracksInteractorImpl @Inject constructor(
                 null
             )
         } catch (e: Exception) {
+//            renameSDCardSong(track)
             Log.wtf("rename exception",e.toString())
         }
     }

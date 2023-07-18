@@ -44,6 +44,7 @@ const val TRACK_CURRENT_PROGRESS = 0
 const val TRACK_CURRENT_TOTAL_CURRENT = 0
 const val ALARM_RINGTONE = "Alarm tone"
 const val SHARE_TRACK = "share_track"
+const val PLAY_TRACK = "play_track"
 const val RENAME_TRACK = "rename_track"
 const val PROPERTIES_TRACK = "properties_track"
 const val SET_TRACK_AS = "set_as"

@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.RingtoneManager
+import android.net.Uri
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -116,10 +118,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
     override fun onPause() {
         super.onPause()
-        tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) {
-            val recent =
-                RecentTrackEntity(it?.id, it?.title, it?.artist, it?.duration, it?.path, it?.albumId)
-            viewState.insertRecentTrack(recent)
+        tracksInteractor.queryTrack(prefs.currentTrackId ?: 0L) { track ->
+            track?.toRecentTrackEntity()?.let { viewState.insertRecentTrack(it) }
         }
     }
 
@@ -196,7 +196,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
                 DELETE_TRACK -> {
                     if (isRPlus()) {
-                        deleteTrack(DELETE_PLAYING_TRACK,tracksList[positionTrack].id ?: 0L)
+                        deleteTrack(DELETE_PLAYING_TRACK, tracksList[positionTrack].id ?: 0L)
                     }
                 }
 
@@ -205,22 +205,22 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                 }
 
                 SET_TRACK_AS -> {
-//                    ensureBackgroundThread {
-//                        bsSetRingtone {
-//                            when (it) {
-//                                DONE -> {
-//                                    when (pref.setRingtone) {
-//                                        PHONE_RINGTONE -> viewState.setRingtone(
-//                                            context = this@MusicPlayerActivity,
-//                                            trackId = tracksList[positionTrack].id
-//                                        )
-//
-//                                        ALARM_RINGTONE -> toast("")
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
+                    bsSetRingtone {
+                        when (it) {
+                            DONE -> {
+                                when (prefs.setRingtone) {
+                                    PHONE_RINGTONE -> viewState.setRingtone(
+                                        context = this@MusicPlayerActivity,
+                                        trackId = tracksList[positionTrack].id ?: 0L
+                                    )
+
+                                    ALARM_RINGTONE -> {
+                                        tracksList[positionTrack].path?.setDefaultAlarmTone(this@MusicPlayerActivity) ?: ""
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -310,5 +310,10 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         registerReceiver(playerReceiver, intentPlayPause)
         registerReceiver(playerReceiver, intentDismiss)
         registerReceiver(playerReceiver, intentComplete)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 }

@@ -3,9 +3,11 @@ package com.app.musicplayer.extentions
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.utils.artworkUri
 import java.io.File
 import java.text.SimpleDateFormat
@@ -17,7 +19,7 @@ fun String.getThumbnailUri(): String {
     return coverUri.toString()
 }
 
-fun String.isUnknownString():String{
+fun String.isUnknownString(): String {
     if (this == MediaStore.UNKNOWN_STRING) {
         return this.substringAfterLast("<").substringBeforeLast(">")
     }
@@ -31,18 +33,23 @@ fun String.shareTrack(context: Context) {
     shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this audio file!")
     context.startActivity(Intent.createChooser(shareIntent, "Share Track"))
 }
-fun excludeMessagesAppRecordings():String {
+
+fun excludeMessagesAppRecordings(): String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
     val folderPath = File(musicDir, "Messenger/Recorded").absolutePath
     return folderPath
 }
-fun excludeRecorderAppRecordings():String {
+
+fun excludeRecorderAppRecordings(): String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
     val folderPath = File(musicDir, "Recordings").absolutePath
     return folderPath
 }
-fun currentDateAndTime():String{
-    val currentTime = Calendar.getInstance().time
-    val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
-    return dateFormat.format(currentTime)
+
+fun String.setDefaultAlarmTone(context: Context) {
+    RingtoneManager.setActualDefaultRingtoneUri(
+        context,
+        RingtoneManager.TYPE_ALARM,
+        Uri.parse(this)
+    )
 }

@@ -1,23 +1,13 @@
 package com.app.musicplayer.ui.fragments
 
-import android.annotation.SuppressLint
-import android.app.RecoverableSecurityException
-import android.content.ContentValues
 import android.content.Intent
-import android.os.Build
-import android.provider.MediaStore
-import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.extentions.deleteTrack
 import com.app.musicplayer.extentions.shareTrack
-import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
-import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.TracksAdapter
@@ -34,11 +24,9 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
 
     @Inject
     override lateinit var listAdapter: TracksAdapter
-
     @Inject
     lateinit var tracksInteractor: TracksInteractor
 
-    @RequiresApi(Build.VERSION_CODES.R)
     override fun onSetup() {
         super.onSetup()
         viewState.apply {
@@ -56,8 +44,15 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
             showMenuEvent.observe(this@AllMusicFragment) { event ->
                 event.ifNew?.let { trackCombinedData ->
                     trackCombinedData.view?.let {
-                        showTrackMenu(it) { callback ->
+                        baseActivity.showTrackMenu(it) { callback ->
                             when (callback) {
+                                PLAY_TRACK -> {
+                                    startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
+                                        putExtra(TRACK_ID, trackCombinedData.track.id)
+                                        putExtra(POSITION, trackCombinedData.position)
+                                    })
+                                }
+
                                 SHARE_TRACK -> {
                                     context?.let { it2 ->
                                         trackCombinedData.track.path?.shareTrack(it2)
@@ -74,14 +69,14 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                                 }
 
                                 RENAME_TRACK -> {
-                                    showTrackRenameMenu(
+                                    baseActivity.showTrackRenameMenu(
                                         trackCombinedData.track.title ?: ""
                                     ) { renamedText ->
                                         tracksInteractor.renameTrack(trackCombinedData, renamedText)
                                     }
                                 }
                                 PROPERTIES_TRACK->{
-                                    showTrackPropertiesDialog(trackCombinedData)
+                                    baseActivity.showTrackPropertiesDialog(trackCombinedData)
                                 }
                             }
                         }

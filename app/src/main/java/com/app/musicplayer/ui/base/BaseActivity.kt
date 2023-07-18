@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
@@ -28,14 +29,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.BsSetRingtoneBinding
+import com.app.musicplayer.databinding.PopupTextFieldBinding
+import com.app.musicplayer.databinding.PopupTrackPropertiesBinding
+import com.app.musicplayer.extentions.formatMillisToHMS
 import com.app.musicplayer.extentions.getPermissionString
 import com.app.musicplayer.extentions.hasPermission
+import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
 import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.string.StringsInteractor
+import com.app.musicplayer.models.TrackCombinedData
 import com.app.musicplayer.utils.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -45,11 +52,15 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     abstract val contentView: View?
     lateinit var linearLayoutManager: RecyclerView.LayoutManager
     private var playerMenuCallBack: (String) -> Unit = {}
+    private var trackMenuCallBack: (String) -> Unit = {}
+    private var renameTrackCallBack: (String) -> Unit = {}
 
     @Inject
     lateinit var disposables: CompositeDisposable
+
     @Inject
     lateinit var strings: StringsInteractor
+
     @Inject
     lateinit var prefs: PreferenceHelper
 
@@ -63,7 +74,6 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         setContentView(contentView)
         linearLayoutManager = LinearLayoutManager(applicationContext)
         onSetup()
-        backPressed()
         viewState.apply {
             attach()
             errorEvent.observe(this@BaseActivity) {
@@ -77,22 +87,6 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
             messageEvent.observe(this@BaseActivity) {
                 it.ifNew?.let(this@BaseActivity::showMessage)
             }
-        }
-    }
-
-    private fun backPressed() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT
-            ) {
-                finish()
-            }
-        } else {
-            onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-//                    finish()
-                }
-            })
         }
     }
 
@@ -122,23 +116,22 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     fun moveBack() {
         finish()
     }
+
     fun bsSetRingtone(setRingtoneCallBack: (String) -> Unit) {
         this.setRingtoneCallBack = setRingtoneCallBack
         var setRingtoneValue: String? = null
-        var setRingtoneBottomSheet:BottomSheetDialog?=null
-        Handler(Looper.getMainLooper()).post {
-            setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
-        }
+        val setRingtoneBottomSheet: BottomSheetDialog?
+        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
         val binding = BsSetRingtoneBinding.inflate(LayoutInflater.from(this))
-        setRingtoneBottomSheet?.setContentView(binding.root)
+        setRingtoneBottomSheet.setContentView(binding.root)
         defaultCheckedRingtone(binding.setRingtoneGroup, prefs)
         binding.setRingtoneGroup.setOnCheckedChangeListener { group, checked ->
             val radioButton = group.findViewById<RadioButton>(checked)
             setRingtoneValue = radioButton.text.toString()
         }
         binding.cancelButton.setOnClickListener {
-            if (setRingtoneBottomSheet?.isShowing == true) {
-                setRingtoneBottomSheet?.dismiss()
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
             }
         }
         binding.doneButton.setOnClickListener {
@@ -146,11 +139,11 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
                 prefs.setRingtone = setRingtoneValue
             }
             setRingtoneCallBack(DONE)
-            if (setRingtoneBottomSheet?.isShowing == true) {
-                setRingtoneBottomSheet?.dismiss()
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
             }
         }
-        setRingtoneBottomSheet?.show()
+        setRingtoneBottomSheet.show()
     }
 
     private fun defaultCheckedRingtone(ringtoneGroup: RadioGroup, prefs: PreferenceHelper) {
@@ -196,6 +189,108 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         }
         popupMenuSelected.show()
 
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun launchGrantAllFilesDialog() {
+        MaterialAlertDialogBuilder(this).setMessage(getString(R.string.access_storage_prompt))
+            .setPositiveButton("OK") { _, _ ->
+                if (!Environment.isExternalStorageManager()) {
+                    launchGrantAllFilesIntent()
+                }
+            }.setCancelable(false).show()
+    }
+
+    private fun launchGrantAllFilesIntent() {
+        try {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.addCategory("android.intent.category.DEFAULT")
+            intent.data = Uri.parse("package:${this.packageName}")
+            startActivityForResult(intent, 214)
+            finish()
+        } catch (e: Exception) {
+            val intent = Intent()
+            intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+            try {
+                startActivity(intent)
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    fun showTrackPropertiesDialog(track: TrackCombinedData) {
+        val binding = PopupTrackPropertiesBinding.inflate(LayoutInflater.from(this))
+        val view = binding.root
+        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
+        builder.setView(view)
+        binding.path.text = track.track.path ?: ""
+        binding.name.text = track.track.path?.substringAfterLast("/")?.substringBeforeLast(".")
+        binding.duration.text = formatMillisToHMS(track.track.duration ?: 0L)
+        binding.artist.text = track.track.artist?.isUnknownString()
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    fun showTrackRenameMenu(name: String, renameCallBack: (String) -> Unit) {
+        this.renameTrackCallBack = renameCallBack
+        val binding = PopupTextFieldBinding.inflate(LayoutInflater.from(this))
+        val view = binding.root
+        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
+        builder.setTitle("Rename Track")
+        builder.setView(view)
+        binding.etName.setText(name.substringBeforeLast("."))
+        builder.setPositiveButton("Rename") { dialog, _ ->
+            renameTrackCallBack(binding.etName.text.toString())
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+        if (isRPlus()) {
+            if (Environment.isExternalStorageManager()) {
+                val dialog = builder.create()
+                dialog.show()
+            } else {
+                launchGrantAllFilesDialog()
+            }
+        }
+    }
+
+    fun showTrackMenu(view: View, isRecent: Boolean? = false, menuCallBack: (String) -> Unit) {
+        this.trackMenuCallBack = menuCallBack
+        val wrapper: Context = ContextThemeWrapper(this, R.style.popUpMenuMain)
+        val popupMenuSelected = PopupMenu(wrapper, view)
+        popupMenuSelected.inflate(R.menu.track_menu)
+        popupMenuSelected.gravity = Gravity.END
+        popupMenuSelected.menu.findItem(R.id.rename).isVisible = isRecent == false
+        popupMenuSelected.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.play -> {
+                    trackMenuCallBack(PLAY_TRACK)
+                }
+
+                R.id.share -> {
+                    trackMenuCallBack(SHARE_TRACK)
+                }
+
+                R.id.delete -> {
+                    trackMenuCallBack(DELETE_TRACK)
+                }
+
+                R.id.rename -> {
+                    trackMenuCallBack(RENAME_TRACK)
+                }
+
+                R.id.properties -> {
+                    trackMenuCallBack(PROPERTIES_TRACK)
+                }
+            }
+            true
+        }
+        popupMenuSelected.show()
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -319,6 +414,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
             sendIntent(NEXT)
         }
     }
+
     open fun <VS : BaseViewState> onFragmentSetup(fragment: BaseFragment<VS>) {}
 
 }

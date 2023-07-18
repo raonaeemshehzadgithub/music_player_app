@@ -41,6 +41,10 @@ class TracksRepositoryImpl @Inject constructor(
         musicDB.getFavoriteDao().removeFavoriteTrack(trackId)
     }
 
+    override fun removeRecentTrack(trackId: Long) {
+        musicDB.getTrackDao().removeRecentTrack(trackId)
+    }
+
     override fun fetchFavoriteTrack(): LiveData<List<Track>> {
         return musicDB.getFavoriteDao().fetchFavoriteList()
     }

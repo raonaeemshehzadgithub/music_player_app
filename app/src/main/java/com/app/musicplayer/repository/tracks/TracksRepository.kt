@@ -15,6 +15,7 @@ interface TracksRepository {
     fun fetchRecentTrack(): LiveData<List<RecentTrackEntity>>
     fun insertFavoriteTrack(track: Track)
     fun removeFavoriteTrack(trackId: Long)
+    fun removeRecentTrack(trackId: Long)
     fun fetchFavoriteTrack(): LiveData<List<Track>>
     fun fetchFavorites(): List<Track>
 }

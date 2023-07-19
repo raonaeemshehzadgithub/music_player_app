@@ -29,6 +29,7 @@
     <string name="set_ringtone">Set Ringtone</string>
     <string name="dialog_message_set_ringtone">Allow Music Player to modify audio settings</string>
     <string name="x_has_been_set_as_ringtone">Set %1$s as your ringtone.</string>
+    <string name="x_has_been_set_as_alarm_tone">Set %1$s as your Alarm Tone.</string>
     <string name="music_settings">Music Settings</string>
     <string name="ab_repeat_function">AB Repeat Function</string>
     <string name="eq_sound_style">EQ Sound Style</string>

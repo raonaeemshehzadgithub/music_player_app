@@ -24,6 +24,7 @@ class ArtistsFragment : ListFragment<Artist, ArtistsViewState>() {
 
     override fun onSetup() {
         super.onSetup()
+        listAdapter.viewHolderType = ARTISTS_VT
         viewState.apply {
             showItemEvent.observe(this@ArtistsFragment) { event ->
                 event.ifNew?.let { artist ->

@@ -11,6 +11,12 @@ import androidx.annotation.ChecksSdkIntAtLeast
 const val ROOM_DB_VERSION = 18
 const val ROOM_DB_NAME = "music_player_db"
 
+const val ALL_TRACKS_VT = 0
+const val ALBUMS_VT = 1
+const val ARTISTS_VT = 2
+const val RECENT_TRACK_VT = 3
+const val FAVORITES_VT = 4
+
 private const val PATH = "com.app.musicplayer.action."
 const val DISMISS = PATH + "DISMISS"
 const val FINISH = PATH + "FINISH"

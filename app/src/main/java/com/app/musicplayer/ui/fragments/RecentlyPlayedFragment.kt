@@ -33,6 +33,7 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
     lateinit var tracksInteractor: TracksInteractor
     override fun onSetup() {
         super.onSetup()
+        listAdapter.viewHolderType = RECENT_TRACK_VT
         viewState.apply {
             fetchRecentTrackList().observe(this@RecentlyPlayedFragment) {
                 listAdapter.items = it

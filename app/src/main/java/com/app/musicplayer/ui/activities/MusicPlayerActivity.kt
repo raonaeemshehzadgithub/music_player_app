@@ -5,20 +5,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.media.RingtoneManager
-import android.net.Uri
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
 import com.app.musicplayer.extentions.*
 import com.app.musicplayer.helpers.OnSwipeTouchListener
 import com.app.musicplayer.interator.tracks.TracksInteractor
-import com.app.musicplayer.db.entities.RecentTrackEntity
 import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.services.MusicService.Companion.positionTrack
 import com.app.musicplayer.services.MusicService.Companion.tracksList
@@ -79,19 +75,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
                 PLAY_PAUSE_ACTION -> {
                     when (intent.getBooleanExtra(PLAY_PAUSE_ICON, true)) {
-                        true -> binding.playPauseTrack.setImageDrawable(
-                            ContextCompat.getDrawable(
-                                this@MusicPlayerActivity,
-                                R.drawable.ic_pause
-                            )
-                        )
-
-                        false -> binding.playPauseTrack.setImageDrawable(
-                            ContextCompat.getDrawable(
-                                this@MusicPlayerActivity,
-                                R.drawable.ic_play
-                            )
-                        )
+                        true -> binding.playPauseTrack.updatePlayIcon(this@MusicPlayerActivity, false)
+                        false -> binding.playPauseTrack.updatePlayIcon(this@MusicPlayerActivity, true)
                     }
                 }
             }
@@ -136,6 +121,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                     binding.trackName.text = track?.title ?: ""
                     binding.artistName.text = track?.artist?.isUnknownString() ?: ""
                     binding.totalDuration.text = formatMillisToHMS(track?.duration ?: 0L)
+                    updatePlayPauseDrawable(binding.playPauseTrack, this@MusicPlayerActivity)
                     Glide.with(this@MusicPlayerActivity)
                         .load(track?.albumId?.getThumbnailUri() ?: "")
                         .placeholder(R.drawable.ic_music).into(binding.thumbnail)
@@ -215,7 +201,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                                     )
 
                                     ALARM_RINGTONE -> {
-                                        tracksList[positionTrack].path?.setDefaultAlarmTone(this@MusicPlayerActivity) ?: ""
+                                        tracksList[positionTrack].path?.setDefaultAlarmTone(this@MusicPlayerActivity)
+                                            ?: ""
                                     }
                                 }
                             }

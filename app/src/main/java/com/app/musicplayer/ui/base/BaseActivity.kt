@@ -10,8 +10,6 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -20,8 +18,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.window.OnBackInvokedDispatcher
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
@@ -207,7 +203,6 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
             intent.addCategory("android.intent.category.DEFAULT")
             intent.data = Uri.parse("package:${this.packageName}")
             startActivityForResult(intent, 214)
-            finish()
         } catch (e: Exception) {
             val intent = Intent()
             intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION

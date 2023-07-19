@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.FragmentNowPlayingBinding
@@ -18,6 +17,7 @@ import com.app.musicplayer.extentions.beVisible
 import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
+import com.app.musicplayer.extentions.updatePlayIcon
 import com.app.musicplayer.extentions.updatePlayPauseDrawable
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.tracks.TracksInteractor
@@ -52,19 +52,8 @@ class NowPlayingFragment : Fragment() {
 
                 PLAY_PAUSE_ACTION -> {
                     when (intent.getBooleanExtra(PLAY_PAUSE_ICON, true)) {
-                        true -> binding.playPauseCurrent.setImageDrawable(
-                            ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.ic_pause
-                            )
-                        )
-
-                        false -> binding.playPauseCurrent.setImageDrawable(
-                            ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.ic_play
-                            )
-                        )
+                        true -> binding.playPauseCurrent.updatePlayIcon(requireContext(), false)
+                        false -> binding.playPauseCurrent.updatePlayIcon(requireContext(), true)
                     }
                 }
             }
@@ -92,7 +81,10 @@ class NowPlayingFragment : Fragment() {
                 putExtra(POSITION, prefs.currentTrackPosition)
                 putExtra(FROM_MINI_PLAYER, true)
             })
-            requireActivity().overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top)
+            requireActivity().overridePendingTransition(
+                R.anim.slide_in_bottom,
+                R.anim.slide_out_top
+            )
         }
         binding.playPauseCurrent.setOnClickListener { requireContext().sendIntent(PLAYPAUSE) }
         binding.nextTrackCurrent.setOnClickListener { requireContext().sendIntent(NEXT) }
@@ -104,6 +96,7 @@ class NowPlayingFragment : Fragment() {
             binding.trackNameCurrent.isSelected = true
             binding.trackNameCurrent.text = track?.title ?: ""
             binding.artistNameCurrent.text = track?.artist?.isUnknownString() ?: ""
+            updatePlayPauseDrawable(binding.playPauseCurrent, requireContext())
             Glide.with(requireContext()).load(track?.albumId?.getThumbnailUri() ?: "")
                 .placeholder(R.drawable.ic_music).into(binding.trackThumbnail)
         }
@@ -111,10 +104,7 @@ class NowPlayingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-//        viewState.queryTrackList { trList ->
-//            tracksList = trList as ArrayList<Track>
-//        }
-        updatePlayPauseDrawable(binding.playPauseCurrent,requireContext())
+        updatePlayPauseDrawable(binding.playPauseCurrent, requireContext())
         if (prefs.currentTrackId != 0L) {
             binding.root.beVisible()
             updateTrackInfo(prefs.currentTrackId ?: 0L)

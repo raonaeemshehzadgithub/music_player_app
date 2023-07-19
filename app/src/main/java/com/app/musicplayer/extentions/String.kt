@@ -7,12 +7,8 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.utils.artworkUri
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 fun String.getThumbnailUri(): String {
     val coverUri = ContentUris.withAppendedId(artworkUri, this.toLong())
@@ -36,14 +32,12 @@ fun String.shareTrack(context: Context) {
 
 fun excludeMessagesAppRecordings(): String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-    val folderPath = File(musicDir, "Messenger/Recorded").absolutePath
-    return folderPath
+    return File(musicDir, "Messenger/Recorded").absolutePath
 }
 
 fun excludeRecorderAppRecordings(): String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-    val folderPath = File(musicDir, "Recordings").absolutePath
-    return folderPath
+    return File(musicDir, "Recordings").absolutePath
 }
 
 fun String.setDefaultAlarmTone(context: Context) {
@@ -52,4 +46,5 @@ fun String.setDefaultAlarmTone(context: Context) {
         RingtoneManager.TYPE_ALARM,
         Uri.parse(this)
     )
+    context.toast("Set default alarm tone")
 }

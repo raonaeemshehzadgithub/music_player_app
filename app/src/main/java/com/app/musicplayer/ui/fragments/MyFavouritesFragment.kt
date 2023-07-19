@@ -13,6 +13,8 @@ import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.FavoritesAdapter
 import com.app.musicplayer.ui.adapters.TracksAdapter
 import com.app.musicplayer.ui.viewstates.FavoritesViewState
+import com.app.musicplayer.utils.ALBUMS_VT
+import com.app.musicplayer.utils.FAVORITES_VT
 import com.app.musicplayer.utils.POSITION
 import com.app.musicplayer.utils.TRACK_ID
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +31,8 @@ class MyFavouritesFragment : ListFragment<Track, FavoritesViewState>() {
     override lateinit var listAdapter: FavoritesAdapter
     override fun onSetup() {
         super.onSetup()
-        viewState.fetchFavoriteTrackList().observe(this){
+        listAdapter.viewHolderType = FAVORITES_VT
+        viewState.fetchFavoriteTrackList().observe(this) {
             listAdapter.items = it
             showEmpty(listAdapter.items.isEmpty())
             favoriteList = it as ArrayList<Track>
@@ -42,8 +45,8 @@ class MyFavouritesFragment : ListFragment<Track, FavoritesViewState>() {
                 })
             }
         }
-        viewState.showFavoriteEvent.observe(this){event->
-            event.ifNew?.let { track->
+        viewState.showFavoriteEvent.observe(this) { event ->
+            event.ifNew?.let { track ->
                 context?.toast(getString(R.string.remove_favorites))
                 viewState.removeFavoriteTrack(track.id ?: 0L)
             }

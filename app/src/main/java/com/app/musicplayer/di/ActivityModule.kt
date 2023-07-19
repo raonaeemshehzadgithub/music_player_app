@@ -18,7 +18,5 @@ class ActivityModule {
 
     @Module
     @InstallIn(ActivityComponent::class)
-    interface BindsModule {
-
-    }
+    interface BindsModule
 }

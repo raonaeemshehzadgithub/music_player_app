@@ -11,7 +11,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
 import androidx.media.session.MediaButtonReceiver
 import com.app.musicplayer.R
-import com.app.musicplayer.db.MusicDB
 import com.app.musicplayer.extentions.getColoredBitmap
 import com.app.musicplayer.extentions.hasPermission
 import com.app.musicplayer.extentions.isUnknownString
@@ -35,12 +34,7 @@ import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.getPermissionToRequest
 import com.app.musicplayer.utils.isQPlus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -53,6 +47,9 @@ class MusicService : Service() {
     lateinit var pref: PreferenceHelper
 
     var timer: ScheduledExecutorService? = null
+    private var mProgressHandler = Handler()
+    private val PROGRESS_UPDATE_INTERVAL = 1000L
+    private var mPlaybackSpeed = 1f
     val intentControl = Intent(PROGRESS_CONTROLS_ACTION)
 
     companion object {
@@ -181,6 +178,10 @@ class MusicService : Service() {
                     setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
                 } else if (pref.shuffleTrack == SHUFFLE_TRACK_ON) {
                     handleNextPrevious(isNext = false, isShuffle = SHUFFLE_TRACK_ON)
+                } else if (positionTrack == tracksList.size.minus(1)) {
+                    dismissNotification()
+                } else {
+                    handleNextPrevious(isNext = true, isShuffle = SHUFFLE_TRACK_OFF)
                 }
             }
 
@@ -192,7 +193,7 @@ class MusicService : Service() {
         notificationHandler.removeCallbacksAndMessages(null)
         notificationHandler.postDelayed({
             mCurrTrackCover = resources.getColoredBitmap(R.drawable.ic_music, R.color.purple)
-            tracksInteractor.queryTrack(pref.currentTrackId?:0L) { track ->
+            tracksInteractor.queryTrack(pref.currentTrackId ?: 0L) { track ->
                 notificationHelper?.createPlayerNotification(
                     trackTitle = track?.title ?: "Track",
                     trackArtist = track?.artist?.isUnknownString() ?: "Artist",
@@ -218,41 +219,43 @@ class MusicService : Service() {
     }
 
     private fun handleProgressHandler(isPlaying: Boolean) {
-//        if (isPlaying) {
-//            mProgressHandler.post(object : Runnable {
-//                override fun run() {
-//                    if (isPlaying()) {
-//                        val position = getCurrentPosition()
-//                        val duration = getTrackDuration()
-//                        intentControl.putExtra(GET_TRACK_DURATION, duration)
-//                        intentControl.putExtra(GET_CURRENT_POSITION, position)
-//                        sendBroadcast(intentControl)
-//                    }
-//                    mProgressHandler.removeCallbacksAndMessages(null)
-//                    mProgressHandler.postDelayed(
-//                        this,
-//                        (PROGRESS_UPDATE_INTERVAL / mPlaybackSpeed).toLong()
-//                    )
-//                }
-//            })
-//        } else {
-//            mProgressHandler.removeCallbacksAndMessages(null)
-//        }
         if (isPlaying) {
-            timer = Executors.newScheduledThreadPool(1)
-            timer?.scheduleAtFixedRate({
-                if (isPlaying()) {
-                    val position = getCurrentPosition()
-                    val duration = getTrackDuration()
-                    intentControl.putExtra(GET_TRACK_DURATION, duration)
-                    intentControl.putExtra(GET_CURRENT_POSITION, position)
-                    sendBroadcast(intentControl)
-
-                    pref.currentTrackTotalDuration = duration
-                    pref.currentTrackProgress = position
+            mProgressHandler.post(object : Runnable {
+                override fun run() {
+                    if (isPlaying()) {
+                        val position = getCurrentPosition()
+                        val duration = getTrackDuration()
+                        intentControl.putExtra(GET_TRACK_DURATION, duration)
+                        intentControl.putExtra(GET_CURRENT_POSITION, position)
+                        sendBroadcast(intentControl)
+                        pref.currentTrackTotalDuration = duration
+                        pref.currentTrackProgress = position
+                    }
+                    mProgressHandler.removeCallbacksAndMessages(null)
+                    mProgressHandler.postDelayed(
+                        this,
+                        (PROGRESS_UPDATE_INTERVAL / mPlaybackSpeed).toLong()
+                    )
                 }
-            }, 10, 10, TimeUnit.MILLISECONDS)
+            })
+        } else {
+            mProgressHandler.removeCallbacksAndMessages(null)
         }
+//        if (isPlaying) {
+//            timer = Executors.newScheduledThreadPool(1)
+//            timer?.scheduleAtFixedRate({
+//                if (isPlaying()) {
+//                    val position = getCurrentPosition()
+//                    val duration = getTrackDuration()
+//                    intentControl.putExtra(GET_TRACK_DURATION, duration)
+//                    intentControl.putExtra(GET_CURRENT_POSITION, position)
+//                    sendBroadcast(intentControl)
+//
+//                    pref.currentTrackTotalDuration = duration
+//                    pref.currentTrackProgress = position
+//                }
+//            }, 10, 10, TimeUnit.MILLISECONDS)
+//        }
     }
 
     override fun onDestroy() {

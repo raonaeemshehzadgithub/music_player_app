@@ -33,9 +33,15 @@ abstract class ListFragment<ItemType : Any, VS : ListViewState<ItemType>> : Base
             getItemsObservable { it.observe(this@ListFragment, viewState::onItemsChanged) }
         }
         listAdapter.apply {
-            setOnItemClickListener(viewState::setOnItemClickListener)
-            setOnMenuClickListener(viewState::setOnMenuClickListener)
-            setOnFavoriteClickListener(viewState::setOnFavoriteClickListener)
+            setOnItemClickListener { item, position ->
+                viewState.setOnItemClickListener(item, position)
+            }
+            setOnMenuClickListener { item, position, view ->
+                viewState.setOnMenuClickListener(item, position, view)
+            }
+            setOnFavoriteClickListener { item ->
+                viewState.setOnFavoriteClickListener(item)
+            }
         }
     }
 

@@ -14,24 +14,32 @@ fun View.beVisibleIf(beVisible: Boolean) = if (beVisible) beVisible() else beGon
 
 fun View.beGoneIf(beGone: Boolean) = beVisibleIf(!beGone)
 
-fun View.beInvisible() { visibility = View.INVISIBLE }
+fun View.beInvisible() {
+    visibility = View.INVISIBLE
+}
 
-fun View.beVisible() { visibility = View.VISIBLE }
+fun View.beVisible() {
+    visibility = View.VISIBLE
+}
 
-fun View.beGone() { visibility = View.GONE }
+fun View.beGone() {
+    visibility = View.GONE
+}
 
 fun View.fadeIn() {
-    animate().alpha(1f).setDuration(SHORT_ANIMATION_DURATION).withStartAction { beVisible() }.start()
+    animate().alpha(1f).setDuration(SHORT_ANIMATION_DURATION).withStartAction { beVisible() }
+        .start()
 }
 
 fun View.fadeOut() {
     animate().alpha(0f).setDuration(SHORT_ANIMATION_DURATION).withEndAction { beGone() }.start()
 }
-fun ImageView.setSelectedTint(context:Context){
+
+fun ImageView.setSelectedTint(context: Context) {
     this.setColorFilter(ContextCompat.getColor(context, R.color.purple))
 }
 
-fun ImageView.setUnSelectedTint(context:Context){
+fun ImageView.setUnSelectedTint(context: Context) {
     if (context.isDarkMode()) {
         this.setColorFilter(ContextCompat.getColor(context, R.color.white))
     } else {
@@ -39,7 +47,7 @@ fun ImageView.setUnSelectedTint(context:Context){
     }
 }
 
-fun ImageView.updateFavoriteIcon(context: Context,isFav:Boolean) {
+fun ImageView.updateFavoriteIcon(context: Context, isFav: Boolean) {
     if (isFav) {
         this.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite))
     } else {
@@ -47,7 +55,25 @@ fun ImageView.updateFavoriteIcon(context: Context,isFav:Boolean) {
     }
 }
 
-fun updatePlayPauseDrawable(playPauseIcon:ImageView,context: Context) {
+fun ImageView.updatePlayIcon(context: Context, isPause: Boolean) {
+    if (isPause) {
+        this.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_play
+            )
+        )
+    } else {
+        this.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_pause
+            )
+        )
+    }
+}
+
+fun updatePlayPauseDrawable(playPauseIcon: ImageView, context: Context) {
     if (MediaPlayer.isPlaying()) {
         playPauseIcon.setImageDrawable(
             ContextCompat.getDrawable(

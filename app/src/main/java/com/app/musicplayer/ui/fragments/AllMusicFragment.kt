@@ -29,6 +29,7 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
 
     override fun onSetup() {
         super.onSetup()
+        listAdapter.viewHolderType = ALL_TRACKS_VT
         viewState.apply {
             getTrackList { trList ->
                 tracksList = trList as ArrayList<Track>

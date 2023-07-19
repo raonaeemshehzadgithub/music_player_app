@@ -9,6 +9,4 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewState @Inject constructor(
     @ApplicationContext private val context: Context
-) : BaseViewState() {
-
-}
+) : BaseViewState()

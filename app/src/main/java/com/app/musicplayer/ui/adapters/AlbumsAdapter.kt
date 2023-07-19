@@ -1,25 +1,19 @@
 package com.app.musicplayer.ui.adapters
 
 import android.content.Context
-import com.app.musicplayer.extentions.getThumbnailUri
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.app.musicplayer.models.Album
 import com.app.musicplayer.models.ListData
-import com.app.musicplayer.ui.holder.ListItemHolder
+import com.app.musicplayer.ui.adapters.holders.AlbumViewHolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class AlbumsAdapter @Inject constructor(@ApplicationContext private val context: Context) :
     ListAdapter<Album>() {
 
-    override fun onBindListItem(listItemHolder: ListItemHolder, item: Album) {
-        listItemHolder.apply {
-            isMenuIconShown(false)
-            isListItemShown(true)
-            isArtistItemShown(false)
-            trackName = item.albumTitle ?: ""
-            artist = "${item.trackCount ?: ""} listed"
-
-            setAlbumThumbnail(item.albumId.toString().getThumbnailUri())
+    override fun onBindListItem(holder: ViewHolder, album: Album) {
+        (holder as AlbumViewHolder).apply {
+            bindData(context,album)
         }
     }
 

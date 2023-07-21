@@ -15,6 +15,7 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -24,6 +25,9 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
+import com.app.musicplayer.databinding.BsEqualizerBinding
+import com.app.musicplayer.databinding.BsPlaybackSpeedBinding
+import com.app.musicplayer.databinding.BsRenameTrackBinding
 import com.app.musicplayer.databinding.BsSetRingtoneBinding
 import com.app.musicplayer.databinding.PopupTextFieldBinding
 import com.app.musicplayer.databinding.PopupTrackPropertiesBinding
@@ -49,7 +53,6 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     lateinit var linearLayoutManager: RecyclerView.LayoutManager
     private var playerMenuCallBack: (String) -> Unit = {}
     private var trackMenuCallBack: (String) -> Unit = {}
-    private var renameTrackCallBack: (String) -> Unit = {}
 
     @Inject
     lateinit var disposables: CompositeDisposable
@@ -62,6 +65,8 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
 
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     private var setRingtoneCallBack: (String) -> Unit = {}
+    private var setPlaySpeedCallBack: (String) -> Unit = {}
+    private var setRenameTrackCallBack: (String) -> Unit = {}
     var isAskingPermissions = false
     var showSettingAlert: AlertDialog? = null
 
@@ -142,12 +147,84 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         setRingtoneBottomSheet.show()
     }
 
+    fun bsPlaySpeed(setSpeedCallBack: (String) -> Unit) {
+        this.setPlaySpeedCallBack = setSpeedCallBack
+        var playSpeedValue: String? = null
+        val setRingtoneBottomSheet: BottomSheetDialog?
+        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        val binding = BsPlaybackSpeedBinding.inflate(LayoutInflater.from(this))
+        setRingtoneBottomSheet.setContentView(binding.root)
+        defaultCheckedPlaySpeed(binding.playSpeedGroup, prefs)
+        binding.playSpeedGroup.setOnCheckedChangeListener { group, checked ->
+            val radioButton = group.findViewById<RadioButton>(checked)
+            playSpeedValue = radioButton.text.toString()
+        }
+        binding.cancelButton.setOnClickListener {
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        binding.doneButton.setOnClickListener {
+            if (playSpeedValue.equals(PLAY_SPEED_0_5x) or playSpeedValue.equals(PLAY_SPEED_0_75x) or playSpeedValue.equals(
+                    PLAY_SPEED_1x
+                ) or playSpeedValue.equals(PLAY_SPEED_1_25x) or playSpeedValue.equals(
+                    PLAY_SPEED_1_5x
+                ) or playSpeedValue.equals(
+                    PLAY_SPEED_2x
+                )
+            ) {
+                prefs.setPlaySpeed = playSpeedValue
+            }
+            setPlaySpeedCallBack(DONE)
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        setRingtoneBottomSheet.show()
+    }
+
+    fun bsEqualizer(setRingtoneCallBack: (String) -> Unit) {
+        this.setRingtoneCallBack = setRingtoneCallBack
+        var setRingtoneValue: String? = null
+        val setRingtoneBottomSheet: BottomSheetDialog?
+        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        val binding = BsEqualizerBinding.inflate(LayoutInflater.from(this))
+        setRingtoneBottomSheet.setContentView(binding.root)
+        binding.cancelButton.setOnClickListener {
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        binding.doneButton.setOnClickListener {
+            if (setRingtoneValue.equals(PHONE_RINGTONE) or setRingtoneValue.equals(ALARM_RINGTONE)) {
+                prefs.setRingtone = setRingtoneValue
+            }
+            setRingtoneCallBack(DONE)
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        setRingtoneBottomSheet.show()
+    }
+
     private fun defaultCheckedRingtone(ringtoneGroup: RadioGroup, prefs: PreferenceHelper) {
         for (count in 0 until ringtoneGroup.childCount) {
             val radioButton: RadioButton = ringtoneGroup.getChildAt(count) as RadioButton
             radioButton.let {
                 when (it.text) {
                     prefs.setRingtone -> {
+                        it.isChecked = true
+                    }
+                }
+            }
+        }
+    }
+    private fun defaultCheckedPlaySpeed(playSpeedGroup: RadioGroup, prefs: PreferenceHelper) {
+        for (count in 0 until playSpeedGroup.childCount) {
+            val radioButton: RadioButton = playSpeedGroup.getChildAt(count) as RadioButton
+            radioButton.let {
+                when (it.text) {
+                    prefs.setPlaySpeed -> {
                         it.isChecked = true
                     }
                 }
@@ -165,6 +242,14 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         popupMenuSelected.gravity = Gravity.END
         popupMenuSelected.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.ab_repeat -> {
+                    playerMenuCallBack(AB_REPEAT_TRACK)
+                }
+
+                R.id.play_speed -> {
+                    playerMenuCallBack(PLAY_SPEED_TRACK)
+                }
+
                 R.id.share_track -> {
                     playerMenuCallBack(SHARE_TRACK)
                 }
@@ -228,26 +313,27 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         val dialog = builder.create()
         dialog.show()
     }
-
-    fun showTrackRenameMenu(name: String, renameCallBack: (String) -> Unit) {
-        this.renameTrackCallBack = renameCallBack
-        val binding = PopupTextFieldBinding.inflate(LayoutInflater.from(this))
-        val view = binding.root
-        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
-        builder.setTitle("Rename Track")
-        builder.setView(view)
+    fun bsRenameTrack(name: String,setRenameTrackCallBack: (String) -> Unit) {
+        this.setRenameTrackCallBack = setRenameTrackCallBack
+        val setRingtoneBottomSheet: BottomSheetDialog?
+        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        val binding = BsRenameTrackBinding.inflate(LayoutInflater.from(this))
+        setRingtoneBottomSheet.setContentView(binding.root)
         binding.etName.setText(name.substringBeforeLast("."))
-        builder.setPositiveButton("Rename") { dialog, _ ->
-            renameTrackCallBack(binding.etName.text.toString())
-            dialog.dismiss()
+        binding.cancelButton.setOnClickListener {
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
         }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.dismiss()
+        binding.renameButton.setOnClickListener {
+            setRenameTrackCallBack(binding.etName.text.toString())
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
         }
         if (isRPlus()) {
             if (Environment.isExternalStorageManager()) {
-                val dialog = builder.create()
-                dialog.show()
+                setRingtoneBottomSheet.show()
             } else {
                 launchGrantAllFilesDialog()
             }

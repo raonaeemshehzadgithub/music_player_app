@@ -14,11 +14,15 @@ import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getColoredBitmap
 import com.app.musicplayer.extentions.hasPermission
 import com.app.musicplayer.extentions.isUnknownString
+import com.app.musicplayer.extentions.playBackSpeed
 import com.app.musicplayer.extentions.shuffleTrack
+import com.app.musicplayer.extentions.toast
+import com.app.musicplayer.helpers.MediaPlayer.abRepeat
 import com.app.musicplayer.helpers.MediaPlayer.completePlayer
 import com.app.musicplayer.helpers.MediaPlayer.getCurrentPosition
 import com.app.musicplayer.helpers.MediaPlayer.getTrackDuration
 import com.app.musicplayer.helpers.MediaPlayer.isPlaying
+import com.app.musicplayer.helpers.MediaPlayer.mPlayer
 import com.app.musicplayer.helpers.MediaPlayer.pauseTrackk
 import com.app.musicplayer.helpers.MediaPlayer.playTrack
 import com.app.musicplayer.helpers.MediaPlayer.releasePlayer
@@ -30,6 +34,8 @@ import com.app.musicplayer.helpers.NotificationHelper.Companion.NOTIFICATION_ID
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
+import com.app.musicplayer.ui.activities.MusicPlayerActivity.Companion.aPosition
+import com.app.musicplayer.ui.activities.MusicPlayerActivity.Companion.bPosition
 import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.getPermissionToRequest
 import com.app.musicplayer.utils.isQPlus
@@ -135,7 +141,8 @@ class MusicService : Service() {
         val nextPreviousIntent = Intent(NEXT_PREVIOUS_ACTION)
         nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, pref.currentTrackId)
         sendBroadcast(nextPreviousIntent)
-        setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
+//        setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?: PLAY_SPEED_1x)
+        setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?.playBackSpeed()?:1f)
         handleProgressHandler(isPlaying())
     }
 
@@ -170,12 +177,12 @@ class MusicService : Service() {
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
         pref.currentTrackId = tracksList[positionTrack].id ?: 0L
-        setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
+        setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?.playBackSpeed()?:1f)
         handleProgressHandler(isPlaying())
         completePlayer { completed ->
             if (completed == COMPLETE_CALLBACK) {
                 if (pref.repeatTrack == REPEAT_TRACK_ON) {
-                    setupTrack(applicationContext, tracksList[positionTrack].path ?: "")
+                    setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?.playBackSpeed()?:1f)
                 } else if (pref.shuffleTrack == SHUFFLE_TRACK_ON) {
                     handleNextPrevious(isNext = false, isShuffle = SHUFFLE_TRACK_ON)
                 } else if (positionTrack == tracksList.size.minus(1)) {
@@ -236,6 +243,9 @@ class MusicService : Service() {
                         this,
                         (PROGRESS_UPDATE_INTERVAL / mPlaybackSpeed).toLong()
                     )
+                    if (bPosition != 0 && mPlayer()?.currentPosition!! >= bPosition) {
+                        abRepeat(aPosition)
+                    }
                 }
             })
         } else {

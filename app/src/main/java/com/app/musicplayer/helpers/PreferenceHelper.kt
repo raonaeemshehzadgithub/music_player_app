@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.CURRENT_TRACK_PROGRESS
 import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.CURRENT_TRACK_TOTAL_CURRENT
+import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.PLAY_SPEED
 import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.REPEAT_TRACK
 import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.SET_RINGTONE
 import com.app.musicplayer.helpers.PreferenceHelper.PreferenceVariable.SHUFFLE_TRACK
@@ -22,6 +23,7 @@ class PreferenceHelper @Inject constructor(@ApplicationContext private val conte
         const val REPEAT_TRACK = "repeat_track"
         const val SHUFFLE_TRACK = "shuffle_track"
         const val SET_RINGTONE = "set_ringtone"
+        const val PLAY_SPEED = "play_speed"
         const val TRACK_ID_CURRENT = "current_track_id"
         const val TRACK_POSITION_CURRENT = "current_track_position"
         const val CURRENT_TRACK_PROGRESS = "current_track_progress"
@@ -50,6 +52,12 @@ class PreferenceHelper @Inject constructor(@ApplicationContext private val conte
         get() = appPrefs.getString(SET_RINGTONE, PHONE_RINGTONE)
         set(shuffleTrack) {
             editor.putString(SET_RINGTONE, shuffleTrack)
+            editor.apply()
+        }
+    var setPlaySpeed: String?
+        get() = appPrefs.getString(PLAY_SPEED, PLAY_SPEED_1x)
+        set(trackSpeed) {
+            editor.putString(PLAY_SPEED, trackSpeed)
             editor.apply()
         }
 

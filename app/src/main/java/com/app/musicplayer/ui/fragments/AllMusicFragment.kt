@@ -1,11 +1,13 @@
 package com.app.musicplayer.ui.fragments
 
 import android.content.Intent
+import android.os.Environment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.extentions.deleteTrack
 import com.app.musicplayer.extentions.shareTrack
+import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService.Companion.tracksList
@@ -70,9 +72,7 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                                 }
 
                                 RENAME_TRACK -> {
-                                    baseActivity.showTrackRenameMenu(
-                                        trackCombinedData.track.title ?: ""
-                                    ) { renamedText ->
+                                    baseActivity.bsRenameTrack(trackCombinedData.track.title ?: "") {renamedText->
                                         tracksInteractor.renameTrack(trackCombinedData, renamedText)
                                     }
                                 }

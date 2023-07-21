@@ -69,9 +69,7 @@ class AlbumDetailsActivity : BaseActivity<TracksViewState>() {
                                     }
                                 }
                                 RENAME_TRACK -> {
-                                    showTrackRenameMenu(
-                                        trackCombinedData.track.title ?: ""
-                                    ) { renamedText ->
+                                    bsRenameTrack(trackCombinedData.track.title ?: "") {renamedText->
                                         tracksInteractor.renameTrack(trackCombinedData, renamedText)
                                     }
                                 }

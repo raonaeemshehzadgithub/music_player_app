@@ -4,7 +4,7 @@
         <shape
             android:shape="line">
             <stroke
-                android:color="@color/gray"
+                android:color="#D1C7DA"
                 android:width="@dimen/seek_bar_thickness"/>
         </shape>
     </item>
@@ -13,7 +13,7 @@
             <shape
                 android:shape="line">
                 <stroke
-                    android:color="@color/gray"
+                    android:color="#D1C7DA"
                     android:width="@dimen/seek_bar_thickness"/>
             </shape>
         </clip>

@@ -5,14 +5,17 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
 import com.app.musicplayer.extentions.*
+import com.app.musicplayer.helpers.MediaPlayer.setPlayBackSpeed
 import com.app.musicplayer.helpers.OnSwipeTouchListener
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.services.MusicService
@@ -42,11 +45,20 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     private val intentDismiss = IntentFilter(DISMISS_PLAYER_ACTION)
     private val intentComplete = IntentFilter(TRACK_COMPLETE_ACTION)
 
+    var position: Int = 0
+    var isA: Boolean = false
+    var isB: Boolean = false
+
+    companion object {
+        var aPosition: Int = 0
+        var bPosition: Int = 0
+    }
+
     var playerReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             when (intent?.action) {
                 PROGRESS_CONTROLS_ACTION -> {
-                    val position = intent.getIntExtra(GET_CURRENT_POSITION, 0)
+                    position = intent.getIntExtra(GET_CURRENT_POSITION, 0)
                     val duration = intent.getIntExtra(GET_TRACK_DURATION, 0)
                     binding.seekBar.max = duration
                     binding.seekBar.progress = position
@@ -75,8 +87,15 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
                 PLAY_PAUSE_ACTION -> {
                     when (intent.getBooleanExtra(PLAY_PAUSE_ICON, true)) {
-                        true -> binding.playPauseTrack.updatePlayIcon(this@MusicPlayerActivity, false)
-                        false -> binding.playPauseTrack.updatePlayIcon(this@MusicPlayerActivity, true)
+                        true -> binding.playPauseTrack.updatePlayIcon(
+                            this@MusicPlayerActivity,
+                            false
+                        )
+
+                        false -> binding.playPauseTrack.updatePlayIcon(
+                            this@MusicPlayerActivity,
+                            true
+                        )
                     }
                 }
             }
@@ -162,6 +181,9 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
             shuffleTrack.setOnClickListener { shuffleTrack() }
             playerMenuMore.setOnClickListener { playerMenus() }
             favouriteTrack.setOnClickListener { favoriteTrack() }
+            a.setOnClickListener { setAPosition() }
+            b.setOnClickListener { setBPosition() }
+            abClose.setOnClickListener { clearAbRepeat() }
             root.setOnTouchListener(object : OnSwipeTouchListener(this@MusicPlayerActivity) {
                 override fun onSwipeDown() {
                     super.onSwipeDown()
@@ -173,9 +195,31 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         setUpPreferences()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun playerMenus() {
-        playerMenu(binding.playerMenuMore) {
-            when (it) {
+        playerMenu(binding.playerMenuMore) { menuCallBack ->
+            when (menuCallBack) {
+                AB_REPEAT_TRACK -> {
+                    binding.abContainer.beVisible()
+                }
+
+                PLAY_SPEED_TRACK -> {
+                    bsPlaySpeed { speedCallBack ->
+                        when (speedCallBack) {
+                            DONE -> {
+                                when (prefs.setPlaySpeed) {
+                                    PLAY_SPEED_0_5x -> setPlayBackSpeed(PLAY_SPEED_0_5x)
+                                    PLAY_SPEED_0_75x -> setPlayBackSpeed(PLAY_SPEED_0_75x)
+                                    PLAY_SPEED_1x -> setPlayBackSpeed(PLAY_SPEED_1x)
+                                    PLAY_SPEED_1_25x -> setPlayBackSpeed(PLAY_SPEED_1_25x)
+                                    PLAY_SPEED_1_5x -> setPlayBackSpeed(PLAY_SPEED_1_5x)
+                                    PLAY_SPEED_2x -> setPlayBackSpeed(PLAY_SPEED_2x)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 SHARE_TRACK -> {
                     tracksList[positionTrack].path?.shareTrack(this@MusicPlayerActivity) ?: ""
                 }
@@ -200,10 +244,10 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                                         trackId = tracksList[positionTrack].id ?: 0L
                                     )
 
-                                    ALARM_RINGTONE -> {
-                                        tracksList[positionTrack].path?.setDefaultAlarmTone(this@MusicPlayerActivity)
-                                            ?: ""
-                                    }
+                                    ALARM_RINGTONE -> viewState.setAlarmTone(
+                                        context = this@MusicPlayerActivity,
+                                        trackPath = tracksList[positionTrack].path ?: ""
+                                    )
                                 }
                             }
                         }
@@ -283,6 +327,40 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                 binding.shuffleTrack.setUnSelectedTint(context = this)
             }
         }
+    }
+
+    private fun setAPosition() {
+        if (isA) {
+            aPosition = 0
+            binding.a.text = "A"
+            isA = false
+        } else {
+            aPosition = position
+            binding.a.text = formatMillisToHMS(aPosition.toLong())
+            isA = true
+        }
+    }
+
+    private fun setBPosition() {
+        if (isB) {
+            bPosition = 0
+            binding.b.text = "B"
+            isB = false
+        } else {
+            bPosition = position
+            binding.b.text = formatMillisToHMS(bPosition.toLong())
+            isB = true
+        }
+    }
+
+    private fun clearAbRepeat() {
+        isA = false
+        isB = false
+        aPosition = 0
+        bPosition = 0
+        binding.a.text = "A"
+        binding.b.text = "B"
+        binding.abContainer.beGone()
     }
 
     override fun onDestroy() {

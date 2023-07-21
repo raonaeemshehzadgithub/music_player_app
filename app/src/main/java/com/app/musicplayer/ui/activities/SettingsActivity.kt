@@ -22,6 +22,11 @@ class SettingsActivity : BaseActivity<SettingsViewState>() {
             moveBack.setOnClickListener {
                 finish()
             }
+            eqSound.setOnClickListener {
+                bsEqualizer {
+
+                }
+            }
         }
     }
 }

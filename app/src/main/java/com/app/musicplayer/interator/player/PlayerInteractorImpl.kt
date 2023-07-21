@@ -26,4 +26,12 @@ class PlayerInteractorImpl @Inject constructor(
             RingtoneManager.setRingtone(context, trackId)
         }
     }
+
+    override fun setAlarmTone(context: Context, trackPath: String) {
+        if (RingtoneManager.requiresDialog(context)) {
+            RingtoneManager.showDialog(context)
+        } else {
+            RingtoneManager.setAlarmTone(context, trackPath)
+        }
+    }
 }

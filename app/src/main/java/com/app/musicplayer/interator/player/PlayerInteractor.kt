@@ -9,4 +9,5 @@ interface PlayerInteractor {
     fun deleteTrack(trackId: Long)
     fun queryTrackList(callback: (List<Track?>) -> Unit)
     fun setPhoneRingtone(context: Context, trackId: Long)
+    fun setAlarmTone(context: Context, trackPath: String)
 }

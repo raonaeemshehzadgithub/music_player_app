@@ -19,12 +19,12 @@
 
         <ImageView
             android:id="@+id/back"
-            android:src="@drawable/ic_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_10"
             android:background="@drawable/selection_ripple_bg"
             android:padding="@dimen/padding_5"
+            android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/now_playing"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,11 +71,11 @@
         tools:ignore="MissingConstraints">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/thack_thumbnail"
+            android:id="@+id/track_thumb"
             android:layout_width="@dimen/thumbnail_width"
             android:layout_height="@dimen/thumbnail_height"
             app:cardCornerRadius="150dp"
-            app:layout_constraintBottom_toTopOf="@+id/track_data"
+            app:layout_constraintBottom_toTopOf="@+id/ab_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -89,6 +89,69 @@
                 tools:ignore="MissingConstraints" />
         </androidx.cardview.widget.CardView>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ab_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_50"
+            android:layout_marginStart="@dimen/margin_20"
+            android:layout_marginEnd="@dimen/margin_20"
+            android:background="@drawable/ab_repeat_bg"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/track_data"
+            app:layout_constraintTop_toBottomOf="@+id/track_thumb">
+
+            <TextView
+                android:id="@+id/a"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_20"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="A"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_20"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/hyphen"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/hyphen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="   -   "
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_20"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/b"
+                app:layout_constraintStart_toEndOf="@+id/a"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/b"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="B"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_20"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/hyphen"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/ab_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_20"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_cross"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/track_data"
@@ -97,18 +160,18 @@
             app:layout_constraintBottom_toTopOf="@+id/progress_container"
             app:layout_constraintEnd_toStartOf="@+id/favourite_track"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/thack_thumbnail">
+            app:layout_constraintTop_toBottomOf="@+id/ab_container">
 
             <TextView
                 android:id="@+id/track_name"
                 style="@style/AppNameText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="start"
                 android:ellipsize="marquee"
-                android:singleLine="true"
+                android:gravity="start"
                 android:paddingStart="@dimen/padding_20"
                 android:paddingEnd="@dimen/padding_20"
+                android:singleLine="true"
                 android:text="@string/track_name"
                 app:layout_constraintBottom_toTopOf="@+id/artist_name"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -269,6 +332,7 @@
             app:layout_constraintStart_toEndOf="@+id/play_pause_track"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
+        tracksList[positionTrack].path?.shareTrack(this@MusicPlayerActivity) ?: ""
 
         <ImageView
             android:id="@+id/repeat_track"

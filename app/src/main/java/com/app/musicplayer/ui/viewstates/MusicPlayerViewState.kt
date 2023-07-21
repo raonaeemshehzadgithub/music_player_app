@@ -45,7 +45,11 @@ class MusicPlayerViewState @Inject constructor(
     }
 
     fun setRingtone(context: Context, trackId: Long) {
-        playerInteractor.setPhoneRingtone(context,trackId)
+        playerInteractor.setPhoneRingtone(context, trackId)
+    }
+
+    fun setAlarmTone(context: Context, trackPath: String) {
+        playerInteractor.setAlarmTone(context, trackPath)
     }
 
     suspend fun fetchFavorites(): List<Track>? {

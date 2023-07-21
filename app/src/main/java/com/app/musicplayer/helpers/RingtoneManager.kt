@@ -1,23 +1,17 @@
 package com.app.musicplayer.helpers
 
 import android.content.ContentUris
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.provider.Settings
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.io.File
 
 object RingtoneManager {
     fun setRingtone(context: Context, trackId: Long) {
@@ -45,6 +39,15 @@ object RingtoneManager {
             }
         } catch (ignored: SecurityException) {
         }
+    }
+
+    fun setAlarmTone(context: Context, trackPath: String) {
+        RingtoneManager.setActualDefaultRingtoneUri(
+            context,
+            RingtoneManager.TYPE_ALARM,
+            Uri.parse(trackPath)
+        )
+        context.toast("Set default alarm tone")
     }
 
     fun requiresDialog(context: Context): Boolean {

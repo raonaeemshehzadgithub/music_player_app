@@ -81,11 +81,6 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
                                 }
 
                                 RENAME_TRACK -> {
-                                    baseActivity.showTrackRenameMenu(
-                                        trackCombinedData.track.title ?: ""
-                                    ) { renamedText ->
-//                                        tracksInteractor.renameTrack(recentTrackCombine, renamedText)
-                                    }
                                 }
                                 PROPERTIES_TRACK->{
                                     val recentTrackCombined = TrackCombinedData(trackCombinedData.track.toTrack(),trackCombinedData.position,trackCombinedData.view)

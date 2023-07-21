@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/ab_repeat"
+        android:title="A-B Repeat"
+        app:showAsAction="never"/>
+    <item android:id="@+id/play_speed"
+        android:title="Play Speed"
+        app:showAsAction="never"/>
     <item android:id="@+id/share_track"
         android:title="Share"
         app:showAsAction="never"/>

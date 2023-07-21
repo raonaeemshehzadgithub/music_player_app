@@ -44,12 +44,20 @@ const val REPEAT_TRACK_OFF = "repeat_off"
 const val SHUFFLE_TRACK_ON = "shuffle_on"
 const val SHUFFLE_TRACK_OFF = "shuffle_off"
 const val PHONE_RINGTONE = "Phone Ringtone"
+const val PLAY_SPEED_0_5x = "0.5x"
+const val PLAY_SPEED_0_75x = "0.75x"
+const val PLAY_SPEED_1x = "1x (Normal)"
+const val PLAY_SPEED_1_25x = "1.25x"
+const val PLAY_SPEED_1_5x = "1.5x"
+const val PLAY_SPEED_2x = "2x"
 const val CURRENT_TRACK_ID = 0L
 const val CURRENT_TRACK_POSITION = 0
 const val TRACK_CURRENT_PROGRESS = 0
 const val TRACK_CURRENT_TOTAL_CURRENT = 0
 const val ALARM_RINGTONE = "Alarm tone"
 const val SHARE_TRACK = "share_track"
+const val AB_REPEAT_TRACK = "ab_repeat_track"
+const val PLAY_SPEED_TRACK = "play_speed_track"
 const val PLAY_TRACK = "play_track"
 const val RENAME_TRACK = "rename_track"
 const val PROPERTIES_TRACK = "properties_track"
@@ -86,6 +94,7 @@ val artworkUri = Uri.parse("content://media/external/audio/albumart")
 fun getPermissionToRequest() =
     if (isTiramisuPlus()) PERMISSION_READ_MEDIA_AUDIOS else PERMISSION_WRITE_STORAGE
 
+fun isMPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 //check if device is running on Android 11 or higher
 fun isRPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 

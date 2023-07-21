@@ -3,10 +3,16 @@ package com.app.musicplayer.extentions
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import com.app.musicplayer.helpers.MediaPlayer
+import com.app.musicplayer.utils.PLAY_SPEED_0_5x
+import com.app.musicplayer.utils.PLAY_SPEED_0_75x
+import com.app.musicplayer.utils.PLAY_SPEED_1_25x
+import com.app.musicplayer.utils.PLAY_SPEED_1_5x
+import com.app.musicplayer.utils.PLAY_SPEED_1x
+import com.app.musicplayer.utils.PLAY_SPEED_2x
 import com.app.musicplayer.utils.artworkUri
 import java.io.File
 
@@ -20,6 +26,18 @@ fun String.isUnknownString(): String {
         return this.substringAfterLast("<").substringBeforeLast(">")
     }
     return this
+}
+
+fun String.playBackSpeed(): Float {
+    when (this) {
+        PLAY_SPEED_0_5x -> return 0.5f
+        PLAY_SPEED_0_75x -> return 0.75f
+        PLAY_SPEED_1x -> return 1f
+        PLAY_SPEED_1_25x -> return 1.25f
+        PLAY_SPEED_1_5x -> return 1.5f
+        PLAY_SPEED_2x -> return 2f
+    }
+    return 1f
 }
 
 fun String.shareTrack(context: Context) {
@@ -38,13 +56,4 @@ fun excludeMessagesAppRecordings(): String {
 fun excludeRecorderAppRecordings(): String {
     val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
     return File(musicDir, "Recordings").absolutePath
-}
-
-fun String.setDefaultAlarmTone(context: Context) {
-    RingtoneManager.setActualDefaultRingtoneUri(
-        context,
-        RingtoneManager.TYPE_ALARM,
-        Uri.parse(this)
-    )
-    context.toast("Set default alarm tone")
 }

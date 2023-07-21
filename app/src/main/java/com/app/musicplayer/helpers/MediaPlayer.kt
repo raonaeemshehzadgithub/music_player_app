@@ -6,10 +6,18 @@ import android.net.Uri
 import android.os.DeadObjectException
 import android.util.Log
 import com.app.musicplayer.utils.COMPLETE_CALLBACK
+import com.app.musicplayer.utils.PLAY_SPEED_0_5x
+import com.app.musicplayer.utils.PLAY_SPEED_0_75x
+import com.app.musicplayer.utils.PLAY_SPEED_1_25x
+import com.app.musicplayer.utils.PLAY_SPEED_1_5x
+import com.app.musicplayer.utils.PLAY_SPEED_1x
+import com.app.musicplayer.utils.PLAY_SPEED_2x
+import com.app.musicplayer.utils.isMPlus
 import java.io.File
 
 object MediaPlayer :
-    MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,MediaPlayer.OnCompletionListener {
+    MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
+    MediaPlayer.OnCompletionListener {
     private var player: MediaPlayer? = null
 
     private var trackCompleteCallback: (String) -> Unit = {}
@@ -21,14 +29,21 @@ object MediaPlayer :
         player = MediaPlayer()
     }
 
-    fun setupTrack(context: Context, path: String) {
+    fun mPlayer(): MediaPlayer? {
+        return player
+    }
+
+    fun setupTrack(context: Context, path: String, playSpeed: Float) {
         initMediaPlayerIfNeeded()
         player?.reset() ?: return
         try {
-            player?.apply {
-                setDataSource(context, Uri.fromFile(File(path)))
-                prepare()
-                start()
+            if (isMPlus()) {
+                player?.apply {
+                    setDataSource(context, Uri.fromFile(File(path)))
+                    playbackParams = this.playbackParams.setSpeed(playSpeed)
+                    prepare()
+                    start()
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -36,7 +51,7 @@ object MediaPlayer :
     }
 
     fun getCurrentPosition(): Int {
-        return player?.currentPosition?:0
+        return player?.currentPosition ?: 0
     }
 
     fun getTrackDuration(): Int? {
@@ -67,6 +82,31 @@ object MediaPlayer :
     fun seekTo(position: Int) {
         if (isPlaying()) {
             player?.seekTo(position)
+        }
+    }
+
+    fun abRepeat(position: Int) {
+        if (isPlaying()) {
+            player?.seekTo(position)
+            player?.start()
+        }
+    }
+
+    fun setPlayBackSpeed(speed: String) {
+        when (speed) {
+            PLAY_SPEED_0_5x -> setSpeedParam(0.5f)
+            PLAY_SPEED_0_75x -> setSpeedParam(0.75f)
+            PLAY_SPEED_1x -> setSpeedParam(1f)
+            PLAY_SPEED_1_25x -> setSpeedParam(1.25f)
+            PLAY_SPEED_1_5x -> setSpeedParam(1.5f)
+            PLAY_SPEED_2x -> setSpeedParam(2f)
+        }
+    }
+
+    private fun setSpeedParam(speed: Float) {
+        if (isMPlus()) {
+            player?.playbackParams = player?.playbackParams?.setSpeed(speed)!!
+            player?.start()
         }
     }
 
@@ -102,7 +142,7 @@ object MediaPlayer :
                 player?.start()
             }
         } catch (e: DeadObjectException) {
-            Log.wtf("DeadObjectException error",e.toString())
+            Log.wtf("DeadObjectException error", e.toString())
             // Handle the DeadObjectException appropriately
             // This could involve reconnecting to the media player service or taking other necessary actions.
         }

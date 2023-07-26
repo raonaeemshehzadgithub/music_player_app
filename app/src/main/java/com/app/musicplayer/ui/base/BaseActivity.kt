@@ -2,23 +2,27 @@ package com.app.musicplayer.ui.base
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
@@ -29,7 +33,7 @@ import com.app.musicplayer.databinding.BsEqualizerBinding
 import com.app.musicplayer.databinding.BsPlaybackSpeedBinding
 import com.app.musicplayer.databinding.BsRenameTrackBinding
 import com.app.musicplayer.databinding.BsSetRingtoneBinding
-import com.app.musicplayer.databinding.PopupTextFieldBinding
+import com.app.musicplayer.databinding.BsSleepTimerBinding
 import com.app.musicplayer.databinding.PopupTrackPropertiesBinding
 import com.app.musicplayer.extentions.formatMillisToHMS
 import com.app.musicplayer.extentions.getPermissionString
@@ -41,6 +45,7 @@ import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.models.TrackCombinedData
 import com.app.musicplayer.utils.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.disposables.CompositeDisposable
@@ -53,6 +58,11 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     lateinit var linearLayoutManager: RecyclerView.LayoutManager
     private var playerMenuCallBack: (String) -> Unit = {}
     private var trackMenuCallBack: (String) -> Unit = {}
+    private lateinit var audioManager: AudioManager
+
+    private lateinit var volumeReceiver: BroadcastReceiver
+    private val pitchValues = arrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f)
+    private var pitch = 1f
 
     @Inject
     lateinit var disposables: CompositeDisposable
@@ -67,6 +77,8 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     private var setRingtoneCallBack: (String) -> Unit = {}
     private var setPlaySpeedCallBack: (String) -> Unit = {}
     private var setRenameTrackCallBack: (String) -> Unit = {}
+    private var setSleepTimerCallBack: (Int) -> Unit = {}
+    private var setEqualizerCallBack: (String) -> Unit = {}
     var isAskingPermissions = false
     var showSettingAlert: AlertDialog? = null
 
@@ -183,28 +195,80 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         setRingtoneBottomSheet.show()
     }
 
-    fun bsEqualizer(setRingtoneCallBack: (String) -> Unit) {
-        this.setRingtoneCallBack = setRingtoneCallBack
-        var setRingtoneValue: String? = null
+    fun bsEqualizer(setEqualizerCallBack: (String) -> Unit) {
+        this.setEqualizerCallBack = setEqualizerCallBack
         val setRingtoneBottomSheet: BottomSheetDialog?
         setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
         val binding = BsEqualizerBinding.inflate(LayoutInflater.from(this))
+        setUpVolumeSeekbar(binding.soundBar)
+        setUpPitchSeekbar(binding.pitchBar)
         setRingtoneBottomSheet.setContentView(binding.root)
         binding.cancelButton.setOnClickListener {
+            unregisterReceiver(volumeReceiver)
             if (setRingtoneBottomSheet.isShowing) {
                 setRingtoneBottomSheet.dismiss()
             }
         }
         binding.doneButton.setOnClickListener {
-            if (setRingtoneValue.equals(PHONE_RINGTONE) or setRingtoneValue.equals(ALARM_RINGTONE)) {
-                prefs.setRingtone = setRingtoneValue
-            }
-            setRingtoneCallBack(DONE)
+            setEqualizerCallBack(DONE)
+            unregisterReceiver(volumeReceiver)
             if (setRingtoneBottomSheet.isShowing) {
                 setRingtoneBottomSheet.dismiss()
             }
         }
         setRingtoneBottomSheet.show()
+    }
+
+    private fun setUpVolumeSeekbar(seekBar: SeekBar) {
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        seekBar.max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        seekBar.progress = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    progress, AudioManager.FLAG_SHOW_UI
+                )
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
+        volumeReceiver = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, intent: Intent?) {
+                if (intent?.action == VOLUME_CHANGED_ACTION) {
+                    val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+                    seekBar.progress = currentVolume
+                }
+            }
+        }
+        val filter = IntentFilter(VOLUME_CHANGED_ACTION)
+        registerReceiver(volumeReceiver, filter)
+    }
+
+    private fun setUpPitchSeekbar(seekBar: SeekBar) {
+        seekBar.progress =
+            ((prefs.setEqPitch?.toFloat()!! - pitchValues[0]) / (pitchValues[pitchValues.size - 1] - pitchValues[0]) * 100).toInt()
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val pitchIndex = (progress / 100f * (pitchValues.size - 1)).toInt()
+                pitch = if (pitchIndex == pitchValues.size - 1) {
+                    pitchValues[pitchIndex]
+                } else {
+                    val minPitch = pitchValues[pitchIndex]
+                    val maxPitch = pitchValues[pitchIndex + 1]
+                    val pitchFraction =
+                        (progress % (100f / (pitchValues.size - 1))) / (100f / (pitchValues.size - 1))
+                    minPitch + (maxPitch - minPitch) * pitchFraction
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                prefs.setEqPitch = "${pitch}f"
+            }
+        })
     }
 
     private fun defaultCheckedRingtone(ringtoneGroup: RadioGroup, prefs: PreferenceHelper) {
@@ -219,6 +283,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
             }
         }
     }
+
     private fun defaultCheckedPlaySpeed(playSpeedGroup: RadioGroup, prefs: PreferenceHelper) {
         for (count in 0 until playSpeedGroup.childCount) {
             val radioButton: RadioButton = playSpeedGroup.getChildAt(count) as RadioButton
@@ -248,6 +313,10 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
 
                 R.id.play_speed -> {
                     playerMenuCallBack(PLAY_SPEED_TRACK)
+                }
+
+                R.id.sleep_timer -> {
+                    playerMenuCallBack(SLEEP_TIMER)
                 }
 
                 R.id.share_track -> {
@@ -313,7 +382,37 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         val dialog = builder.create()
         dialog.show()
     }
-    fun bsRenameTrack(name: String,setRenameTrackCallBack: (String) -> Unit) {
+
+    fun bsSleepTimer(setSleepTimerCallBack: (Int) -> Unit) {
+        this.setSleepTimerCallBack = setSleepTimerCallBack
+        var selectedTime = 0
+        val setRingtoneBottomSheet: BottomSheetDialog?
+        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        val binding = BsSleepTimerBinding.inflate(LayoutInflater.from(this))
+        setRingtoneBottomSheet.setContentView(binding.root)
+        val displayedValues = (10..90 step 5).map { "$it mins" }.toTypedArray()
+        binding.numberPicker.displayedValues = displayedValues
+        binding.numberPicker.minValue = 0
+        binding.numberPicker.maxValue = displayedValues.size - 1
+        binding.numberPicker.value = 0
+        binding.numberPicker.setOnValueChangedListener { picker, oldVal, newVal ->
+            selectedTime = newVal
+        }
+        binding.setTimer.setOnClickListener {
+            setSleepTimerCallBack(selectedTime)
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        binding.cancelButton.setOnClickListener {
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        setRingtoneBottomSheet.show()
+    }
+
+    fun bsRenameTrack(name: String, setRenameTrackCallBack: (String) -> Unit) {
         this.setRenameTrackCallBack = setRenameTrackCallBack
         val setRingtoneBottomSheet: BottomSheetDialog?
         setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)

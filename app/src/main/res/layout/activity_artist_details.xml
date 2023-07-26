@@ -33,12 +33,16 @@
         <TextView
             android:id="@+id/title"
             style="@style/AppNameText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/album_name"
+            android:layout_marginEnd="@dimen/margin_30"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="2"
+            android:text="@string/artist_name"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/move_back"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -47,12 +51,13 @@
         android:id="@+id/songs_and_albums"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="5 Albums • 54 Songs"
         android:padding="@dimen/padding_20"
-        tools:ignore="MissingConstraints"
+        android:text="5 Albums • 54 Songs"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        tools:ignore="MissingConstraints" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/artists_rv"
         android:layout_width="match_parent"

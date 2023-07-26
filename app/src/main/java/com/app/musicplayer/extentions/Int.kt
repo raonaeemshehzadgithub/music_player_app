@@ -27,3 +27,26 @@ fun Int.shuffleTrack(): Int {
     }
     return shufflePosition.indexOf(MusicService.positionTrack)
 }
+
+fun Int.getTimerMinutes(): Int {
+    when (this) {
+        0 -> return 10
+        1 -> return 15
+        2 -> return 20
+        3 -> return 25
+        4 -> return 30
+        5 -> return 35
+        6 -> return 40
+        7 -> return 45
+        8 -> return 50
+        9 -> return 55
+        10 -> return 60
+        11 -> return 65
+        12 -> return 70
+        13 -> return 75
+        14 -> return 80
+        15 -> return 85
+        16 -> return 90
+        else -> return 10
+    }
+}

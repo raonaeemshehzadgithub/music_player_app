@@ -8,7 +8,7 @@ import android.provider.MediaStore
 import androidx.annotation.ChecksSdkIntAtLeast
 
 //room db
-const val ROOM_DB_VERSION = 18
+const val ROOM_DB_VERSION = 21
 const val ROOM_DB_NAME = "music_player_db"
 
 const val ALL_TRACKS_VT = 0
@@ -16,6 +16,7 @@ const val ALBUMS_VT = 1
 const val ARTISTS_VT = 2
 const val RECENT_TRACK_VT = 3
 const val FAVORITES_VT = 4
+const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
 
 private const val PATH = "com.app.musicplayer.action."
 const val DISMISS = PATH + "DISMISS"
@@ -50,6 +51,7 @@ const val PLAY_SPEED_1x = "1x (Normal)"
 const val PLAY_SPEED_1_25x = "1.25x"
 const val PLAY_SPEED_1_5x = "1.5x"
 const val PLAY_SPEED_2x = "2x"
+const val EQUALIZER_PITCH_DEFAULT = "1f"
 const val CURRENT_TRACK_ID = 0L
 const val CURRENT_TRACK_POSITION = 0
 const val TRACK_CURRENT_PROGRESS = 0
@@ -58,6 +60,7 @@ const val ALARM_RINGTONE = "Alarm tone"
 const val SHARE_TRACK = "share_track"
 const val AB_REPEAT_TRACK = "ab_repeat_track"
 const val PLAY_SPEED_TRACK = "play_speed_track"
+const val SLEEP_TIMER = "sleep_timer"
 const val PLAY_TRACK = "play_track"
 const val RENAME_TRACK = "rename_track"
 const val PROPERTIES_TRACK = "properties_track"

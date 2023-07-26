@@ -12,6 +12,7 @@ import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
+import com.app.musicplayer.ui.activities.SettingsActivity
 import com.app.musicplayer.ui.adapters.TracksAdapter
 import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
@@ -50,9 +51,9 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                         baseActivity.showTrackMenu(it) { callback ->
                             when (callback) {
                                 PLAY_TRACK -> {
-                                    startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
-                                        putExtra(TRACK_ID, trackCombinedData.track.id)
-                                        putExtra(POSITION, trackCombinedData.position)
+                                    startActivity(Intent(requireContext(), SettingsActivity::class.java).apply {
+//                                        putExtra(TRACK_ID, trackCombinedData.track.id)
+//                                        putExtra(POSITION, trackCombinedData.position)
                                     })
                                 }
 

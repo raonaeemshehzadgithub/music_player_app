@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.FragmentNowPlayingBinding
@@ -17,6 +18,7 @@ import com.app.musicplayer.extentions.beVisible
 import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
+import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.extentions.updatePlayIcon
 import com.app.musicplayer.extentions.updatePlayPauseDrawable
 import com.app.musicplayer.helpers.PreferenceHelper
@@ -40,6 +42,7 @@ class NowPlayingFragment : Fragment() {
     lateinit var binding: FragmentNowPlayingBinding
     private val intentNextPrevious = IntentFilter(NEXT_PREVIOUS_ACTION)
     private val intentPlayPause = IntentFilter(PLAY_PAUSE_ACTION)
+    private val intentDismiss = IntentFilter(DISMISS_PLAYER_ACTION)
 
     var playerReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -56,6 +59,11 @@ class NowPlayingFragment : Fragment() {
                         false -> binding.playPauseCurrent.updatePlayIcon(requireContext(), true)
                     }
                 }
+                DISMISS_PLAYER_ACTION -> {
+                    if (intent.getBooleanExtra(DISMISS_PLAYER, false)) {
+                        binding.playPauseCurrent.updatePlayIcon(requireContext(), true)
+                    }
+                }
             }
         }
     }
@@ -68,6 +76,7 @@ class NowPlayingFragment : Fragment() {
         binding = FragmentNowPlayingBinding.bind(view)
         requireContext().registerReceiver(playerReceiver, intentNextPrevious)
         requireContext().registerReceiver(playerReceiver, intentPlayPause)
+        requireContext().registerReceiver(playerReceiver, intentDismiss)
         setUpClicks()
         return view
     }

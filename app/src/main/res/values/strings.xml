@@ -22,6 +22,7 @@
     <string name="add_favorites">Added to Favorites</string>
     <string name="remove_favorites">Removed from Favorites</string>
     <string name="set_as">Set as</string>
+    <string name="select_time">Stop Player at regular intervals</string>
     <string name="select_play_speed">Select Playback Speed</string>
     <string name="custom_equalizer">Custom equalizer</string>
     <string name="pitch">Pitch</string>
@@ -38,6 +39,7 @@
     <string name="alarm_tone">Alarm tone</string>
     <string name="cancel">Cancel</string>
     <string name="done">Done</string>
+    <string name="set_timer">Set Timer</string>
     <string name="rename">Rename</string>
     <string name="set_ringtone">Set Ringtone</string>
     <string name="dialog_message_set_ringtone">Allow Music Player to modify audio settings</string>

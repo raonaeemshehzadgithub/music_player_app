@@ -96,6 +96,6 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
 
     override fun onResume() {
         super.onResume()
-        tracksList = recentList!!
+//        tracksList = recentList!!
     }
 }

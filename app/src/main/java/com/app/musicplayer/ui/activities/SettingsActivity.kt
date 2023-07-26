@@ -3,8 +3,10 @@ package com.app.musicplayer.ui.activities
 import android.view.View
 import androidx.activity.viewModels
 import com.app.musicplayer.databinding.ActivitySettingsBinding
+import com.app.musicplayer.helpers.MediaPlayer.setEqualizerPitch
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.SettingsViewState
+import com.app.musicplayer.utils.DONE
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,8 +25,10 @@ class SettingsActivity : BaseActivity<SettingsViewState>() {
                 finish()
             }
             eqSound.setOnClickListener {
-                bsEqualizer {
-
+                bsEqualizer {eqCallBack->
+                    when(eqCallBack){
+                        DONE->setEqualizerPitch(prefs.setEqPitch?.toFloat()?:1f)
+                    }
                 }
             }
         }

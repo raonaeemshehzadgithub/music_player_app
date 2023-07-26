@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Handler
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -44,6 +45,11 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     private val intentPlayPause = IntentFilter(PLAY_PAUSE_ACTION)
     private val intentDismiss = IntentFilter(DISMISS_PLAYER_ACTION)
     private val intentComplete = IntentFilter(TRACK_COMPLETE_ACTION)
+    private var timerHandler = Handler()
+    private val timerRunnable = Runnable {
+        sendIntent(PLAYPAUSE)
+        timerHandler.removeCallbacksAndMessages(null)
+    }
 
     var position: Int = 0
     var isA: Boolean = false
@@ -163,6 +169,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("ClickableViewAccessibility")
     private fun setUpButtons() {
         binding.apply {
@@ -220,6 +227,15 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                     }
                 }
 
+                SLEEP_TIMER -> {
+                    bsSleepTimer {
+                        cancelTimer()
+                        val delayInMillis = it.getTimerMinutes() * 60 * 1000L
+                        timerHandler.postDelayed(timerRunnable, delayInMillis)
+                        toast("Player will stop in ${it.getTimerMinutes()} minutes")
+                    }
+                }
+
                 SHARE_TRACK -> {
                     tracksList[positionTrack].path?.shareTrack(this@MusicPlayerActivity) ?: ""
                 }
@@ -255,6 +271,10 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                 }
             }
         }
+    }
+
+    private fun cancelTimer() {
+        timerHandler.removeCallbacks(timerRunnable)
     }
 
     private fun setUpPreferences() {

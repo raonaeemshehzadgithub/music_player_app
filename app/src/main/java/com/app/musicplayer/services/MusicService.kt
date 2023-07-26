@@ -116,7 +116,7 @@ class MusicService : Service() {
 
     private fun dismissNotification() {
         if (isPlaying()) {
-            releasePlayer()
+            pauseTrackk {}
         }
         stopForegroundAndNotification()
         val dismissIntent = Intent(DISMISS_PLAYER_ACTION)
@@ -142,7 +142,12 @@ class MusicService : Service() {
         nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, pref.currentTrackId)
         sendBroadcast(nextPreviousIntent)
 //        setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?: PLAY_SPEED_1x)
-        setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?.playBackSpeed()?:1f)
+        setupTrack(
+            applicationContext,
+            tracksList[positionTrack].path ?: "",
+            pref.setPlaySpeed?.playBackSpeed() ?: 1f,
+            pref.setEqPitch?.toFloat()?:1f
+        )
         handleProgressHandler(isPlaying())
     }
 
@@ -177,12 +182,22 @@ class MusicService : Service() {
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
         pref.currentTrackId = tracksList[positionTrack].id ?: 0L
-        setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?.playBackSpeed()?:1f)
+        setupTrack(
+            applicationContext,
+            tracksList[positionTrack].path ?: "",
+            pref.setPlaySpeed?.playBackSpeed() ?: 1f,
+            pref.setEqPitch?.toFloat()?:1f
+        )
         handleProgressHandler(isPlaying())
         completePlayer { completed ->
             if (completed == COMPLETE_CALLBACK) {
                 if (pref.repeatTrack == REPEAT_TRACK_ON) {
-                    setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?.playBackSpeed()?:1f)
+                    setupTrack(
+                        applicationContext,
+                        tracksList[positionTrack].path ?: "",
+                        pref.setPlaySpeed?.playBackSpeed() ?: 1f,
+                        pref.setEqPitch?.toFloat()?:1f
+                    )
                 } else if (pref.shuffleTrack == SHUFFLE_TRACK_ON) {
                     handleNextPrevious(isNext = false, isShuffle = SHUFFLE_TRACK_ON)
                 } else if (positionTrack == tracksList.size.minus(1)) {

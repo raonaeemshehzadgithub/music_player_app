@@ -33,7 +33,7 @@ object MediaPlayer :
         return player
     }
 
-    fun setupTrack(context: Context, path: String, playSpeed: Float) {
+    fun setupTrack(context: Context, path: String, playSpeed: Float,eqPitch:Float) {
         initMediaPlayerIfNeeded()
         player?.reset() ?: return
         try {
@@ -41,6 +41,7 @@ object MediaPlayer :
                 player?.apply {
                     setDataSource(context, Uri.fromFile(File(path)))
                     playbackParams = this.playbackParams.setSpeed(playSpeed)
+                    playbackParams = this.playbackParams.setPitch(eqPitch)
                     prepare()
                     start()
                 }
@@ -110,6 +111,12 @@ object MediaPlayer :
         }
     }
 
+    fun setEqualizerPitch(pitch:Float) {
+        if (isMPlus()) {
+            player?.playbackParams = player?.playbackParams?.setPitch(pitch)!!
+            player?.start()
+        }
+    }
     fun completePlayer(trackCompleteCallback: (String) -> Unit) {
         this.trackCompleteCallback = trackCompleteCallback
         player?.setOnCompletionListener {

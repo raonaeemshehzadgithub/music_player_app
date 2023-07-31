@@ -51,9 +51,9 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                         baseActivity.showTrackMenu(it) { callback ->
                             when (callback) {
                                 PLAY_TRACK -> {
-                                    startActivity(Intent(requireContext(), SettingsActivity::class.java).apply {
-//                                        putExtra(TRACK_ID, trackCombinedData.track.id)
-//                                        putExtra(POSITION, trackCombinedData.position)
+                                    startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
+                                        putExtra(TRACK_ID, trackCombinedData.track.id)
+                                        putExtra(POSITION, trackCombinedData.position)
                                     })
                                 }
 
@@ -75,6 +75,9 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                                 RENAME_TRACK -> {
                                     baseActivity.bsRenameTrack(trackCombinedData.track.title ?: "") {renamedText->
                                         tracksInteractor.renameTrack(trackCombinedData, renamedText)
+                                        getTrackList { trList ->
+                                            tracksList = trList as ArrayList<Track>
+                                        }
                                     }
                                 }
                                 PROPERTIES_TRACK->{

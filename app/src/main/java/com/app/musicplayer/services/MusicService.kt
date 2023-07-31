@@ -63,7 +63,6 @@ class MusicService : Service() {
         private var mMediaSession: MediaSessionCompat? = null
         var tracksList = ArrayList<Track>()
         var positionTrack: Int = 0
-        var isTrackCompleted: Boolean = false
     }
 
     //    private var currentTrackId: Long = 0L
@@ -146,7 +145,7 @@ class MusicService : Service() {
             applicationContext,
             tracksList[positionTrack].path ?: "",
             pref.setPlaySpeed?.playBackSpeed() ?: 1f,
-            pref.setEqPitch?.toFloat()?:1f
+            pref.setEqPitch?.toFloat() ?: 1f
         )
         handleProgressHandler(isPlaying())
     }
@@ -186,7 +185,7 @@ class MusicService : Service() {
             applicationContext,
             tracksList[positionTrack].path ?: "",
             pref.setPlaySpeed?.playBackSpeed() ?: 1f,
-            pref.setEqPitch?.toFloat()?:1f
+            pref.setEqPitch?.toFloat() ?: 1f
         )
         handleProgressHandler(isPlaying())
         completePlayer { completed ->
@@ -196,7 +195,7 @@ class MusicService : Service() {
                         applicationContext,
                         tracksList[positionTrack].path ?: "",
                         pref.setPlaySpeed?.playBackSpeed() ?: 1f,
-                        pref.setEqPitch?.toFloat()?:1f
+                        pref.setEqPitch?.toFloat() ?: 1f
                     )
                 } else if (pref.shuffleTrack == SHUFFLE_TRACK_ON) {
                     handleNextPrevious(isNext = false, isShuffle = SHUFFLE_TRACK_ON)

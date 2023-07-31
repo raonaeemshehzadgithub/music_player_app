@@ -14,17 +14,8 @@ class TracksRepositoryImpl @Inject constructor(
     private val musicDB: MusicDB
 ) : TracksRepository {
     override fun getTracks(): LiveData<List<Track>> = liveDataFactory.getTracksLiveData()
-    override fun getTracksOfAlbum(albumId: Long?, callback: (List<Track>) -> Unit) {
-        contentResolverFactory.getTracksContentResolver(null, albumId).queryItems {
-            callback.invoke(it)
-        }
-    }
-    override fun getTracksOfArtist(artistId: Long?, callback: (List<Track>) -> Unit) {
-        contentResolverFactory.getTracksContentResolver(null, null,artistId).queryItems {
-            callback.invoke(it)
-        }
-    }
-
+    override fun getAlbumTracks(albumId: Long?) = liveDataFactory.getAlbumsTracksLiveData(albumId)
+    override fun getArtistTracks(artistId:Long?) = liveDataFactory.getArtistsTracksLiveData(artistId)
     override fun insertRecentTrack(track: RecentTrackEntity) {
         musicDB.getTrackDao().insertRecentTrack(track)
     }

@@ -50,3 +50,11 @@ fun Int.getTimerMinutes(): Int {
         else -> return 10
     }
 }
+fun Int.convertToSeekBarProgress(): Int {
+    return if (this < 0) {
+        val positiveValue = this + 1500
+        (positiveValue.toFloat() / 1500 * 1500).toInt()
+    } else {
+        (this.toFloat() / 1500 * 1500 + 1500).toInt()
+    }
+}

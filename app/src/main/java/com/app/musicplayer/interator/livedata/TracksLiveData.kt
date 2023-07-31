@@ -11,7 +11,9 @@ import javax.inject.Singleton
 class TracksLiveData(
     @ApplicationContext context: Context,
     private val trackId: Long? = null,
+    private val albumId: Long? = null,
+    private val artistId: Long? = null,
     private val contentResolverFactory: ContentResolverFactory,
 ) : ContentProviderLiveData<TracksContentResolver, Track>(context) {
-    override val contentResolver by lazy { contentResolverFactory.getTracksContentResolver(trackId,null,null) }
+    override val contentResolver by lazy { contentResolverFactory.getTracksContentResolver(trackId,albumId,artistId) }
 }

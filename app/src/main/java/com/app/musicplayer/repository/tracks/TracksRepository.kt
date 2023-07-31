@@ -1,16 +1,13 @@
 package com.app.musicplayer.repository.tracks
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.db.entities.RecentTrackEntity
 
 interface TracksRepository {
     fun getTracks(): LiveData<List<Track>>
-
-    fun getTracksOfAlbum(albumId: Long? = null, callback: (List<Track>) -> Unit)
-    fun getTracksOfArtist(artistId: Long? = null, callback: (List<Track>) -> Unit)
-
+    fun getAlbumTracks(albumId:Long?=null): LiveData<List<Track>>
+    fun getArtistTracks(artistId:Long?=null): LiveData<List<Track>>
     fun insertRecentTrack(track: RecentTrackEntity)
     fun fetchRecentTrack(): LiveData<List<RecentTrackEntity>>
     fun insertFavoriteTrack(track: Track)

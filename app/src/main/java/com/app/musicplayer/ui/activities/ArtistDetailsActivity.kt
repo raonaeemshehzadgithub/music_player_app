@@ -14,14 +14,14 @@ import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.adapters.TracksAdapter
 import com.app.musicplayer.ui.base.BaseActivity
-import com.app.musicplayer.ui.viewstates.TracksViewState
+import com.app.musicplayer.ui.viewstates.ArtistDetailsViewState
 import com.app.musicplayer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ArtistDetailsActivity : BaseActivity<TracksViewState>() {
-    override val viewState: TracksViewState by viewModels()
+class ArtistDetailsActivity : BaseActivity<ArtistDetailsViewState>() {
+    override val viewState: ArtistDetailsViewState by viewModels()
     private val binding by lazy { ActivityArtistDetailsBinding.inflate(layoutInflater) }
     override val contentView: View by lazy { binding.root }
 
@@ -32,11 +32,6 @@ class ArtistDetailsActivity : BaseActivity<TracksViewState>() {
     override fun onSetup() {
         onSetupViews()
         viewState.apply {
-            getTracksOfArtist(intent.getLongExtra(ARTIST_ID, 0L)) {
-                tracksAdapter.items = it
-                showEmpty(tracksAdapter.items.isEmpty())
-                tracksList = it as ArrayList<Track>
-            }
             showItemEvent.observe(this@ArtistDetailsActivity) { event ->
                 event.ifNew?.let { trackCombinedData ->
                     startActivity(Intent(this@ArtistDetailsActivity, MusicPlayerActivity::class.java).apply {
@@ -77,12 +72,14 @@ class ArtistDetailsActivity : BaseActivity<TracksViewState>() {
                     }
                 }
             }
-//            itemsChangedEvent.observe(this@AlbumDetailsActivity) { event ->
-//                event.ifNew?.let {
-//                    tracksAdapter.items = it
-//                    showEmpty(tracksAdapter.items.isEmpty())
-//                }
-//            }
+            itemsChangedEvent.observe(this@ArtistDetailsActivity) { event ->
+                event.ifNew?.let {
+                    tracksAdapter.items = it
+                    showEmpty(tracksAdapter.items.isEmpty())
+                    tracksList = it as ArrayList<Track>
+                }
+            }
+            queryArtistDetails(intent.getLongExtra(ARTIST_ID, 0L))
             getItemsObservable { it.observe(this@ArtistDetailsActivity, viewState::onItemsChanged) }
         }
         tracksAdapter.apply {

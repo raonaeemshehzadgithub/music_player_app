@@ -52,6 +52,7 @@ const val PLAY_SPEED_1_25x = "1.25x"
 const val PLAY_SPEED_1_5x = "1.5x"
 const val PLAY_SPEED_2x = "2x"
 const val EQUALIZER_PITCH_DEFAULT = "1f"
+const val EQUALIZER_BASS_DEFAULT = "0"
 const val CURRENT_TRACK_ID = 0L
 const val CURRENT_TRACK_POSITION = 0
 const val TRACK_CURRENT_PROGRESS = 0

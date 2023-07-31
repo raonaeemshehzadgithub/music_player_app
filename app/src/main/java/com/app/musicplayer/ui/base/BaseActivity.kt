@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.media.audiofx.Equalizer
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -35,12 +36,14 @@ import com.app.musicplayer.databinding.BsRenameTrackBinding
 import com.app.musicplayer.databinding.BsSetRingtoneBinding
 import com.app.musicplayer.databinding.BsSleepTimerBinding
 import com.app.musicplayer.databinding.PopupTrackPropertiesBinding
+import com.app.musicplayer.extentions.convertToSeekBarProgress
 import com.app.musicplayer.extentions.formatMillisToHMS
 import com.app.musicplayer.extentions.getPermissionString
 import com.app.musicplayer.extentions.hasPermission
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
 import com.app.musicplayer.extentions.toast
+import com.app.musicplayer.helpers.MediaPlayer.mPlayer
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.models.TrackCombinedData
@@ -63,6 +66,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     private lateinit var volumeReceiver: BroadcastReceiver
     private val pitchValues = arrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f)
     private var pitch = 1f
+    private val equalizer = mPlayer()?.audioSessionId?.let { Equalizer(0, it) }
 
     @Inject
     lateinit var disposables: CompositeDisposable
@@ -81,6 +85,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     private var setEqualizerCallBack: (String) -> Unit = {}
     var isAskingPermissions = false
     var showSettingAlert: AlertDialog? = null
+    var bassLevel: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -197,11 +202,13 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
 
     fun bsEqualizer(setEqualizerCallBack: (String) -> Unit) {
         this.setEqualizerCallBack = setEqualizerCallBack
+        equalizer?.enabled = true
         val setRingtoneBottomSheet: BottomSheetDialog?
         setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
         val binding = BsEqualizerBinding.inflate(LayoutInflater.from(this))
         setUpVolumeSeekbar(binding.soundBar)
         setUpPitchSeekbar(binding.pitchBar)
+        setUpBassSeekbar(binding.baseBar)
         setRingtoneBottomSheet.setContentView(binding.root)
         binding.cancelButton.setOnClickListener {
             unregisterReceiver(volumeReceiver)
@@ -267,6 +274,31 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 prefs.setEqPitch = "${pitch}f"
+            }
+        })
+    }
+
+    private fun setUpBassSeekbar(seekBar: SeekBar) {
+        val numberOfBands = equalizer?.numberOfBands
+        val minBassLevel = equalizer?.bandLevelRange?.get(0)
+        val maxBassLevel = equalizer?.bandLevelRange?.get(1)
+        if (maxBassLevel != null) {
+            seekBar.max = maxBassLevel - minBassLevel!!
+        }
+        seekBar.progress = prefs.setEqBass?.toInt()?.convertToSeekBarProgress() ?: 1500
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                bassLevel = minBassLevel?.plus(progress)
+                for (band in 0 until numberOfBands!!) {
+                    bassLevel?.toShort()?.let {
+                        equalizer?.setBandLevel(band.toShort(), it)
+                    }
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                prefs.setEqBass = bassLevel.toString()
             }
         })
     }

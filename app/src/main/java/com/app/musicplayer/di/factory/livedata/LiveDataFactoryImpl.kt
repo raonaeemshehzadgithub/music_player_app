@@ -15,11 +15,17 @@ class LiveDataFactoryImpl @Inject constructor(
     private val contentResolverFactory: ContentResolverFactory
 ) : LiveDataFactory {
     override fun getTracksLiveData(trackId: Long?): TracksLiveData =
-        TracksLiveData(context, trackId, contentResolverFactory)
+        TracksLiveData(context, trackId, null,null, contentResolverFactory)
 
     override fun getAlbumsLiveData(albumId: Long?): AlbumsLiveData =
         AlbumsLiveData(context, albumId, contentResolverFactory)
 
     override fun getArtistsLiveData(artistId: Long?): ArtistsLiveData =
         ArtistsLiveData(context, artistId, contentResolverFactory)
+
+    override fun getAlbumsTracksLiveData(albumId: Long?) =
+        TracksLiveData(context, null, albumId, null, contentResolverFactory)
+
+    override fun getArtistsTracksLiveData(artistId: Long?) =
+        TracksLiveData(context, null, null, artistId, contentResolverFactory)
 }

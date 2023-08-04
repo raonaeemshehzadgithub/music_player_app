@@ -22,7 +22,6 @@ class RecentTrackViewState @Inject constructor(
 
     val showItemEvent = DataLiveEvent<RecentTrackCombinedData>()
     val showMenuEvent = DataLiveEvent<RecentTrackCombinedData>()
-    //    private val tracksLiveData = tracksRepository.getTracks() as TracksLiveData
     override fun getItemsObservable(callback: (LiveData<List<RecentTrackEntity>>) -> Unit) {
     }
 

@@ -4,14 +4,18 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import androidx.media.session.MediaButtonReceiver
 import com.app.musicplayer.R
 import com.app.musicplayer.extentions.getColoredBitmap
+import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.extentions.hasPermission
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.playBackSpeed
@@ -57,6 +61,14 @@ class MusicService : Service() {
     private val PROGRESS_UPDATE_INTERVAL = 1000L
     private var mPlaybackSpeed = 1f
     val intentControl = Intent(PROGRESS_CONTROLS_ACTION)
+    private val mMediaSessionActions =
+        PlaybackStateCompat.ACTION_STOP or
+                PlaybackStateCompat.ACTION_PAUSE or
+                PlaybackStateCompat.ACTION_PLAY or
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                PlaybackStateCompat.ACTION_SEEK_TO or
+                PlaybackStateCompat.ACTION_PLAY_PAUSE
 
     companion object {
         private var mCurrTrackCover: Bitmap? = null
@@ -81,7 +93,7 @@ class MusicService : Service() {
     private fun createMediaSession() {
         mMediaSession = MediaSessionCompat(this, "MusicService")
         mMediaSession!!.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS)
-        val mediaSessionCallback = MediaSessionCallback(this)
+        val mediaSessionCallback = MediaSessionCallback(this, context = applicationContext)
         mMediaSession!!.setCallback(mediaSessionCallback)
     }
 
@@ -127,7 +139,7 @@ class MusicService : Service() {
         seekTo(intent.getIntExtra(PROGRESS, getCurrentPosition()))
     }
 
-    private fun handleNextPrevious(isNext: Boolean, isShuffle: String) {
+    fun handleNextPrevious(isNext: Boolean, isShuffle: String) {
         if (isNext && positionTrack != tracksList.size.minus(1)) {
             positionTrack++
         } else if (!isNext && positionTrack != 0) {
@@ -140,7 +152,6 @@ class MusicService : Service() {
         val nextPreviousIntent = Intent(NEXT_PREVIOUS_ACTION)
         nextPreviousIntent.putExtra(NEXT_PREVIOUS_TRACK_ID, pref.currentTrackId)
         sendBroadcast(nextPreviousIntent)
-//        setupTrack(applicationContext, tracksList[positionTrack].path ?: "",pref.setPlaySpeed?: PLAY_SPEED_1x)
         setupTrack(
             applicationContext,
             tracksList[positionTrack].path ?: "",
@@ -148,6 +159,8 @@ class MusicService : Service() {
             pref.setEqPitch?.toFloat() ?: 1f
         )
         handleProgressHandler(isPlaying())
+        updateMediaSession()
+        updateMediaSessionState()
     }
 
     private fun handlePlayPause() {
@@ -156,9 +169,10 @@ class MusicService : Service() {
         } else {
             resumeTrack()
         }
+        updateMediaSessionState()
     }
 
-    fun pauseTrack() {
+    private fun pauseTrack() {
         pauseTrackk {
             if (!it) {
                 val playPauseIntent = Intent(PLAY_PAUSE_ACTION)
@@ -168,7 +182,7 @@ class MusicService : Service() {
         }
     }
 
-    fun resumeTrack() {
+    private fun resumeTrack() {
         playTrack {
             if (it) {
                 val playPauseIntent = Intent(PLAY_PAUSE_ACTION)
@@ -181,6 +195,7 @@ class MusicService : Service() {
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
         pref.currentTrackId = tracksList[positionTrack].id ?: 0L
+        toast(positionTrack.toString())
         setupTrack(
             applicationContext,
             tracksList[positionTrack].path ?: "",
@@ -188,6 +203,8 @@ class MusicService : Service() {
             pref.setEqPitch?.toFloat() ?: 1f
         )
         handleProgressHandler(isPlaying())
+        updateMediaSession()
+        updateMediaSessionState()
         completePlayer { completed ->
             if (completed == COMPLETE_CALLBACK) {
                 if (pref.repeatTrack == REPEAT_TRACK_ON) {
@@ -199,17 +216,18 @@ class MusicService : Service() {
                     )
                 } else if (pref.shuffleTrack == SHUFFLE_TRACK_ON) {
                     handleNextPrevious(isNext = false, isShuffle = SHUFFLE_TRACK_ON)
+                    startForegroundAndNotify()
                 } else if (positionTrack == tracksList.size.minus(1)) {
                     dismissNotification()
                 } else {
                     handleNextPrevious(isNext = true, isShuffle = SHUFFLE_TRACK_OFF)
+                    startForegroundAndNotify()
                 }
             }
 
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun startForegroundAndNotify() {
         notificationHandler.removeCallbacksAndMessages(null)
         notificationHandler.postDelayed({
@@ -251,6 +269,7 @@ class MusicService : Service() {
                         sendBroadcast(intentControl)
                         pref.currentTrackTotalDuration = duration
                         pref.currentTrackProgress = position
+                        updateMediaSessionState()
                     }
                     mProgressHandler.removeCallbacksAndMessages(null)
                     mProgressHandler.postDelayed(
@@ -280,6 +299,65 @@ class MusicService : Service() {
 //                }
 //            }, 10, 10, TimeUnit.MILLISECONDS)
 //        }
+    }
+
+    private fun updateMediaSession() {
+        val metadata = MediaMetadataCompat.Builder()
+            .putString(
+                MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
+                tracksList[positionTrack].albumId?.getThumbnailUri() ?: ""
+            )
+            .putString(
+                MediaMetadataCompat.METADATA_KEY_ARTIST,
+                tracksList[positionTrack].artist?.isUnknownString() ?: ""
+            )
+            .putString(
+                MediaMetadataCompat.METADATA_KEY_TITLE,
+                tracksList[positionTrack].title?.substringBeforeLast(".") ?: ""
+            )
+            .putString(
+                MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
+                tracksList[positionTrack].id?.toString()
+            )
+            .putLong(
+                MediaMetadataCompat.METADATA_KEY_DURATION,
+                tracksList[positionTrack].duration ?: 0L
+            )
+            .putLong(
+                MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,
+                tracksList.indexOf(tracksList[positionTrack]).toLong() + 1
+            )
+            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, tracksList.size.toLong())
+            .build()
+        mMediaSession?.setMetadata(metadata)
+    }
+
+    fun updateMediaSessionState() {
+        val builder = PlaybackStateCompat.Builder()
+        val playbackState = if (isPlaying()) {
+            PlaybackStateCompat.STATE_PLAYING
+        } else {
+            PlaybackStateCompat.STATE_PAUSED
+        }
+
+        val dismissAction = PlaybackStateCompat.CustomAction.Builder(
+            DISMISS,
+            getString(R.string.dismiss),
+            R.drawable.ic_cross
+        ).build()
+
+        builder
+            .setActions(mMediaSessionActions)
+            .setState(
+                playbackState,
+                getCurrentPosition().toLong(),
+                pref.setPlaySpeed?.playBackSpeed() ?: 1f
+            )
+            .addCustomAction(dismissAction)
+        try {
+            mMediaSession?.setPlaybackState(builder.build())
+        } catch (ignored: Exception) {
+        }
     }
 
     override fun onDestroy() {

@@ -21,6 +21,7 @@ import com.app.musicplayer.ui.viewstates.ArtistsViewState
 import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.ui.viewstates.MainViewState
 import com.app.musicplayer.utils.*
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -91,38 +92,85 @@ class MainActivity : BaseActivity<MainViewState>() {
     }
 
     private fun setUpViewPager() {
-        val viewPagerAdapter = ViewPagerAdapter(supportFragmentManager, lifecycle)
-        viewPagerAdapter.addFragment(AllMusicFragment())
-        viewPagerAdapter.addFragment(AlbumsFragment())
-        viewPagerAdapter.addFragment(ArtistsFragment())
-        viewPagerAdapter.addFragment(RecentlyPlayedFragment())
-        viewPagerAdapter.addFragment(MyFavouritesFragment())
-        binding.fragmentCallsViewPager.adapter = viewPagerAdapter
-        TabLayoutMediator(
-            binding.musicTabs, binding.fragmentCallsViewPager
-        ) { tab, position ->
-            when (position) {
-                0 -> {
-                    tab.text = getString(R.string.all_songs)
+        binding.apply {
+            musicTabs.addTab(binding.musicTabs.newTab().setText(getString(R.string.all_songs)))
+            musicTabs.addTab(binding.musicTabs.newTab().setText(getString(R.string.albums)))
+            musicTabs.addTab(binding.musicTabs.newTab().setText(getString(R.string.artists)))
+            musicTabs.addTab(
+                binding.musicTabs.newTab().setText(getString(R.string.recently_played))
+            )
+            musicTabs.addTab(binding.musicTabs.newTab().setText(getString(R.string.my_favorites)))
+            musicTabs.tabGravity = TabLayout.GRAVITY_FILL
+            val adapter = ViewPagerAdapter(
+                this@MainActivity, supportFragmentManager,
+                musicTabs.tabCount
+            )
+            musicViewPager.adapter = adapter
+            musicViewPager.offscreenPageLimit = 5
+            musicViewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(musicTabs))
+            musicTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    musicViewPager.currentItem = tab.position
+                    when (tab.position) {
+                        0 -> {
+                            musicTabs.getTabAt(tab.position)?.select()
+                        }
+
+                        1 -> {
+                            musicTabs.getTabAt(tab.position)?.select()
+                        }
+
+                        2 -> {
+                            musicTabs.getTabAt(tab.position)?.select()
+                        }
+
+                        3 -> {
+                            musicTabs.getTabAt(tab.position)?.select()
+                        }
+
+                        4 -> {
+                            musicTabs.getTabAt(tab.position)?.select()
+                        }
+                    }
                 }
 
-                1 -> {
-                    tab.text = getString(R.string.albums)
-                }
+                override fun onTabUnselected(tab: TabLayout.Tab) {}
+                override fun onTabReselected(tab: TabLayout.Tab) {}
+            })
 
-                2 -> {
-                    tab.text = getString(R.string.artists)
-                }
-
-                3 -> {
-                    tab.text = getString(R.string.recently_played)
-                }
-
-                4 -> {
-                    tab.text = getString(R.string.my_favorites)
-                }
-            }
-        }.attach()
+        }
+//        val viewPagerAdapter = ViewPagerAdapter(supportFragmentManager, lifecycle)
+//        viewPagerAdapter.addFragment(AllMusicFragment())
+//        viewPagerAdapter.addFragment(AlbumsFragment())
+//        viewPagerAdapter.addFragment(ArtistsFragment())
+//        viewPagerAdapter.addFragment(RecentlyPlayedFragment())
+//        viewPagerAdapter.addFragment(MyFavouritesFragment())
+//        binding.fragmentCallsViewPager.adapter = viewPagerAdapter
+//        TabLayoutMediator(
+//            binding.musicTabs, binding.fragmentCallsViewPager
+//        ) { tab, position ->
+//            when (position) {
+//                0 -> {
+//                    tab.text = getString(R.string.all_songs)
+//                }
+//
+//                1 -> {
+//                    tab.text = getString(R.string.albums)
+//                }
+//
+//                2 -> {
+//                    tab.text = getString(R.string.artists)
+//                }
+//
+//                3 -> {
+//                    tab.text = getString(R.string.recently_played)
+//                }
+//
+//                4 -> {
+//                    tab.text = getString(R.string.my_favorites)
+//                }
+//            }
+//        }.attach()
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

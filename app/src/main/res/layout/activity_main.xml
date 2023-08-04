@@ -15,7 +15,7 @@
         style="@style/TabLayoutBg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/fragment_calls_view_pager"
+        app:layout_constraintBottom_toTopOf="@+id/music_view_pager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
@@ -26,8 +26,8 @@
         app:tabTextColor="@color/default_gray"
         tools:ignore="NotSibling" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/fragment_calls_view_pager"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/music_view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="visible"
@@ -41,7 +41,7 @@
         android:name="com.app.musicplayer.ui.fragments.NowPlayingFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_calls_view_pager"
+        app:layout_constraintTop_toBottomOf="@+id/music_view_pager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

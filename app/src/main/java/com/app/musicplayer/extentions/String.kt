@@ -17,8 +17,12 @@ import com.app.musicplayer.utils.artworkUri
 import java.io.File
 
 fun String.getThumbnailUri(): String {
-    val coverUri = ContentUris.withAppendedId(artworkUri, this.toLong())
-    return coverUri.toString()
+    return if (this == "") {
+        ""
+    } else {
+        val coverUri = ContentUris.withAppendedId(artworkUri, this.toLong())
+        coverUri.toString()
+    }
 }
 
 fun String.isUnknownString(): String {

@@ -29,85 +29,86 @@ class NotificationHelper(
     lateinit var tracksInteractor: TracksInteractor
     private var notificationManager = context.notificationManager
 
-    @RequiresApi(Build.VERSION_CODES.M)
     fun createPlayerNotification(
-        trackTitle:String?,
-        trackArtist:String?,
+        trackTitle: String?,
+        trackArtist: String?,
         isPlaying: Boolean,
         largeIcon: Bitmap?,
         callback: (Notification) -> Unit
     ) {
 
-        var postTime = 0L
-        var showWhen = false
-        var usesChronometer = false
-        var ongoing = false
-        if (isPlaying) {
+        if (isMPlus()) {
+            var postTime = 0L
+            var showWhen = false
+            var usesChronometer = false
+            var ongoing = false
+            if (isPlaying) {
 //            postTime = System.currentTimeMillis() - (MusicService.mPlayer?.currentPosition ?: 0)
-            showWhen = true
-            usesChronometer = true
-            ongoing = true
-        }
-
-        val notificationDismissedIntent =
-            Intent(context, NotificationDismissedReceiver::class.java).apply {
-                action = NOTIFICATION_DISMISSED
+                showWhen = true
+                usesChronometer = true
+                ongoing = true
             }
-        val flag = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        val notificationDismissedPendingIntent =
-            PendingIntent.getBroadcast(context, 0, notificationDismissedIntent, flag)
 
-        val previousAction = NotificationCompat.Action.Builder(
-            R.drawable.ic_previous,
-            context.getString(R.string.previous),
-            getControlsIntent(PREVIOUS)
-        ).build()
-        val nextAction = NotificationCompat.Action.Builder(
-            R.drawable.ic_next,
-            context.getString(R.string.next),
-            getControlsIntent(NEXT)
-        ).build()
-        val playPauseIcon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
-        val playPauseAction = NotificationCompat.Action.Builder(
-            playPauseIcon,
-            context.getString(R.string.playpause),
-            getControlsIntent(PLAYPAUSE)
-        ).build()
-        val dismissAction = NotificationCompat.Action.Builder(
-            R.drawable.ic_cross,
-            context.getString(R.string.dismiss),
-            getControlsIntent(DISMISS)
-        ).build()
+            val notificationDismissedIntent =
+                Intent(context, NotificationDismissedReceiver::class.java).apply {
+                    action = NOTIFICATION_DISMISSED
+                }
+            val flag = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            val notificationDismissedPendingIntent =
+                PendingIntent.getBroadcast(context, 0, notificationDismissedIntent, flag)
 
-        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
-            .setContentTitle(trackTitle)
-            .setContentText(trackArtist)
-            .setSmallIcon(R.drawable.ic_music_app)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            val previousAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_previous,
+                context.getString(R.string.previous),
+                getControlsIntent(PREVIOUS)
+            ).build()
+            val nextAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_next,
+                context.getString(R.string.next),
+                getControlsIntent(NEXT)
+            ).build()
+            val playPauseIcon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+            val playPauseAction = NotificationCompat.Action.Builder(
+                playPauseIcon,
+                context.getString(R.string.playpause),
+                getControlsIntent(PLAYPAUSE)
+            ).build()
+            val dismissAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_cross,
+                context.getString(R.string.dismiss),
+                getControlsIntent(DISMISS)
+            ).build()
+
+            val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
+                .setContentTitle(trackTitle)
+                .setContentText(trackArtist)
+                .setSmallIcon(R.drawable.ic_music_app)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
 //            .setWhen(postTime)
 //            .setShowWhen(showWhen)
 //            .setUsesChronometer(usesChronometer)
-            .setContentIntent(getContentIntent())
+                .setContentIntent(getContentIntent())
 //            .setOngoing(ongoing)
-            .setAutoCancel(false)
-            .setChannelId(NOTIFICATION_CHANNEL)
-            .setCategory(Notification.CATEGORY_SERVICE)
-            .setStyle(
-                androidx.media.app.NotificationCompat.MediaStyle()
-                    .setShowActionsInCompactView(0, 1, 2)
-//                    .setMediaSession(mediaSessionToken)
-            )
-            .setDeleteIntent(notificationDismissedPendingIntent)
-            .addAction(previousAction)
-            .addAction(playPauseAction)
-            .addAction(nextAction)
-            .addAction(dismissAction)
-        try {
-            builder.setLargeIcon(largeIcon)
-        } catch (ignored: OutOfMemoryError) {
+                .setAutoCancel(false)
+                .setChannelId(NOTIFICATION_CHANNEL)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setStyle(
+                    androidx.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(0, 1, 2)
+                        .setMediaSession(mediaSessionToken)
+                )
+                .setDeleteIntent(notificationDismissedPendingIntent)
+                .addAction(previousAction)
+                .addAction(playPauseAction)
+                .addAction(nextAction)
+                .addAction(dismissAction)
+            try {
+                builder.setLargeIcon(largeIcon)
+            } catch (ignored: OutOfMemoryError) {
+            }
+            callback(builder.build())
         }
-        callback(builder.build())
     }
 
     fun notify(id: Int, notification: Notification) = notificationManager.notify(id, notification)

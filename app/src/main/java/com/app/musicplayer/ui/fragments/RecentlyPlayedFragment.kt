@@ -4,13 +4,11 @@ import android.content.Intent
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.app.musicplayer.models.Track
 import com.app.musicplayer.db.entities.RecentTrackEntity
-import com.app.musicplayer.extentions.deleteTrack
 import com.app.musicplayer.extentions.shareTrack
 import com.app.musicplayer.extentions.toTrack
 import com.app.musicplayer.interator.tracks.TracksInteractor
-import com.app.musicplayer.models.RecentTrackCombinedData
+import com.app.musicplayer.models.Track
 import com.app.musicplayer.models.TrackCombinedData
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
@@ -96,6 +94,8 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
 
     override fun onResume() {
         super.onResume()
-//        tracksList = recentList!!
+        recentList?.let {
+            tracksList = it
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.app.musicplayer.ui.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +29,7 @@ class ArtistDetailsActivity : BaseActivity<ArtistDetailsViewState>() {
     lateinit var tracksAdapter: TracksAdapter
     @Inject
     lateinit var tracksInteractor: TracksInteractor
+    @SuppressLint("SetTextI18n")
     override fun onSetup() {
         onSetupViews()
         viewState.apply {
@@ -73,10 +74,11 @@ class ArtistDetailsActivity : BaseActivity<ArtistDetailsViewState>() {
                 }
             }
             itemsChangedEvent.observe(this@ArtistDetailsActivity) { event ->
-                event.ifNew?.let {
-                    tracksAdapter.items = it
+                event.ifNew?.let {list->
+                    tracksAdapter.items = list
                     showEmpty(tracksAdapter.items.isEmpty())
-                    tracksList = it as ArrayList<Track>
+                    tracksList = list as ArrayList<Track>
+                    binding.songsAndAlbums.text = "${list.size} Songs"
                 }
             }
             queryArtistDetails(intent.getLongExtra(ARTIST_ID, 0L))
@@ -94,11 +96,11 @@ class ArtistDetailsActivity : BaseActivity<ArtistDetailsViewState>() {
             this.adapter = tracksAdapter
         }
         binding.title.text = intent.getStringExtra(ARTIST_TITLE)
-        val builder = SpannableStringBuilder()
-        val songs = intent.getStringExtra(SONGS_IN_ARTIST)
-        val albums = intent.getStringExtra(ALBUMS_IN_ARTIST)
-        binding.songsAndAlbums.text =
-            builder.append("$songs Songs").append(" • ").append("$albums Albums")
+//        val builder = SpannableStringBuilder()
+//        val songs = intent.getStringExtra(SONGS_IN_ARTIST)
+//        val albums = intent.getStringExtra(ALBUMS_IN_ARTIST)
+//        binding.songsAndAlbums.text ="${tracksList.size} Songs"
+//            builder.append("$songs Songs").append(" • ").append("$albums Albums")
         binding.moveBack.setOnClickListener { finish() }
     }
 

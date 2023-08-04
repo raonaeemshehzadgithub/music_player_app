@@ -1,32 +1,36 @@
 package com.app.musicplayer.helpers
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
+import com.app.musicplayer.extentions.sendIntent
+import com.app.musicplayer.helpers.MediaPlayer.seekTo
 import com.app.musicplayer.services.MusicService
+import com.app.musicplayer.utils.PLAYPAUSE
+import com.app.musicplayer.utils.SHUFFLE_TRACK_OFF
 
-class MediaSessionCallback(private val service: MusicService) : MediaSessionCompat.Callback() {
+class MediaSessionCallback(private val service: MusicService, private val context: Context) :
+    MediaSessionCompat.Callback() {
 
     override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
         return super.onMediaButtonEvent(mediaButtonEvent)
     }
 
     override fun onPlay() {
-//        service.resumeTrack()
+        context.sendIntent(PLAYPAUSE)
     }
 
     override fun onPause() {
-//        service.pauseTrack()
+        context.sendIntent(PLAYPAUSE)
     }
 
     override fun onSkipToNext() {
-        Log.wtf("next on notification", "yes")
-        super.onSkipToNext()
+        service.handleNextPrevious(isNext = true, isShuffle = SHUFFLE_TRACK_OFF)
     }
 
     override fun onSkipToPrevious() {
-        super.onSkipToPrevious()
+        service.handleNextPrevious(isNext = false, isShuffle = SHUFFLE_TRACK_OFF)
     }
 
     override fun onStop() {
@@ -34,7 +38,7 @@ class MediaSessionCallback(private val service: MusicService) : MediaSessionComp
     }
 
     override fun onSeekTo(pos: Long) {
-        super.onSeekTo(pos)
+        seekTo(pos.toInt())
     }
 
     override fun onCustomAction(action: String?, extras: Bundle?) {

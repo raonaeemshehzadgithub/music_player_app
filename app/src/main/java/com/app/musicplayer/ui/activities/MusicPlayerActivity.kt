@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -47,6 +48,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
     private val intentComplete = IntentFilter(TRACK_COMPLETE_ACTION)
     private var timerHandler = Handler()
     private val timerRunnable = Runnable {
+        //pause the player when sleep time reached
         sendIntent(PLAYPAUSE)
         timerHandler.removeCallbacksAndMessages(null)
     }

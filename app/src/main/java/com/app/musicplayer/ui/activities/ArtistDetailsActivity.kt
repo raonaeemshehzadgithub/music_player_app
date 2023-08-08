@@ -38,6 +38,8 @@ class ArtistDetailsActivity : BaseActivity<ArtistDetailsViewState>() {
                     startActivity(Intent(this@ArtistDetailsActivity, MusicPlayerActivity::class.java).apply {
                         putExtra(TRACK_ID, trackCombinedData.track.id)
                         putExtra(POSITION, trackCombinedData.position)
+                        putExtra(PLAYER_LIST, FROM_ARTIST_LIST)
+                        putExtra(ARTIST_ID, intent.getLongExtra(ARTIST_ID, 0L))
                     })
                 }
             }
@@ -77,7 +79,6 @@ class ArtistDetailsActivity : BaseActivity<ArtistDetailsViewState>() {
                 event.ifNew?.let {list->
                     tracksAdapter.items = list
                     showEmpty(tracksAdapter.items.isEmpty())
-                    tracksList = list as ArrayList<Track>
                     binding.songsAndAlbums.text = "${list.size} Songs"
                 }
             }

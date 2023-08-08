@@ -65,6 +65,12 @@ class MusicPlayerViewState @Inject constructor(
     fun fetchFavoriteTrackList(): LiveData<List<Track>> {
         return tracksRepository.fetchFavoriteTrack()
     }
+    fun getAlbumTracksOnlyList(albumId: Long):LiveData<List<Track>> {
+        return tracksRepository.getAlbumTracks(albumId) as TracksLiveData
+    }
+    fun getArtistTracksOnlyList(artistId: Long):LiveData<List<Track>> {
+        return tracksRepository.getArtistTracks(artistId) as TracksLiveData
+    }
 
     suspend fun fetchFavorites(): List<Track>? {
         return withContext(Dispatchers.IO) {

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -115,41 +116,53 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
             if (granted) {
                 setUpButtons()
                 registerReceivers()
-                updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
                 if (!intent.getBooleanExtra(FROM_MINI_PLAYER, false)) {
                     when (intent.getStringExtra(PLAYER_LIST)) {
                         FROM_ALL_SONG -> {
                             viewState.getAllTrackList { trList ->
-                                toast("all song list")
-                                tracksList.clear()
-                                tracksList.addAll(trList)
+                                setPlayerList(trList)
                                 initPlayer()
                             }
                         }
 
                         FROM_RECENT -> {
                             viewState.fetchRecentTrackList().observe(this) {
-                                toast("recent list")
                                 val recentTrackList: ArrayList<Track> =
                                     ArrayList(it.map { recentTrack ->
                                         recentTrack.toTrack()
                                     })
-                                tracksList.clear()
-                                tracksList.addAll(recentTrackList)
+                                setPlayerList(recentTrackList)
                                 initPlayer()
                             }
                         }
 
                         FROM_FAVORITE -> {
-                            viewState.fetchFavoriteTrackList().observe(this) {
-                                toast("favorite list")
-                                tracksList.clear()
-                                tracksList.addAll(it)
-                                initPlayer()
+                            lifecycleScope.launch {
+                                viewState.fetchFavorites().let {
+                                    it?.let { it1 -> setPlayerList(it1) }
+                                    initPlayer()
+                                }
                             }
+                        }
+
+                        FROM_ALBUM_LIST -> {
+                            viewState.getAlbumTracksOnlyList(intent.getLongExtra(ALBUM_ID, 0L))
+                                .observe(this) { albumList ->
+                                    setPlayerList(albumList)
+                                    initPlayer()
+                                }
+                        }
+
+                        FROM_ARTIST_LIST -> {
+                            viewState.getArtistTracksOnlyList(intent.getLongExtra(ARTIST_ID, 0L))
+                                .observe(this) { artistList ->
+                                    setPlayerList(artistList)
+                                    initPlayer()
+                                }
                         }
                     }
                 }
+                updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
             }
         }
     }
@@ -312,6 +325,11 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
 
     private fun cancelTimer() {
         timerHandler.removeCallbacks(timerRunnable)
+    }
+
+    private fun setPlayerList(list: List<Track>) {
+        tracksList.clear()
+        tracksList.addAll(list)
     }
 
     private fun setUpPreferences() {

@@ -42,6 +42,8 @@ class AlbumDetailsActivity : BaseActivity<AlbumDetailsViewState>() {
                         ).apply {
                             putExtra(TRACK_ID, trackCombinedData.track.id)
                             putExtra(POSITION, trackCombinedData.position)
+                            putExtra(PLAYER_LIST, FROM_ALBUM_LIST)
+                            putExtra(ALBUM_ID, intent.getLongExtra(ALBUM_ID, 0L))
                         })
                 }
             }
@@ -94,7 +96,6 @@ class AlbumDetailsActivity : BaseActivity<AlbumDetailsViewState>() {
                 event.ifNew?.let {
                     tracksAdapter.items = it
                     showEmpty(tracksAdapter.items.isEmpty())
-                    tracksList = it as ArrayList<Track>
                 }
             }
             queryAlbumDetails(intent.getLongExtra(ALBUM_ID, 0L))

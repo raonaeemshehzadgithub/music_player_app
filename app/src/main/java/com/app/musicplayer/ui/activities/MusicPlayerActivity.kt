@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -20,6 +19,7 @@ import com.app.musicplayer.extentions.*
 import com.app.musicplayer.helpers.MediaPlayer.setPlayBackSpeed
 import com.app.musicplayer.helpers.OnSwipeTouchListener
 import com.app.musicplayer.interator.tracks.TracksInteractor
+import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.services.MusicService.Companion.positionTrack
 import com.app.musicplayer.services.MusicService.Companion.tracksList
@@ -117,14 +117,49 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                 registerReceivers()
                 updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
                 if (!intent.getBooleanExtra(FROM_MINI_PLAYER, false)) {
-                    Intent(this, MusicService::class.java).apply {
-                        putExtra(TRACK_ID_SERVICE, intent.getLongExtra(TRACK_ID, 0L))
-                        putExtra(POSITION, intent.getIntExtra(POSITION, 0))
-                        action = INIT
-                        startService(this)
+                    when (intent.getStringExtra(PLAYER_LIST)) {
+                        FROM_ALL_SONG -> {
+                            viewState.getAllTrackList { trList ->
+                                toast("all song list")
+                                tracksList.clear()
+                                tracksList.addAll(trList)
+                                initPlayer()
+                            }
+                        }
+
+                        FROM_RECENT -> {
+                            viewState.fetchRecentTrackList().observe(this) {
+                                toast("recent list")
+                                val recentTrackList: ArrayList<Track> =
+                                    ArrayList(it.map { recentTrack ->
+                                        recentTrack.toTrack()
+                                    })
+                                tracksList.clear()
+                                tracksList.addAll(recentTrackList)
+                                initPlayer()
+                            }
+                        }
+
+                        FROM_FAVORITE -> {
+                            viewState.fetchFavoriteTrackList().observe(this) {
+                                toast("favorite list")
+                                tracksList.clear()
+                                tracksList.addAll(it)
+                                initPlayer()
+                            }
+                        }
                     }
                 }
             }
+        }
+    }
+
+    private fun initPlayer() {
+        Intent(this, MusicService::class.java).apply {
+            putExtra(TRACK_ID_SERVICE, intent.getLongExtra(TRACK_ID, 0L))
+            putExtra(POSITION, intent.getIntExtra(POSITION, 0))
+            action = INIT
+            startService(this)
         }
     }
 

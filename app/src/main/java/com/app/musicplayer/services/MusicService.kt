@@ -195,7 +195,6 @@ class MusicService : Service() {
     private fun handleInit(intent: Intent) {
         positionTrack = intent.getIntExtra(POSITION, 0)
         pref.currentTrackId = tracksList[positionTrack].id ?: 0L
-        toast(positionTrack.toString())
         setupTrack(
             applicationContext,
             tracksList[positionTrack].path ?: "",

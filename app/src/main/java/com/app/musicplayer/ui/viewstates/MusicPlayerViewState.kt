@@ -10,6 +10,7 @@ import com.app.musicplayer.db.entities.RecentTrackEntity
 import com.app.musicplayer.repository.tracks.TracksRepository
 import com.app.musicplayer.ui.list.ListViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,6 +51,19 @@ class MusicPlayerViewState @Inject constructor(
 
     fun setAlarmTone(context: Context, trackPath: String) {
         playerInteractor.setAlarmTone(context, trackPath)
+    }
+
+    fun getAllTrackList(trackList:(List<Track>)->Unit) {
+        playerInteractor.queryTrackList {
+            trackList.invoke(it as List<Track>)
+        }
+    }
+    fun fetchRecentTrackList(): LiveData<List<RecentTrackEntity>> {
+        return tracksRepository.fetchRecentTrack()
+    }
+
+    fun fetchFavoriteTrackList(): LiveData<List<Track>> {
+        return tracksRepository.fetchFavoriteTrack()
     }
 
     suspend fun fetchFavorites(): List<Track>? {

@@ -8,9 +8,7 @@ import com.app.musicplayer.db.entities.RecentTrackEntity
 import com.app.musicplayer.extentions.shareTrack
 import com.app.musicplayer.extentions.toTrack
 import com.app.musicplayer.interator.tracks.TracksInteractor
-import com.app.musicplayer.models.Track
 import com.app.musicplayer.models.TrackCombinedData
-import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.RecentTracksAdapter
 import com.app.musicplayer.ui.viewstates.RecentTrackViewState
@@ -23,10 +21,10 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
     override val viewState: RecentTrackViewState by activityViewModels()
     override val manager: RecyclerView.LayoutManager =
         LinearLayoutManager(activity?.applicationContext)
-    private var recentList: ArrayList<Track>? = null
 
     @Inject
     override lateinit var listAdapter: RecentTracksAdapter
+
     @Inject
     lateinit var tracksInteractor: TracksInteractor
     override fun onSetup() {
@@ -36,36 +34,30 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
             fetchRecentTrackList().observe(this@RecentlyPlayedFragment) {
                 listAdapter.items = it
                 showEmpty(listAdapter.items.isEmpty())
-                val recentTrackList: ArrayList<Track> = ArrayList(it.map { track ->
-                    Track(
-                        id = track.id,
-                        title = track.title,
-                        artist = track.artist,
-                        duration = track.duration,
-                        path = track.path,
-                        albumId = track.albumId
-                    )
-                })
-                recentList = recentTrackList
             }
             showItemEvent.observe(this@RecentlyPlayedFragment) { event ->
                 event.ifNew?.let { trackCombinedData ->
                     startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
                         putExtra(TRACK_ID, trackCombinedData.track.id)
                         putExtra(POSITION, trackCombinedData.position)
+                        putExtra(PLAYER_LIST, FROM_RECENT)
                     })
                 }
             }
             showMenuEvent.observe(this@RecentlyPlayedFragment) { event ->
                 event.ifNew?.let { trackCombinedData ->
                     trackCombinedData.view?.let {
-                        baseActivity.showTrackMenu(it,true) { callback ->
+                        baseActivity.showTrackMenu(it, true) { callback ->
                             when (callback) {
                                 PLAY_TRACK -> {
-                                    startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
-                                        putExtra(TRACK_ID, trackCombinedData.track.id)
-                                        putExtra(POSITION, trackCombinedData.position)
-                                    })
+                                    startActivity(
+                                        Intent(
+                                            requireContext(),
+                                            MusicPlayerActivity::class.java
+                                        ).apply {
+                                            putExtra(TRACK_ID, trackCombinedData.track.id)
+                                            putExtra(POSITION, trackCombinedData.position)
+                                        })
                                 }
 
                                 SHARE_TRACK -> {
@@ -75,13 +67,18 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
                                 }
 
                                 DELETE_TRACK -> {
-                                    removeRecentTrack(trackCombinedData.track.id?:0L)
+                                    viewState.removeRecentTrack(trackCombinedData.track.id ?: 0L)
                                 }
 
                                 RENAME_TRACK -> {
                                 }
-                                PROPERTIES_TRACK->{
-                                    val recentTrackCombined = TrackCombinedData(trackCombinedData.track.toTrack(),trackCombinedData.position,trackCombinedData.view)
+
+                                PROPERTIES_TRACK -> {
+                                    val recentTrackCombined = TrackCombinedData(
+                                        trackCombinedData.track.toTrack(),
+                                        trackCombinedData.position,
+                                        trackCombinedData.view
+                                    )
                                     baseActivity.showTrackPropertiesDialog(recentTrackCombined)
                                 }
                             }
@@ -89,13 +86,6 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
                     }
                 }
             }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        recentList?.let {
-            tracksList = it
         }
     }
 }

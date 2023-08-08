@@ -12,6 +12,7 @@ import com.app.musicplayer.ui.list.ListViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,6 +37,14 @@ class RecentTrackViewState @Inject constructor(
     }
     fun fetchRecentTrackList(): LiveData<List<RecentTrackEntity>> {
         return tracksRepository.fetchRecentTrack()
+    }
+    suspend fun fetchRecentListOnly(): List<RecentTrackEntity>? {
+        return withContext(Dispatchers.IO) {
+            val trackList = tracksRepository.fetchRecentListOnly()
+            trackList.ifEmpty {
+                null
+            }
+        }
     }
     fun removeRecentTrack(trackId: Long) {
         viewModelScope.launch(Dispatchers.IO) {

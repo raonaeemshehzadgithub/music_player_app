@@ -8,7 +8,7 @@ import android.provider.MediaStore
 import androidx.annotation.ChecksSdkIntAtLeast
 
 //room db
-const val ROOM_DB_VERSION = 21
+const val ROOM_DB_VERSION = 22
 const val ROOM_DB_NAME = "music_player_db"
 
 const val ALL_TRACKS_VT = 0
@@ -81,6 +81,12 @@ const val OPEN_SETTINGS = 6
 
 const val POSITION = "position"
 const val FROM_MINI_PLAYER = "mini_player"
+const val PLAYER_LIST = "player_list"
+const val FROM_ALL_SONG = "from_all_song"
+const val FROM_RECENT = "from_recent"
+const val FROM_FAVORITE = "from_favorite"
+const val FROM_ALBUM_LIST = "from_album_list"
+const val FROM_ARTIST_LIST = "from_artist_list"
 const val TRACK_ID = "track_id"
 const val ALBUM_ID = "album_id"
 const val ARTIST_ID = "artist_id"

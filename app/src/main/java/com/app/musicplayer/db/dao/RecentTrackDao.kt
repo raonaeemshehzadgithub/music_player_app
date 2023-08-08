@@ -11,9 +11,12 @@ import com.app.musicplayer.db.entities.RecentTrackEntity
 interface RecentTrackDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertRecentTrack(track: RecentTrackEntity)
-
-    @Query("select * from RecentTrackEntity order by time_stamp DESC")
+    @Query("select * from RecentTrackEntity")
+    fun fetchRecentListOnly():List<RecentTrackEntity>
+    @Query("select * from RecentTrackEntity")
     fun fetchRecentTrackList():LiveData<List<RecentTrackEntity>>
     @Query("delete from RecentTrackEntity where id =:id")
     fun removeRecentTrack(id:Long)
+    @Query("DELETE FROM RecentTrackEntity WHERE id NOT IN (SELECT id FROM RecentTrackEntity ORDER BY time_stamp DESC LIMIT 5)")
+    fun deleteExtraTracks()
 }

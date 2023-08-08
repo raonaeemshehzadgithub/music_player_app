@@ -6,10 +6,11 @@ import com.app.musicplayer.db.entities.RecentTrackEntity
 
 interface TracksRepository {
     fun getTracks(): LiveData<List<Track>>
-    fun getAlbumTracks(albumId:Long?=null): LiveData<List<Track>>
-    fun getArtistTracks(artistId:Long?=null): LiveData<List<Track>>
+    fun getAlbumTracks(albumId: Long? = null): LiveData<List<Track>>
+    fun getArtistTracks(artistId: Long? = null): LiveData<List<Track>>
     fun insertRecentTrack(track: RecentTrackEntity)
     fun fetchRecentTrack(): LiveData<List<RecentTrackEntity>>
+    fun fetchRecentListOnly(): List<RecentTrackEntity>
     fun insertFavoriteTrack(track: Track)
     fun removeFavoriteTrack(trackId: Long)
     fun removeRecentTrack(trackId: Long)

@@ -22,7 +22,6 @@ import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.ui.viewstates.MainViewState
 import com.app.musicplayer.utils.*
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

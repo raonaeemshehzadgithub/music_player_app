@@ -38,9 +38,9 @@ android {
         applicationId "com.app.musicplayer"
         minSdk 21
         targetSdk 33
-        versionCode 22
-        versionName "1.22"
-
+        versionCode 24
+        versionName "1.24"
+        setProperty("archivesBaseName","MusicPlayer_$versionCode")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

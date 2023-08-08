@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 22,
-      "versionName": "1.22",
-      "outputFile": "app-release.apk"
+      "versionCode": 24,
+      "versionName": "1.24",
+      "outputFile": "MusicPlayer_24-release.apk"
     }
   ],
   "elementType": "File"

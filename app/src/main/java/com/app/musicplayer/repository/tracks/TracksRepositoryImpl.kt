@@ -18,10 +18,14 @@ class TracksRepositoryImpl @Inject constructor(
     override fun getArtistTracks(artistId:Long?) = liveDataFactory.getArtistsTracksLiveData(artistId)
     override fun insertRecentTrack(track: RecentTrackEntity) {
         musicDB.getTrackDao().insertRecentTrack(track)
+        musicDB.getTrackDao().deleteExtraTracks()
     }
 
     override fun fetchRecentTrack(): LiveData<List<RecentTrackEntity>> {
         return musicDB.getTrackDao().fetchRecentTrackList()
+    }
+    override fun fetchRecentListOnly(): List<RecentTrackEntity> {
+        return musicDB.getTrackDao().fetchRecentListOnly()
     }
 
     override fun insertFavoriteTrack(track: Track) {

@@ -24,6 +24,7 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
 
     @Inject
     override lateinit var listAdapter: TracksAdapter
+
     @Inject
     lateinit var tracksInteractor: TracksInteractor
 
@@ -31,15 +32,15 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
         super.onSetup()
         listAdapter.viewHolderType = ALL_TRACKS_VT
         viewState.apply {
-            getTrackList { trList ->
-                tracksList = trList as ArrayList<Track>
-            }
             showItemEvent.observe(this@AllMusicFragment) { event ->
                 event.ifNew?.let { trackCombinedData ->
-                    startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
-                        putExtra(TRACK_ID, trackCombinedData.track.id)
-                        putExtra(POSITION, trackCombinedData.position)
-                    })
+                    startActivity(
+                        Intent(requireContext(), MusicPlayerActivity::class.java).apply {
+                            putExtra(TRACK_ID, trackCombinedData.track.id)
+                            putExtra(POSITION, trackCombinedData.position)
+                            putExtra(PLAYER_LIST, FROM_ALL_SONG)
+                        })
+
                 }
             }
             showMenuEvent.observe(this@AllMusicFragment) { event ->
@@ -48,10 +49,14 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                         baseActivity.showTrackMenu(it) { callback ->
                             when (callback) {
                                 PLAY_TRACK -> {
-                                    startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
-                                        putExtra(TRACK_ID, trackCombinedData.track.id)
-                                        putExtra(POSITION, trackCombinedData.position)
-                                    })
+                                    startActivity(
+                                        Intent(
+                                            requireContext(),
+                                            MusicPlayerActivity::class.java
+                                        ).apply {
+                                            putExtra(TRACK_ID, trackCombinedData.track.id)
+                                            putExtra(POSITION, trackCombinedData.position)
+                                        })
                                 }
 
                                 SHARE_TRACK -> {
@@ -70,14 +75,17 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                                 }
 
                                 RENAME_TRACK -> {
-                                    baseActivity.bsRenameTrack(trackCombinedData.track.title ?: "") {renamedText->
+                                    baseActivity.bsRenameTrack(
+                                        trackCombinedData.track.title ?: ""
+                                    ) { renamedText ->
                                         tracksInteractor.renameTrack(trackCombinedData, renamedText)
-                                        getTrackList { trList ->
+                                        viewState.getTrackList { trList ->
                                             tracksList = trList as ArrayList<Track>
                                         }
                                     }
                                 }
-                                PROPERTIES_TRACK->{
+
+                                PROPERTIES_TRACK -> {
                                     baseActivity.showTrackPropertiesDialog(trackCombinedData)
                                 }
                             }
@@ -85,13 +93,6 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                     }
                 }
             }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewState.getTrackList { trList ->
-            tracksList = trList as ArrayList<Track>
         }
     }
 }

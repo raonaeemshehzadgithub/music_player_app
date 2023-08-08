@@ -23,6 +23,7 @@ import com.app.musicplayer.extentions.updatePlayIcon
 import com.app.musicplayer.extentions.updatePlayPauseDrawable
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.tracks.TracksInteractor
+import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*
@@ -85,6 +86,7 @@ class NowPlayingFragment : Fragment() {
 
     private fun setUpClicks() {
         binding.root.setOnClickListener {
+            context?.toast(tracksList.size.toString())
             startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
                 putExtra(TRACK_ID, prefs.currentTrackId)
                 putExtra(POSITION, prefs.currentTrackPosition)

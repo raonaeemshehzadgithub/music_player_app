@@ -1,17 +1,13 @@
 package com.app.musicplayer.ui.adapters
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Lifecycle
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.app.musicplayer.ui.fragments.AlbumsFragment
 import com.app.musicplayer.ui.fragments.AllMusicFragment
 import com.app.musicplayer.ui.fragments.ArtistsFragment
-import com.app.musicplayer.ui.fragments.MyFavouritesFragment
+import com.app.musicplayer.ui.fragments.FavoritesFragment
 import com.app.musicplayer.ui.fragments.RecentlyPlayedFragment
 
 internal class ViewPagerAdapter(
@@ -39,7 +35,7 @@ internal class ViewPagerAdapter(
             }
 
             4 -> {
-                MyFavouritesFragment()
+                FavoritesFragment()
             }
 
             else -> getItem(position)

@@ -57,6 +57,7 @@ class RecentlyPlayedFragment : ListFragment<RecentTrackEntity, RecentTrackViewSt
                                         ).apply {
                                             putExtra(TRACK_ID, trackCombinedData.track.id)
                                             putExtra(POSITION, trackCombinedData.position)
+                                            putExtra(PLAYER_LIST, FROM_RECENT)
                                         })
                                 }
 

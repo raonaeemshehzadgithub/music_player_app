@@ -60,6 +60,8 @@ class AlbumDetailsActivity : BaseActivity<AlbumDetailsViewState>() {
                                         ).apply {
                                             putExtra(TRACK_ID, trackCombinedData.track.id)
                                             putExtra(POSITION, trackCombinedData.position)
+                                            putExtra(PLAYER_LIST, FROM_ALBUM_LIST)
+                                            putExtra(ALBUM_ID, intent.getLongExtra(ALBUM_ID, 0L))
                                         })
                                 }
 

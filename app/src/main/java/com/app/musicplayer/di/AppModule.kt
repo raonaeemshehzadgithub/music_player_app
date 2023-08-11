@@ -7,7 +7,7 @@ import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactoryImpl
 import com.app.musicplayer.di.factory.livedata.LiveDataFactory
 import com.app.musicplayer.di.factory.livedata.LiveDataFactoryImpl
-import com.app.musicplayer.extentions.MIGRATION_21_22
+import com.app.musicplayer.extentions.MIGRATION_22_23
 import com.app.musicplayer.interator.albums.AlbumsInteractorImpl
 import com.app.musicplayer.interator.albums.AlbumsInterator
 import com.app.musicplayer.interator.player.PlayerInteractor
@@ -43,7 +43,7 @@ class AppModule {
     @Singleton
     fun provideRoomDb(@ApplicationContext context: Context): MusicDB {
         return Room.databaseBuilder(context, MusicDB::class.java, ROOM_DB_NAME)
-            .addMigrations(MIGRATION_21_22).build()
+            .addMigrations(MIGRATION_22_23).build()
     }
 
     @Module

@@ -52,6 +52,8 @@ class ArtistDetailsActivity : BaseActivity<ArtistDetailsViewState>() {
                                     startActivity(Intent(this@ArtistDetailsActivity, MusicPlayerActivity::class.java).apply {
                                         putExtra(TRACK_ID, trackCombinedData.track.id)
                                         putExtra(POSITION, trackCombinedData.position)
+                                        putExtra(PLAYER_LIST, FROM_ARTIST_LIST)
+                                        putExtra(ARTIST_ID, intent.getLongExtra(ARTIST_ID, 0L))
                                     })
                                 }
                                 SHARE_TRACK -> {

@@ -24,7 +24,7 @@
         android:gravity="center"
         android:paddingStart="@dimen/padding_20"
         android:paddingEnd="@dimen/padding_20"
-        android:text="@string/no_audio_files_detected_make_sure_you_have_music_files_on_your_device"
+        android:text="@string/no_audio_files_detected"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

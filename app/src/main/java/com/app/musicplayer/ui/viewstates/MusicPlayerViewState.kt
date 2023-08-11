@@ -80,4 +80,12 @@ class MusicPlayerViewState @Inject constructor(
             }
         }
     }
+    suspend fun fetchSongIdsForPlaylist(playlistId: Long): List<Long>? {
+        return withContext(Dispatchers.IO) {
+            val trackList = tracksRepository.getSongIdsForPlaylist(playlistId)
+            trackList.ifEmpty {
+                null
+            }
+        }
+    }
 }

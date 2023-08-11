@@ -35,7 +35,9 @@ import com.app.musicplayer.databinding.BsPlaybackSpeedBinding
 import com.app.musicplayer.databinding.BsRenameTrackBinding
 import com.app.musicplayer.databinding.BsSetRingtoneBinding
 import com.app.musicplayer.databinding.BsSleepTimerBinding
+import com.app.musicplayer.databinding.PopupAddToPlaylistBinding
 import com.app.musicplayer.databinding.PopupTrackPropertiesBinding
+import com.app.musicplayer.db.entities.PlaylistEntity
 import com.app.musicplayer.extentions.convertToSeekBarProgress
 import com.app.musicplayer.extentions.formatMillisToHMS
 import com.app.musicplayer.extentions.getPermissionString
@@ -47,6 +49,7 @@ import com.app.musicplayer.helpers.MediaPlayer.mPlayer
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.string.StringsInteractor
 import com.app.musicplayer.models.TrackCombinedData
+import com.app.musicplayer.ui.adapters.PlaylistsAdapter
 import com.app.musicplayer.utils.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -62,6 +65,9 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     private var playerMenuCallBack: (String) -> Unit = {}
     private var trackMenuCallBack: (String) -> Unit = {}
     private lateinit var audioManager: AudioManager
+
+    @Inject
+    lateinit var playlistAdapter: PlaylistsAdapter
 
     private lateinit var volumeReceiver: BroadcastReceiver
     private val pitchValues = arrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f)
@@ -83,6 +89,8 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     private var setRenameTrackCallBack: (String) -> Unit = {}
     private var setSleepTimerCallBack: (Int) -> Unit = {}
     private var setEqualizerCallBack: (String) -> Unit = {}
+    private var addToPlaylistCallBack: (String) -> Unit = {}
+    private var createPlaylistCallBack: (String) -> Unit = {}
     var isAskingPermissions = false
     var showSettingAlert: AlertDialog? = null
     var bassLevel: Int? = null
@@ -168,7 +176,9 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         this.setPlaySpeedCallBack = setSpeedCallBack
         var playSpeedValue: String? = null
         val setRingtoneBottomSheet: BottomSheetDialog?
-        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog).apply {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
         val binding = BsPlaybackSpeedBinding.inflate(LayoutInflater.from(this))
         setRingtoneBottomSheet.setContentView(binding.root)
         defaultCheckedPlaySpeed(binding.playSpeedGroup, prefs)
@@ -415,6 +425,54 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         dialog.show()
     }
 
+    fun addToPlaylistDialog(list: List<PlaylistEntity>, addToPlaylistCallBack: (String) -> Unit) {
+        this.addToPlaylistCallBack = addToPlaylistCallBack
+        playlistAdapter.viewHolderType = PLAYLISTS_VT
+        playlistAdapter.isListOnly = true
+        val binding = PopupAddToPlaylistBinding.inflate(LayoutInflater.from(this))
+        val view = binding.root
+        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
+        builder.setView(view)
+        val dialog = builder.create()
+        binding.playlistRv.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        playlistAdapter.items = list
+        binding.playlistRv.adapter = playlistAdapter
+        playlistAdapter.setOnItemClickListener { playlistEntity, i ->
+            addToPlaylistCallBack(playlistEntity.playlistId.toString())
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+        binding.createPlaylist.setOnClickListener {
+            addToPlaylistCallBack(CREATE_PLAYLIST)
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    fun bsCreatePlaylist(createPlaylistCallBack: (String) -> Unit) {
+        this.createPlaylistCallBack = createPlaylistCallBack
+        val setRingtoneBottomSheet: BottomSheetDialog?
+        setRingtoneBottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        val binding = BsRenameTrackBinding.inflate(LayoutInflater.from(this))
+        setRingtoneBottomSheet.setContentView(binding.root)
+        binding.renameButton.text = getString(R.string.create)
+        binding.bsTitle.text = getString(R.string.create_playlist)
+        binding.cancelButton.setOnClickListener {
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        binding.renameButton.setOnClickListener {
+            createPlaylistCallBack(binding.etName.text.toString())
+            if (setRingtoneBottomSheet.isShowing) {
+                setRingtoneBottomSheet.dismiss()
+            }
+        }
+        setRingtoneBottomSheet.show()
+    }
+
     fun bsSleepTimer(setSleepTimerCallBack: (Int) -> Unit) {
         this.setSleepTimerCallBack = setSleepTimerCallBack
         var selectedTime = 0
@@ -482,6 +540,10 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
             when (item.itemId) {
                 R.id.play -> {
                     trackMenuCallBack(PLAY_TRACK)
+                }
+
+                R.id.add_to_playlist -> {
+                    trackMenuCallBack(ADD_TO_PLAYLIST)
                 }
 
                 R.id.share -> {

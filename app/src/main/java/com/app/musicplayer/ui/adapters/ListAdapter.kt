@@ -14,6 +14,7 @@ import com.app.musicplayer.ui.adapters.holders.AlbumViewHolder
 import com.app.musicplayer.ui.adapters.holders.ArtistViewHolder
 import com.app.musicplayer.ui.adapters.holders.FavoritesViewHolder
 import com.app.musicplayer.ui.adapters.holders.ListItemHolder
+import com.app.musicplayer.ui.adapters.holders.PlaylistsViewHolder
 import com.app.musicplayer.ui.adapters.holders.RecentTrackViewHolder
 import com.app.musicplayer.ui.adapters.holders.TrackViewHolder
 import com.app.musicplayer.utils.*
@@ -64,6 +65,10 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ViewHolder>() {
             FAVORITES_VT -> {
                 view = TrackItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return FavoritesViewHolder(view)
+            }
+            PLAYLISTS_VT -> {
+                view = TrackItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                return PlaylistsViewHolder(view)
             }
 
             else -> return ListItemHolder(view as ListItemBinding)
@@ -122,6 +127,17 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ViewHolder>() {
                     }
                     setOnMenuClick {
                         _onItemFavoriteClickListener.invoke(dataItem)
+                    }
+                    onBindListItem(this, dataItem)
+                }
+            }
+            PLAYLISTS_VT -> {
+                (holder as PlaylistsViewHolder).apply {
+                    setOnItemClick {
+                        _onItemClickListener.invoke(dataItem, holder.adapterPosition)
+                    }
+                    setOnMenuClick {
+                        _onItemMenuClickListener.invoke(dataItem, holder.adapterPosition, it)
                     }
                     onBindListItem(this, dataItem)
                 }

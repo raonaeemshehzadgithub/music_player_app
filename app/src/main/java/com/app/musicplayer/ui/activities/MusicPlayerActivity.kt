@@ -160,6 +160,16 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                                     initPlayer()
                                 }
                         }
+                        FROM_PLAYLIST->{
+                            lifecycleScope.launch {
+                                viewState.fetchSongIdsForPlaylist(intent.getLongExtra(PLAYLIST_ID, 0L))?.let { songIdsList ->
+                                    returnList(songIdsList) { trackList ->
+                                        setPlayerList(trackList)
+                                        initPlayer()
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
@@ -436,6 +446,21 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         binding.a.text = "A"
         binding.b.text = "B"
         binding.abContainer.beGone()
+    }
+    private fun returnList(list: List<Long>, callback: (List<Track>) -> Unit) {
+        val trackList = mutableListOf<Track>()
+        var count = 0
+        list.forEach { id ->
+            tracksInteractor.queryTrack(id) { track ->
+                track?.let {
+                    trackList.add(it)
+                }
+                count++
+                if (count == list.size) {
+                    callback(trackList)
+                }
+            }
+        }
     }
 
     override fun onDestroy() {

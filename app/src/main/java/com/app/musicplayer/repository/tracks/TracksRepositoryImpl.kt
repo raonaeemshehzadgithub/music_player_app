@@ -2,6 +2,8 @@ package com.app.musicplayer.repository.tracks
 
 import androidx.lifecycle.LiveData
 import com.app.musicplayer.db.MusicDB
+import com.app.musicplayer.db.entities.PlaylistEntity
+import com.app.musicplayer.db.entities.PlaylistSongCrossRef
 import com.app.musicplayer.di.factory.contentresolver.ContentResolverFactory
 import com.app.musicplayer.di.factory.livedata.LiveDataFactory
 import com.app.musicplayer.models.Track
@@ -46,5 +48,22 @@ class TracksRepositoryImpl @Inject constructor(
 
     override fun fetchFavorites(): List<Track> {
         return musicDB.getFavoriteDao().fetchFavorites()
+    }
+    override fun insertNewPlaylist(playlist:PlaylistEntity) {
+        return musicDB.getPlaylistDao().insertTrackToPlaylist(playlist)
+    }
+    override fun fetchPlaylistsLiveList(): LiveData<List<PlaylistEntity>> {
+        return musicDB.getPlaylistDao().fetchPlaylistsLiveList()
+    }
+    override fun fetchPlaylists(): List<PlaylistEntity> {
+        return musicDB.getPlaylistDao().fetchPlaylists()
+    }
+
+    override fun insert(crossRef: PlaylistSongCrossRef) {
+        return musicDB.getPlaylistSongCrossRefDao().insert(crossRef)
+    }
+
+    override fun getSongIdsForPlaylist(playlistId: Long): List<Long> {
+        return musicDB.getPlaylistSongCrossRefDao().getSongIdsForPlaylist(playlistId)
     }
 }

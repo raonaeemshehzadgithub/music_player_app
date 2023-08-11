@@ -86,7 +86,6 @@ class NowPlayingFragment : Fragment() {
 
     private fun setUpClicks() {
         binding.root.setOnClickListener {
-            context?.toast(tracksList.size.toString())
             startActivity(Intent(requireContext(), MusicPlayerActivity::class.java).apply {
                 putExtra(TRACK_ID, prefs.currentTrackId)
                 putExtra(POSITION, prefs.currentTrackPosition)

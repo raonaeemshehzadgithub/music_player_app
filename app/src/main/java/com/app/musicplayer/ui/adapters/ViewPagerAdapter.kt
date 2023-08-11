@@ -8,6 +8,7 @@ import com.app.musicplayer.ui.fragments.AlbumsFragment
 import com.app.musicplayer.ui.fragments.AllMusicFragment
 import com.app.musicplayer.ui.fragments.ArtistsFragment
 import com.app.musicplayer.ui.fragments.FavoritesFragment
+import com.app.musicplayer.ui.fragments.PlaylistFragment
 import com.app.musicplayer.ui.fragments.RecentlyPlayedFragment
 
 internal class ViewPagerAdapter(
@@ -36,6 +37,10 @@ internal class ViewPagerAdapter(
 
             4 -> {
                 FavoritesFragment()
+            }
+
+            5 -> {
+                PlaylistFragment()
             }
 
             else -> getItem(position)

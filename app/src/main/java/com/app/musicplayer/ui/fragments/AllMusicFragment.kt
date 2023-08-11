@@ -1,19 +1,40 @@
 package com.app.musicplayer.ui.fragments
 
 import android.content.Intent
+import android.util.Log
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.app.musicplayer.db.entities.PlaylistEntity
+import com.app.musicplayer.db.entities.PlaylistSongCrossRef
 import com.app.musicplayer.extentions.deleteTrack
 import com.app.musicplayer.extentions.shareTrack
+import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.TracksAdapter
+import com.app.musicplayer.ui.viewstates.PlaylistViewState
 import com.app.musicplayer.ui.viewstates.TracksViewState
-import com.app.musicplayer.utils.*
+import com.app.musicplayer.utils.ADD_TO_PLAYLIST
+import com.app.musicplayer.utils.ALL_TRACKS_VT
+import com.app.musicplayer.utils.CREATE_PLAYLIST
+import com.app.musicplayer.utils.DELETE_TRACK
+import com.app.musicplayer.utils.DELETE_TRACK_CODE
+import com.app.musicplayer.utils.FROM_ALL_SONG
+import com.app.musicplayer.utils.PLAYER_LIST
+import com.app.musicplayer.utils.PLAY_TRACK
+import com.app.musicplayer.utils.POSITION
+import com.app.musicplayer.utils.PROPERTIES_TRACK
+import com.app.musicplayer.utils.RENAME_TRACK
+import com.app.musicplayer.utils.SHARE_TRACK
+import com.app.musicplayer.utils.TRACK_ID
+import com.app.musicplayer.utils.isRPlus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -40,7 +61,6 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                             putExtra(POSITION, trackCombinedData.position)
                             putExtra(PLAYER_LIST, FROM_ALL_SONG)
                         })
-
                 }
             }
             showMenuEvent.observe(this@AllMusicFragment) { event ->
@@ -56,7 +76,49 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                                         ).apply {
                                             putExtra(TRACK_ID, trackCombinedData.track.id)
                                             putExtra(POSITION, trackCombinedData.position)
+                                            putExtra(PLAYER_LIST, FROM_ALL_SONG)
                                         })
+                                }
+
+                                ADD_TO_PLAYLIST -> {
+                                    lifecycleScope.launch {
+                                        fetchPlaylists()?.let { playlist ->
+                                            baseActivity.addToPlaylistDialog(playlist) { callback ->
+                                                when (callback) {
+                                                    CREATE_PLAYLIST -> {
+                                                        baseActivity.bsCreatePlaylist { playlistName ->
+                                                            val playlistModel = PlaylistEntity(
+                                                                playlistId = 0,
+                                                                playlistName = playlistName
+                                                            )
+                                                            insertNewPlaylist(playlistModel)
+                                                            context?.toast("${playlistModel.playlistName} created successfully")
+                                                        }
+                                                    }
+
+                                                    else -> {
+                                                        val crossRef = PlaylistSongCrossRef(
+                                                            callback.toLong(),
+                                                            trackCombinedData.track.id ?: 0L
+                                                        )
+                                                        lifecycleScope.launch(Dispatchers.IO) {
+                                                            insert(crossRef)
+                                                        }
+                                                        context?.toast("Song added to playlist")
+                                                    }
+                                                }
+                                            }
+                                        } ?: run{
+                                            baseActivity.bsCreatePlaylist { playlistName ->
+                                                val playlistModel = PlaylistEntity(
+                                                    playlistId = 0,
+                                                    playlistName = playlistName
+                                                )
+                                                insertNewPlaylist(playlistModel)
+                                                context?.toast("${playlistModel.playlistName} created successfully")
+                                            }
+                                        }
+                                    }
                                 }
 
                                 SHARE_TRACK -> {

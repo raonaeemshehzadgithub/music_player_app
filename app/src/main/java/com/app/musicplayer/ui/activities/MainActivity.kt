@@ -99,13 +99,14 @@ class MainActivity : BaseActivity<MainViewState>() {
                 binding.musicTabs.newTab().setText(getString(R.string.recently_played))
             )
             musicTabs.addTab(binding.musicTabs.newTab().setText(getString(R.string.my_favorites)))
+            musicTabs.addTab(binding.musicTabs.newTab().setText(getString(R.string.playlists)))
             musicTabs.tabGravity = TabLayout.GRAVITY_FILL
             val adapter = ViewPagerAdapter(
                 this@MainActivity, supportFragmentManager,
                 musicTabs.tabCount
             )
             musicViewPager.adapter = adapter
-            musicViewPager.offscreenPageLimit = 5
+            musicViewPager.offscreenPageLimit = 6
             musicViewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(musicTabs))
             musicTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
@@ -128,6 +129,9 @@ class MainActivity : BaseActivity<MainViewState>() {
                         }
 
                         4 -> {
+                            musicTabs.getTabAt(tab.position)?.select()
+                        }
+                        5 -> {
                             musicTabs.getTabAt(tab.position)?.select()
                         }
                     }

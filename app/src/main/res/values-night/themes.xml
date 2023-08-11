@@ -119,4 +119,9 @@
         <item name="android:dropDownHorizontalOffset">-4dp</item>
         <item name="android:dropDownVerticalOffset">4dp</item>
     </style>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MusicPlayer" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    </style>
 </resources>

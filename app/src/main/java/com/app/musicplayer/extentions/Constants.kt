@@ -8,7 +8,7 @@ import android.provider.MediaStore
 import androidx.annotation.ChecksSdkIntAtLeast
 
 //room db
-const val ROOM_DB_VERSION = 22
+const val ROOM_DB_VERSION = 23
 const val ROOM_DB_NAME = "music_player_db"
 
 const val ALL_TRACKS_VT = 0
@@ -16,6 +16,7 @@ const val ALBUMS_VT = 1
 const val ARTISTS_VT = 2
 const val RECENT_TRACK_VT = 3
 const val FAVORITES_VT = 4
+const val PLAYLISTS_VT = 5
 const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
 
 private const val PATH = "com.app.musicplayer.action."
@@ -63,6 +64,8 @@ const val AB_REPEAT_TRACK = "ab_repeat_track"
 const val PLAY_SPEED_TRACK = "play_speed_track"
 const val SLEEP_TIMER = "sleep_timer"
 const val PLAY_TRACK = "play_track"
+const val ADD_TO_PLAYLIST = "add_to_playlist"
+const val CREATE_PLAYLIST = "create_playlist"
 const val RENAME_TRACK = "rename_track"
 const val PROPERTIES_TRACK = "properties_track"
 const val SET_TRACK_AS = "set_as"
@@ -87,6 +90,7 @@ const val FROM_RECENT = "from_recent"
 const val FROM_FAVORITE = "from_favorite"
 const val FROM_ALBUM_LIST = "from_album_list"
 const val FROM_ARTIST_LIST = "from_artist_list"
+const val FROM_PLAYLIST = "from_playlist"
 const val TRACK_ID = "track_id"
 const val ALBUM_ID = "album_id"
 const val ARTIST_ID = "artist_id"
@@ -97,6 +101,8 @@ const val ARTIST_TITLE = "artist_title"
 const val NEXT_PREVIOUS_TRACK_ID = "next_prev_track_id"
 const val TRACK_COMPLETED = "track_complete"
 const val TRACK_ID_SERVICE = "track_id_service"
+const val PLAYLIST_ID = "playlist_id"
+const val PLAYLIST_NAME = "playlist_name"
 const val SHORT_ANIMATION_DURATION = 150L
 
 val artworkUri = Uri.parse("content://media/external/audio/albumart")

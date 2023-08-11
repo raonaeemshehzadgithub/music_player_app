@@ -1,6 +1,8 @@
 package com.app.musicplayer.repository.tracks
 
 import androidx.lifecycle.LiveData
+import com.app.musicplayer.db.entities.PlaylistEntity
+import com.app.musicplayer.db.entities.PlaylistSongCrossRef
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.db.entities.RecentTrackEntity
 
@@ -16,4 +18,9 @@ interface TracksRepository {
     fun removeRecentTrack(trackId: Long)
     fun fetchFavoriteTrack(): LiveData<List<Track>>
     fun fetchFavorites(): List<Track>
+    fun insertNewPlaylist(playlist: PlaylistEntity)
+    fun fetchPlaylistsLiveList(): LiveData<List<PlaylistEntity>>
+    fun fetchPlaylists(): List<PlaylistEntity>
+    fun insert(crossRef:PlaylistSongCrossRef)
+    fun getSongIdsForPlaylist(playlistId: Long):List<Long>
 }

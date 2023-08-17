@@ -23,10 +23,12 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ViewHolder>() {
 
     private var _data: ListData<ItemType> = ListData()
     private var _onItemClickListener: (ItemType, Int) -> Unit = { _, _ -> }
+    private var _onItemSelectListener: (ItemType) -> Unit = { _ -> }
     private var _onItemMenuClickListener: (ItemType, Int, View) -> Unit = { _, _, _ -> }
     private var _onItemFavoriteClickListener: (ItemType) -> Unit = {}
     private var setViewType: Int = ALL_TRACKS_VT
-
+    var selected_position = -1
+    var isChecked = false
     var items: List<ItemType>
         get() = _data.items
         set(value) {
@@ -139,6 +141,11 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ViewHolder>() {
                     setOnMenuClick {
                         _onItemMenuClickListener.invoke(dataItem, holder.adapterPosition, it)
                     }
+                    setOnItemSelect{
+                        isChecked = true
+                        selected_position = holder.adapterPosition
+                        _onItemSelectListener.invoke(dataItem)
+                    }
                     onBindListItem(this, dataItem)
                 }
             }
@@ -163,5 +170,8 @@ abstract class ListAdapter<ItemType> : RecyclerView.Adapter<ViewHolder>() {
 
     fun setOnFavoriteClickListener(onItemFavoriteClickListener: (ItemType) -> Unit) {
         _onItemFavoriteClickListener = onItemFavoriteClickListener
+    }
+    fun setOnPlaylistSelectListener(onItemPlaylistSelectListener: (ItemType) -> Unit) {
+        _onItemSelectListener = onItemPlaylistSelectListener
     }
 }

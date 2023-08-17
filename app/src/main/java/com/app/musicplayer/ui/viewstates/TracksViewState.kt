@@ -71,4 +71,12 @@ class TracksViewState @Inject constructor(
     fun insert(crossRef: PlaylistSongCrossRef) {
         return tracksRepository.insert(crossRef)
     }
+    suspend fun fetchPlaylistSongCrossRef(playlistId: Long): List<Long>? {
+        return withContext(Dispatchers.IO) {
+            val trackList = tracksRepository.getSongIdsForPlaylist(playlistId)
+            trackList.ifEmpty {
+                null
+            }
+        }
+    }
 }

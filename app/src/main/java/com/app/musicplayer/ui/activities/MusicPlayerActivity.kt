@@ -16,6 +16,8 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.ActivityMusicPlayerBinding
+import com.app.musicplayer.db.entities.PlaylistEntity
+import com.app.musicplayer.db.entities.PlaylistSongCrossRef
 import com.app.musicplayer.extentions.*
 import com.app.musicplayer.helpers.MediaPlayer.setPlayBackSpeed
 import com.app.musicplayer.helpers.OnSwipeTouchListener
@@ -30,6 +32,7 @@ import com.app.musicplayer.utils.*
 import com.bumptech.glide.Glide
 import com.realpacific.clickshrinkeffect.applyClickShrink
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -160,9 +163,15 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                                     initPlayer()
                                 }
                         }
-                        FROM_PLAYLIST->{
+
+                        FROM_PLAYLIST -> {
                             lifecycleScope.launch {
-                                viewState.fetchSongIdsForPlaylist(intent.getLongExtra(PLAYLIST_ID, 0L))?.let { songIdsList ->
+                                viewState.fetchSongIdsForPlaylist(
+                                    intent.getLongExtra(
+                                        PLAYLIST_ID,
+                                        0L
+                                    )
+                                )?.let { songIdsList ->
                                     returnList(songIdsList) { trackList ->
                                         setPlayerList(trackList)
                                         initPlayer()
@@ -293,6 +302,41 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                         val delayInMillis = it.getTimerMinutes() * 60 * 1000L
                         timerHandler.postDelayed(timerRunnable, delayInMillis)
                         toast("Player will stop in ${it.getTimerMinutes()} minutes")
+                    }
+                }
+
+                ADD_TO_PLAYLIST -> {
+                    lifecycleScope.launch {
+                        viewState.fetchPlaylists()?.let { playlist ->
+                            bsAddToPlaylist(playlist) { callback ->
+                                when (callback) {
+                                    CREATE_PLAYLIST -> {
+                                        bsCreatePlaylist { playlistName ->
+                                            createPlaylistAndSaveSong(
+                                                playlistName,
+                                                intent.getLongExtra(TRACK_ID, 0L)
+                                            )
+                                        }
+                                    }
+
+                                    else -> {
+                                        //clicked on playlist to add song
+                                        addSongToPlaylist(
+                                            callback.toLong(),
+                                            intent.getLongExtra(TRACK_ID, 0L)
+                                        )
+                                    }
+                                }
+                            }
+                        } ?: run {
+                            //first time open create playlist sheet by default
+                            bsCreatePlaylist { playlistName ->
+                                createPlaylistAndSaveSong(
+                                    playlistName,
+                                    intent.getLongExtra(TRACK_ID, 0L)
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -447,6 +491,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         binding.b.text = "B"
         binding.abContainer.beGone()
     }
+
     private fun returnList(list: List<Long>, callback: (List<Track>) -> Unit) {
         val trackList = mutableListOf<Track>()
         var count = 0
@@ -475,6 +520,43 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
         registerReceiver(playerReceiver, intentPlayPause)
         registerReceiver(playerReceiver, intentDismiss)
         registerReceiver(playerReceiver, intentComplete)
+    }
+
+    private fun addSongToPlaylist(playlistId: Long, songId: Long) {
+        val crossRef =
+            PlaylistSongCrossRef(
+                playlistId,
+                songId
+            )
+        lifecycleScope.launch(
+            Dispatchers.IO
+        ) {
+            viewState.insert(crossRef)
+        }
+        toast("Song added to playlist")
+    }
+
+    private fun createPlaylistAndSaveSong(playlistName: String, songId: Long) {
+        val playlistModel = PlaylistEntity(
+            playlistId = 0,
+            playlistName = playlistName
+        )
+        viewState.insertNewPlaylist(playlistModel)
+        toast("${playlistModel.playlistName} created successfully")
+
+        //add song to newly created playlist
+        lifecycleScope.launch {
+            viewState.fetchPlaylists()?.let { playlist ->
+                playlist.forEach { playlistEntity ->
+                    if (playlistName == playlistEntity.playlistName) {
+                        addSongToPlaylist(
+                            playlistEntity.playlistId,
+                            songId
+                        )
+                    }
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {

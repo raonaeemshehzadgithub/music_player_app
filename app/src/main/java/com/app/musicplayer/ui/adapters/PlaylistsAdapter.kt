@@ -1,7 +1,9 @@
 package com.app.musicplayer.ui.adapters
 
 import android.content.Context
+import android.widget.RadioButton
 import androidx.recyclerview.widget.RecyclerView
+import com.app.musicplayer.R
 import com.app.musicplayer.db.entities.PlaylistEntity
 import com.app.musicplayer.models.ListData
 import com.app.musicplayer.ui.adapters.holders.PlaylistsViewHolder
@@ -14,6 +16,14 @@ class PlaylistsAdapter @Inject constructor(@ApplicationContext private val conte
     override fun onBindListItem(holder: RecyclerView.ViewHolder, item: PlaylistEntity) {
         (holder as PlaylistsViewHolder).apply {
             bindData(context, item)
+            if (selected_position == holder.adapterPosition) {
+                holder.itemView.findViewById<RadioButton>(R.id.select_track).isChecked = true
+            } else {
+                if (isChecked) {
+                    holder.itemView.findViewById<RadioButton>(R.id.select_track).isChecked =
+                        false
+                }
+            }
             if (isListOnly == true) {
                 showPlaylistNames()
             }

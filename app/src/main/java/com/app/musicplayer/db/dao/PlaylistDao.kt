@@ -17,4 +17,7 @@ interface PlaylistDao {
 
     @Query("SELECT * from PlaylistEntity")
     fun fetchPlaylists():List<PlaylistEntity>
+
+    @Query("DELETE from PlaylistEntity WHERE playlist_id=:playlistId")
+    fun deletePlaylist(playlistId:Long)
 }

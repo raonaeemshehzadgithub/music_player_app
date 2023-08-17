@@ -23,6 +23,8 @@
     <string name="create_playlist">Create playlist</string>
     <string name="create">Create</string>
     <string name="add_favorites">Added to Favorites</string>
+    <string name="add_playlist">Add to Playlist</string>
+    <string name="add">Add</string>
     <string name="remove_favorites">Removed from Favorites</string>
     <string name="set_as">Set as</string>
     <string name="select_time">Stop Player at regular intervals</string>

@@ -2,15 +2,22 @@ package com.app.musicplayer.ui.fragments
 
 import android.content.Intent
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.db.entities.PlaylistEntity
+import com.app.musicplayer.extentions.deleteTrack
+import com.app.musicplayer.extentions.shareTrack
+import com.app.musicplayer.extentions.toast
+import com.app.musicplayer.models.Track
+import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.activities.PlaylistDetailsActivity
 import com.app.musicplayer.ui.adapters.PlaylistsAdapter
 import com.app.musicplayer.ui.viewstates.PlaylistViewState
 import com.app.musicplayer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,15 +37,32 @@ class PlaylistFragment : ListFragment<PlaylistEntity, PlaylistViewState>() {
                 showEmpty(listAdapter.items.isEmpty())
             }
             showMenuEvent.observe(this@PlaylistFragment) { event ->
-                event.ifNew?.let { playlistEntity ->
+                event.ifNew?.let { playlistCombinedData ->
+                    playlistCombinedData.view?.let {
+                        baseActivity.showTrackMenu(
+                            it,
+                            isRecent = false,
+                            isPlaylist = true
+                        ) { callback ->
+                            when (callback) {
+                                DELETE_TRACK -> {
+                                    baseActivity.deleteConfirmationDialog { isDelete ->
+                                        if (isDelete) {
+                                            deletePlaylist(playlistCombinedData.playlist.playlistId)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             showItemEvent.observe(this@PlaylistFragment) { event ->
                 event.ifNew?.let { playlistEntity ->
                     startActivity(
                         Intent(requireContext(), PlaylistDetailsActivity::class.java).apply {
-                            putExtra(PLAYLIST_ID, playlistEntity.playlistId)
-                            putExtra(PLAYLIST_NAME, playlistEntity.playlistName)
+                            putExtra(PLAYLIST_ID, playlistEntity.playlist.playlistId)
+                            putExtra(PLAYLIST_NAME, playlistEntity.playlist.playlistName)
                         })
                 }
             }

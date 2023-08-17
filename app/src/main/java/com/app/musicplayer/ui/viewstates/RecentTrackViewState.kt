@@ -4,6 +4,8 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.app.musicplayer.core.utils.DataLiveEvent
+import com.app.musicplayer.db.entities.PlaylistEntity
+import com.app.musicplayer.db.entities.PlaylistSongCrossRef
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.RecentTrackCombinedData
 import com.app.musicplayer.db.entities.RecentTrackEntity
@@ -50,5 +52,23 @@ class RecentTrackViewState @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             tracksRepository.removeRecentTrack(trackId)
         }
+    }
+    suspend fun fetchPlaylists(): List<PlaylistEntity>? {
+        return withContext(Dispatchers.IO) {
+            val playList = tracksRepository.fetchPlaylists()
+            playList.ifEmpty {
+                null
+            }
+        }
+    }
+
+    fun insertNewPlaylist(playlist: PlaylistEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tracksRepository.insertNewPlaylist(playlist)
+        }
+    }
+
+    fun insert(crossRef: PlaylistSongCrossRef) {
+        return tracksRepository.insert(crossRef)
     }
 }

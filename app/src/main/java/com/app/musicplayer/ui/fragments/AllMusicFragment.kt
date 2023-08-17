@@ -83,39 +83,34 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
                                 ADD_TO_PLAYLIST -> {
                                     lifecycleScope.launch {
                                         fetchPlaylists()?.let { playlist ->
-                                            baseActivity.addToPlaylistDialog(playlist) { callback ->
+                                            baseActivity.bsAddToPlaylist(playlist) { callback ->
                                                 when (callback) {
                                                     CREATE_PLAYLIST -> {
                                                         baseActivity.bsCreatePlaylist { playlistName ->
-                                                            val playlistModel = PlaylistEntity(
-                                                                playlistId = 0,
-                                                                playlistName = playlistName
+                                                            createPlaylistAndSaveSong(
+                                                                playlistName,
+                                                                trackCombinedData.track.id ?: 0L
                                                             )
-                                                            insertNewPlaylist(playlistModel)
-                                                            context?.toast("${playlistModel.playlistName} created successfully")
                                                         }
                                                     }
 
                                                     else -> {
-                                                        val crossRef = PlaylistSongCrossRef(
+                                                        //clicked on playlist to add song
+                                                        addSongToPlaylist(
                                                             callback.toLong(),
-                                                            trackCombinedData.track.id ?: 0L
+                                                            trackCombinedData.track.id
+                                                                ?: 0L
                                                         )
-                                                        lifecycleScope.launch(Dispatchers.IO) {
-                                                            insert(crossRef)
-                                                        }
-                                                        context?.toast("Song added to playlist")
                                                     }
                                                 }
                                             }
-                                        } ?: run{
+                                        } ?: run {
+                                            //first time open create playlist sheet by default
                                             baseActivity.bsCreatePlaylist { playlistName ->
-                                                val playlistModel = PlaylistEntity(
-                                                    playlistId = 0,
-                                                    playlistName = playlistName
+                                                createPlaylistAndSaveSong(
+                                                    playlistName,
+                                                    trackCombinedData.track.id ?: 0L
                                                 )
-                                                insertNewPlaylist(playlistModel)
-                                                context?.toast("${playlistModel.playlistName} created successfully")
                                             }
                                         }
                                     }
@@ -157,4 +152,42 @@ class AllMusicFragment : ListFragment<Track, TracksViewState>() {
             }
         }
     }
+
+    private fun addSongToPlaylist(playlistId: Long, songId: Long) {
+        val crossRef =
+            PlaylistSongCrossRef(
+                playlistId,
+                songId
+            )
+        lifecycleScope.launch(
+            Dispatchers.IO
+        ) {
+            viewState.insert(crossRef)
+        }
+        context?.toast("Song added to playlist")
+    }
+
+    private fun createPlaylistAndSaveSong(playlistName: String, songId: Long) {
+        val playlistModel = PlaylistEntity(
+            playlistId = 0,
+            playlistName = playlistName
+        )
+        viewState.insertNewPlaylist(playlistModel)
+        context?.toast("${playlistModel.playlistName} created successfully")
+
+        //add song to newly created playlist
+        lifecycleScope.launch {
+            viewState.fetchPlaylists()?.let { playlist ->
+                playlist.forEach { playlistEntity ->
+                    if (playlistName == playlistEntity.playlistName) {
+                        addSongToPlaylist(
+                            playlistEntity.playlistId,
+                            songId
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 }

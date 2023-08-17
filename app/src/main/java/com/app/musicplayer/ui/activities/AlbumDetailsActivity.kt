@@ -3,11 +3,15 @@ package com.app.musicplayer.ui.activities
 import android.content.Intent
 import android.view.View
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.musicplayer.databinding.ActivityAlbumDetailsBinding
+import com.app.musicplayer.db.entities.PlaylistEntity
+import com.app.musicplayer.db.entities.PlaylistSongCrossRef
 import com.app.musicplayer.extentions.beVisibleIf
 import com.app.musicplayer.extentions.deleteTrack
 import com.app.musicplayer.extentions.shareTrack
+import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService.Companion.tracksList
@@ -16,6 +20,8 @@ import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.AlbumDetailsViewState
 import com.app.musicplayer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -63,6 +69,42 @@ class AlbumDetailsActivity : BaseActivity<AlbumDetailsViewState>() {
                                             putExtra(PLAYER_LIST, FROM_ALBUM_LIST)
                                             putExtra(ALBUM_ID, intent.getLongExtra(ALBUM_ID, 0L))
                                         })
+                                }
+
+                                ADD_TO_PLAYLIST -> {
+                                    lifecycleScope.launch {
+                                        fetchPlaylists()?.let { playlist ->
+                                            bsAddToPlaylist(playlist) { callback ->
+                                                when (callback) {
+                                                    CREATE_PLAYLIST -> {
+                                                        bsCreatePlaylist { playlistName ->
+                                                            createPlaylistAndSaveSong(
+                                                                playlistName,
+                                                                trackCombinedData.track.id ?: 0L
+                                                            )
+                                                        }
+                                                    }
+
+                                                    else -> {
+                                                        //clicked on playlist to add song
+                                                        addSongToPlaylist(
+                                                            callback.toLong(),
+                                                            trackCombinedData.track.id
+                                                                ?: 0L
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        } ?: run {
+                                            //first time open create playlist sheet by default
+                                            bsCreatePlaylist { playlistName ->
+                                                createPlaylistAndSaveSong(
+                                                    playlistName,
+                                                    trackCombinedData.track.id ?: 0L
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
 
                                 SHARE_TRACK -> {
@@ -123,6 +165,42 @@ class AlbumDetailsActivity : BaseActivity<AlbumDetailsViewState>() {
             empty.emptyImage.beVisibleIf(isShow)
             empty.emptyText.beVisibleIf(isShow)
             albumsRv.beVisibleIf(!isShow)
+        }
+    }
+    private fun addSongToPlaylist(playlistId: Long, songId: Long) {
+        val crossRef =
+            PlaylistSongCrossRef(
+                playlistId,
+                songId
+            )
+        lifecycleScope.launch(
+            Dispatchers.IO
+        ) {
+            viewState.insert(crossRef)
+        }
+        toast("Song added to playlist")
+    }
+
+    private fun createPlaylistAndSaveSong(playlistName: String, songId: Long) {
+        val playlistModel = PlaylistEntity(
+            playlistId = 0,
+            playlistName = playlistName
+        )
+        viewState.insertNewPlaylist(playlistModel)
+        toast("${playlistModel.playlistName} created successfully")
+
+        //add song to newly created playlist
+        lifecycleScope.launch {
+            viewState.fetchPlaylists()?.let { playlist ->
+                playlist.forEach { playlistEntity ->
+                    if (playlistName == playlistEntity.playlistName) {
+                        addSongToPlaylist(
+                            playlistEntity.playlistId,
+                            songId
+                        )
+                    }
+                }
+            }
         }
     }
 

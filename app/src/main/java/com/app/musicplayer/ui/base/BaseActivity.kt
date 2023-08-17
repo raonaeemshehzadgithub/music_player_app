@@ -11,11 +11,9 @@ import android.media.AudioManager
 import android.media.audiofx.Equalizer
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -25,23 +23,25 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.musicplayer.R
+import com.app.musicplayer.databinding.BsAddToPlaylistBinding
 import com.app.musicplayer.databinding.BsEqualizerBinding
 import com.app.musicplayer.databinding.BsPlaybackSpeedBinding
 import com.app.musicplayer.databinding.BsRenameTrackBinding
 import com.app.musicplayer.databinding.BsSetRingtoneBinding
 import com.app.musicplayer.databinding.BsSleepTimerBinding
-import com.app.musicplayer.databinding.PopupAddToPlaylistBinding
 import com.app.musicplayer.databinding.PopupTrackPropertiesBinding
 import com.app.musicplayer.db.entities.PlaylistEntity
 import com.app.musicplayer.extentions.convertToSeekBarProgress
 import com.app.musicplayer.extentions.formatMillisToHMS
 import com.app.musicplayer.extentions.getPermissionString
 import com.app.musicplayer.extentions.hasPermission
+import com.app.musicplayer.extentions.isDarkMode
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
 import com.app.musicplayer.extentions.toast
@@ -84,6 +84,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     lateinit var prefs: PreferenceHelper
 
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
+    private var deleteConfirmation: (Boolean) -> Unit = {}
     private var setRingtoneCallBack: (String) -> Unit = {}
     private var setPlaySpeedCallBack: (String) -> Unit = {}
     private var setRenameTrackCallBack: (String) -> Unit = {}
@@ -94,6 +95,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
     var isAskingPermissions = false
     var showSettingAlert: AlertDialog? = null
     var bassLevel: Int? = null
+    var selectedPlaylistId = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -361,6 +363,10 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
                     playerMenuCallBack(SLEEP_TIMER)
                 }
 
+                R.id.add_to_playlist -> {
+                    playerMenuCallBack(ADD_TO_PLAYLIST)
+                }
+
                 R.id.share_track -> {
                     playerMenuCallBack(SHARE_TRACK)
                 }
@@ -409,11 +415,23 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     fun showTrackPropertiesDialog(track: TrackCombinedData) {
         val binding = PopupTrackPropertiesBinding.inflate(LayoutInflater.from(this))
         val view = binding.root
         val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
         builder.setView(view)
+        if (this.isDarkMode()) {
+            binding.path.setTextColor(getColor(R.color.white))
+            binding.name.setTextColor(getColor(R.color.white))
+            binding.duration.setTextColor(getColor(R.color.white))
+            binding.artist.setTextColor(getColor(R.color.white))
+        } else {
+            binding.path.setTextColor(getColor(R.color.black))
+            binding.name.setTextColor(getColor(R.color.black))
+            binding.duration.setTextColor(getColor(R.color.black))
+            binding.artist.setTextColor(getColor(R.color.black))
+        }
         binding.path.text = track.track.path ?: ""
         binding.name.text = track.track.path?.substringAfterLast("/")?.substringBeforeLast(".")
         binding.duration.text = formatMillisToHMS(track.track.duration ?: 0L)
@@ -425,30 +443,67 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         dialog.show()
     }
 
-    fun addToPlaylistDialog(list: List<PlaylistEntity>, addToPlaylistCallBack: (String) -> Unit) {
-        this.addToPlaylistCallBack = addToPlaylistCallBack
-        playlistAdapter.viewHolderType = PLAYLISTS_VT
-        playlistAdapter.isListOnly = true
-        val binding = PopupAddToPlaylistBinding.inflate(LayoutInflater.from(this))
-        val view = binding.root
+    fun deleteConfirmationDialog(isSong: Boolean? = null, deleteConfirmation: (Boolean) -> Unit) {
+        this.deleteConfirmation = deleteConfirmation
         val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
-        builder.setView(view)
-        val dialog = builder.create()
-        binding.playlistRv.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        playlistAdapter.items = list
-        binding.playlistRv.adapter = playlistAdapter
-        playlistAdapter.setOnItemClickListener { playlistEntity, i ->
-            addToPlaylistCallBack(playlistEntity.playlistId.toString())
+        builder.setTitle("Delete")
+        if (isSong == true) {
+            builder.setMessage("Do you want to delete this song?")
+        } else {
+            builder.setMessage("Do you want to delete this playlist?")
+        }
+
+        builder.setPositiveButton("OK") { dialog, _ ->
+            deleteConfirmation(true)
             dialog.dismiss()
         }
         builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.dismiss()
         }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    fun bsAddToPlaylist(list: List<PlaylistEntity>, addToPlaylistCallBack: (String) -> Unit) {
+        this.addToPlaylistCallBack = addToPlaylistCallBack
+        val bsAddToPlaylist: BottomSheetDialog?
+        bsAddToPlaylist = BottomSheetDialog(this, R.style.BottomSheetDialog).apply {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+        val binding = BsAddToPlaylistBinding.inflate(LayoutInflater.from(this))
+        bsAddToPlaylist.setContentView(binding.root)
+        playlistAdapter.apply {
+            viewHolderType = PLAYLISTS_VT
+            isListOnly = true
+            isChecked = false
+            selected_position = -1
+            binding.playlistRv.layoutManager =
+                LinearLayoutManager(this@BaseActivity, RecyclerView.VERTICAL, false)
+            items = list
+            binding.playlistRv.adapter = this
+            setOnPlaylistSelectListener { playlistEntity ->
+                selectedPlaylistId = playlistEntity.playlistId
+                notifyDataSetChanged()
+            }
+        }
+        binding.addButton.setOnClickListener {
+            if (bsAddToPlaylist.isShowing && selectedPlaylistId != 0L) {
+                addToPlaylistCallBack(selectedPlaylistId.toString())
+                bsAddToPlaylist.dismiss()
+            } else {
+                toast("Select playlist first")
+            }
+        }
         binding.createPlaylist.setOnClickListener {
             addToPlaylistCallBack(CREATE_PLAYLIST)
-            dialog.dismiss()
+            bsAddToPlaylist.dismiss()
         }
-        dialog.show()
+        binding.cancelButton.setOnClickListener {
+            if (bsAddToPlaylist.isShowing) {
+                bsAddToPlaylist.dismiss()
+            }
+        }
+        bsAddToPlaylist.show()
     }
 
     fun bsCreatePlaylist(createPlaylistCallBack: (String) -> Unit) {
@@ -529,13 +584,26 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         }
     }
 
-    fun showTrackMenu(view: View, isRecent: Boolean? = false, menuCallBack: (String) -> Unit) {
+    fun showTrackMenu(
+        view: View,
+        isRecent: Boolean? = false,
+        isPlaylist: Boolean? = false,
+        menuCallBack: (String) -> Unit
+    ) {
         this.trackMenuCallBack = menuCallBack
         val wrapper: Context = ContextThemeWrapper(this, R.style.popUpMenuMain)
         val popupMenuSelected = PopupMenu(wrapper, view)
         popupMenuSelected.inflate(R.menu.track_menu)
         popupMenuSelected.gravity = Gravity.END
         popupMenuSelected.menu.findItem(R.id.rename).isVisible = isRecent == false
+        if (isPlaylist == true) {
+            popupMenuSelected.menu.findItem(R.id.play).isVisible = false
+            popupMenuSelected.menu.findItem(R.id.add_to_playlist).isVisible = false
+            popupMenuSelected.menu.findItem(R.id.share).isVisible = false
+            popupMenuSelected.menu.findItem(R.id.rename).isVisible = false
+            popupMenuSelected.menu.findItem(R.id.properties).isVisible = false
+            popupMenuSelected.menu.findItem(R.id.delete).title = "Delete Playlist"
+        }
         popupMenuSelected.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.play -> {

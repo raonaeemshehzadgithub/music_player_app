@@ -6,7 +6,6 @@ import android.os.Build
 import android.provider.MediaStore
 import android.view.View
 import androidx.annotation.RequiresApi
-import com.app.musicplayer.utils.DELETE_PLAYING_TRACK
 
 fun Activity.hideKeyboard() {
     hideKeyboard(currentFocus ?: View(this))

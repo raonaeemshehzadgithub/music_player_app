@@ -12,6 +12,8 @@ import com.app.musicplayer.interator.albums.AlbumsInteractorImpl
 import com.app.musicplayer.interator.albums.AlbumsInterator
 import com.app.musicplayer.interator.player.PlayerInteractor
 import com.app.musicplayer.interator.player.PlayerInteractorImpl
+import com.app.musicplayer.interator.playlist.PlaylistInteractor
+import com.app.musicplayer.interator.playlist.PlaylistInteractorImpl
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.interator.tracks.TracksInteractorImpl
 import com.app.musicplayer.interator.string.StringsInteractor
@@ -52,6 +54,9 @@ class AppModule {
 
         @Binds
         fun bindsTracksInteractor(tracksInteractorImpl: TracksInteractorImpl): TracksInteractor
+
+        @Binds
+        fun bindsPlaylistInteractor(playlistInteractorImpl: PlaylistInteractorImpl):PlaylistInteractor
 
         @Binds
         fun bindsAlbumsInteractor(albumsInteractorImpl: AlbumsInteractorImpl): AlbumsInterator

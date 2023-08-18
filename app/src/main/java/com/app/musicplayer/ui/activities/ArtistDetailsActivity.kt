@@ -14,8 +14,6 @@ import com.app.musicplayer.extentions.deleteTrack
 import com.app.musicplayer.extentions.shareTrack
 import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.tracks.TracksInteractor
-import com.app.musicplayer.models.Track
-import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.adapters.TracksAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.ArtistDetailsViewState

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import com.app.musicplayer.helpers.MediaPlayer
 import com.app.musicplayer.utils.PLAY_SPEED_0_5x
 import com.app.musicplayer.utils.PLAY_SPEED_0_75x
 import com.app.musicplayer.utils.PLAY_SPEED_1_25x

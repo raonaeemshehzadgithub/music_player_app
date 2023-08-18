@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -20,7 +19,6 @@ import com.app.musicplayer.extentions.hasPermission
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.playBackSpeed
 import com.app.musicplayer.extentions.shuffleTrack
-import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.helpers.MediaPlayer.abRepeat
 import com.app.musicplayer.helpers.MediaPlayer.completePlayer
 import com.app.musicplayer.helpers.MediaPlayer.getCurrentPosition
@@ -29,7 +27,6 @@ import com.app.musicplayer.helpers.MediaPlayer.isPlaying
 import com.app.musicplayer.helpers.MediaPlayer.mPlayer
 import com.app.musicplayer.helpers.MediaPlayer.pauseTrackk
 import com.app.musicplayer.helpers.MediaPlayer.playTrack
-import com.app.musicplayer.helpers.MediaPlayer.releasePlayer
 import com.app.musicplayer.helpers.MediaPlayer.seekTo
 import com.app.musicplayer.helpers.MediaPlayer.setupTrack
 import com.app.musicplayer.helpers.MediaSessionCallback

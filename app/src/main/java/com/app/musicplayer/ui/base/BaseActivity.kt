@@ -415,22 +415,23 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     fun showTrackPropertiesDialog(track: TrackCombinedData) {
         val binding = PopupTrackPropertiesBinding.inflate(LayoutInflater.from(this))
         val view = binding.root
         val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
         builder.setView(view)
-        if (this.isDarkMode()) {
-            binding.path.setTextColor(getColor(R.color.white))
-            binding.name.setTextColor(getColor(R.color.white))
-            binding.duration.setTextColor(getColor(R.color.white))
-            binding.artist.setTextColor(getColor(R.color.white))
-        } else {
-            binding.path.setTextColor(getColor(R.color.black))
-            binding.name.setTextColor(getColor(R.color.black))
-            binding.duration.setTextColor(getColor(R.color.black))
-            binding.artist.setTextColor(getColor(R.color.black))
+        if (isMPlus()) {
+            if (this.isDarkMode()) {
+                binding.path.setTextColor(getColor(R.color.white))
+                binding.name.setTextColor(getColor(R.color.white))
+                binding.duration.setTextColor(getColor(R.color.white))
+                binding.artist.setTextColor(getColor(R.color.white))
+            } else {
+                binding.path.setTextColor(getColor(R.color.black))
+                binding.name.setTextColor(getColor(R.color.black))
+                binding.duration.setTextColor(getColor(R.color.black))
+                binding.artist.setTextColor(getColor(R.color.black))
+            }
         }
         binding.path.text = track.track.path ?: ""
         binding.name.text = track.track.path?.substringAfterLast("/")?.substringBeforeLast(".")
@@ -588,6 +589,7 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
         view: View,
         isRecent: Boolean? = false,
         isPlaylist: Boolean? = false,
+        isPlaylistSong: Boolean? = false,
         menuCallBack: (String) -> Unit
     ) {
         this.trackMenuCallBack = menuCallBack
@@ -603,6 +605,9 @@ abstract class BaseActivity<VM : BaseViewState> : AppCompatActivity(), BaseView<
             popupMenuSelected.menu.findItem(R.id.rename).isVisible = false
             popupMenuSelected.menu.findItem(R.id.properties).isVisible = false
             popupMenuSelected.menu.findItem(R.id.delete).title = "Delete Playlist"
+        }else if (isPlaylistSong == true) {
+            popupMenuSelected.menu.findItem(R.id.add_to_playlist).isVisible = false
+            popupMenuSelected.menu.findItem(R.id.delete).title = "Remove from Playlist"
         }
         popupMenuSelected.setOnMenuItemClickListener { item ->
             when (item.itemId) {

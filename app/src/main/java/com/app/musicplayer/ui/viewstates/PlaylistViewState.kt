@@ -20,25 +20,27 @@ import javax.inject.Inject
 @HiltViewModel
 class PlaylistViewState @Inject constructor(
     private val trackRepository: TracksRepository
-): ListViewState<PlaylistEntity>() {
+) : ListViewState<PlaylistEntity>() {
 
     val showMenuEvent = DataLiveEvent<PlaylistCombinedData>()
     val showItemEvent = DataLiveEvent<PlaylistCombinedData>()
     override fun getItemsObservable(callback: (LiveData<List<PlaylistEntity>>) -> Unit) {
     }
+
     fun fetchPlaylists(): LiveData<List<PlaylistEntity>> {
         return trackRepository.fetchPlaylistsLiveList()
     }
 
     override fun setOnMenuClickListener(item: PlaylistEntity, position: Int, view: View) {
         super.setOnMenuClickListener(item, position, view)
-        showMenuEvent.call(PlaylistCombinedData(item,position,view))
+        showMenuEvent.call(PlaylistCombinedData(item, position, view))
     }
 
     override fun setOnItemClickListener(item: PlaylistEntity, position: Int) {
         super.setOnItemClickListener(item, position)
-        showItemEvent.call(PlaylistCombinedData(item,position))
+        showItemEvent.call(PlaylistCombinedData(item, position))
     }
+
     fun deletePlaylist(playlistId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             trackRepository.deletePlaylist(playlistId)

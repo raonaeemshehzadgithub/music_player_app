@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.app.musicplayer.R
 import com.app.musicplayer.databinding.FragmentNowPlayingBinding
@@ -18,12 +17,10 @@ import com.app.musicplayer.extentions.beVisible
 import com.app.musicplayer.extentions.getThumbnailUri
 import com.app.musicplayer.extentions.isUnknownString
 import com.app.musicplayer.extentions.sendIntent
-import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.extentions.updatePlayIcon
 import com.app.musicplayer.extentions.updatePlayPauseDrawable
 import com.app.musicplayer.helpers.PreferenceHelper
 import com.app.musicplayer.interator.tracks.TracksInteractor
-import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.*

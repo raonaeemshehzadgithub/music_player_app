@@ -15,17 +15,16 @@ import com.bumptech.glide.Glide
 open class PlaylistsViewHolder (protected val binding: TrackItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bindData(context: Context, playlist: PlaylistEntity) {
+    fun bindData(context: Context, playlist: PlaylistEntity,songsCount:Int) {
         Glide.with(context).load("")
             .placeholder(R.drawable.ic_playlist)
             .into(binding.thumbnail)
         binding.trackName.text = playlist.playlistName
-        binding.artistName.text = " 10 Songs"
+        binding.artistName.text = " $songsCount Songs"
     }
     fun showPlaylistNames() {
         binding.menuTrack.beInvisible()
         binding.selectTrack.beVisible()
-
     }
     fun setOnItemSelect(onItemSelectListener: View.OnClickListener) {
         binding.selectTrack.setOnClickListener(onItemSelectListener)

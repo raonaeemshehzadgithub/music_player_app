@@ -15,7 +15,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import com.app.musicplayer.R
 import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.utils.*
 import com.app.musicplayer.utils.isOnMainThread

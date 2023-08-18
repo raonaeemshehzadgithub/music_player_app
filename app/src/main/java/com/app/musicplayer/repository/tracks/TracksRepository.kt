@@ -23,5 +23,7 @@ interface TracksRepository {
     fun fetchPlaylists(): List<PlaylistEntity>
     fun insert(crossRef:PlaylistSongCrossRef)
     fun getSongIdsForPlaylist(playlistId: Long):List<Long>
+    fun getSongIdsForPlaylistLive(playlistId: Long):LiveData<List<Long>>
     fun deletePlaylist(playlistId: Long)
+    fun removeSongFromPlaylist(playlistId: Long,songId:Long)
 }

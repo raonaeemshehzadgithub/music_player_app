@@ -1,22 +1,16 @@
 package com.app.musicplayer.interator.tracks
 
-import android.content.ContentResolver
-import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import com.app.musicplayer.contentresolver.TracksContentResolver
-import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.base.BaseInteratorImpl
 import com.app.musicplayer.models.Track
 import com.app.musicplayer.models.TrackCombinedData
 import com.app.musicplayer.utils.getAudioFileContentUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.CompositeDisposable
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 

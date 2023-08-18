@@ -67,7 +67,15 @@ class TracksRepositoryImpl @Inject constructor(
         return musicDB.getPlaylistSongCrossRefDao().getSongIdsForPlaylist(playlistId)
     }
 
+    override fun getSongIdsForPlaylistLive(playlistId: Long): LiveData<List<Long>> {
+        return musicDB.getPlaylistSongCrossRefDao().getSongIdsForPlaylistLive(playlistId)
+    }
+
     override fun deletePlaylist(playlistId: Long) {
         return musicDB.getPlaylistDao().deletePlaylist(playlistId)
+    }
+
+    override fun removeSongFromPlaylist(playlistId: Long, songId: Long) {
+        return musicDB.getPlaylistSongCrossRefDao().removeSongFromPlaylist(playlistId,songId)
     }
 }

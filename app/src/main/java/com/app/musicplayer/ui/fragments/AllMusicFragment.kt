@@ -1,7 +1,6 @@
 package com.app.musicplayer.ui.fragments
 
 import android.content.Intent
-import android.util.Log
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +15,6 @@ import com.app.musicplayer.models.Track
 import com.app.musicplayer.services.MusicService.Companion.tracksList
 import com.app.musicplayer.ui.activities.MusicPlayerActivity
 import com.app.musicplayer.ui.adapters.TracksAdapter
-import com.app.musicplayer.ui.viewstates.PlaylistViewState
 import com.app.musicplayer.ui.viewstates.TracksViewState
 import com.app.musicplayer.utils.ADD_TO_PLAYLIST
 import com.app.musicplayer.utils.ALL_TRACKS_VT

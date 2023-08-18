@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -180,6 +179,8 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                             }
                         }
                     }
+                } else {
+                    updatePlayPauseDrawable(binding.playPauseTrack, this@MusicPlayerActivity)
                 }
                 updateTrackInfo(intent.getLongExtra(TRACK_ID, 0L))
             }
@@ -215,7 +216,7 @@ class MusicPlayerActivity : BaseActivity<MusicPlayerViewState>() {
                     binding.trackName.text = track?.title ?: ""
                     binding.artistName.text = track?.artist?.isUnknownString() ?: ""
                     binding.totalDuration.text = formatMillisToHMS(track?.duration ?: 0L)
-                    updatePlayPauseDrawable(binding.playPauseTrack, this@MusicPlayerActivity)
+//                    updatePlayPauseDrawable(binding.playPauseTrack, this@MusicPlayerActivity)
                     Glide.with(this@MusicPlayerActivity)
                         .load(track?.albumId?.getThumbnailUri() ?: "")
                         .placeholder(R.drawable.ic_music).into(binding.thumbnail)

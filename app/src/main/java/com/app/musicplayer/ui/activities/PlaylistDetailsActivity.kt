@@ -16,7 +16,6 @@ import com.app.musicplayer.extentions.shareTrack
 import com.app.musicplayer.extentions.toast
 import com.app.musicplayer.interator.tracks.TracksInteractor
 import com.app.musicplayer.models.Track
-import com.app.musicplayer.services.MusicService
 import com.app.musicplayer.ui.adapters.TracksAdapter
 import com.app.musicplayer.ui.base.BaseActivity
 import com.app.musicplayer.ui.viewstates.PlaylistDetailsViewState
@@ -24,7 +23,6 @@ import com.app.musicplayer.utils.ADD_TO_PLAYLIST
 import com.app.musicplayer.utils.CREATE_PLAYLIST
 import com.app.musicplayer.utils.DELETE_TRACK
 import com.app.musicplayer.utils.DELETE_TRACK_CODE
-import com.app.musicplayer.utils.FROM_ALL_SONG
 import com.app.musicplayer.utils.FROM_PLAYLIST
 import com.app.musicplayer.utils.PLAYER_LIST
 import com.app.musicplayer.utils.PLAYLIST_ID
@@ -58,7 +56,12 @@ class PlaylistDetailsActivity : BaseActivity<PlaylistDetailsViewState>() {
         onSetupViews()
         viewState.apply {
             lifecycleScope.launch {
-                fetchSongIdsForPlaylist(intent.getLongExtra(PLAYLIST_ID, 0L))?.let { songIdsList ->
+                fetchSongIdsForPlaylistLive(
+                    intent.getLongExtra(
+                        PLAYLIST_ID,
+                        0L
+                    )
+                ).observe(this@PlaylistDetailsActivity) { songIdsList ->
                     returnList(songIdsList) { trackList ->
                         tracksAdapter.items = trackList
                         showEmpty(tracksAdapter.items.isEmpty())
@@ -82,7 +85,7 @@ class PlaylistDetailsActivity : BaseActivity<PlaylistDetailsViewState>() {
             showMenuEvent.observe(this@PlaylistDetailsActivity) { event ->
                 event.ifNew?.let { trackCombinedData ->
                     trackCombinedData.view?.let {
-                        showTrackMenu(it) { callback ->
+                        showTrackMenu(it, isPlaylistSong = true) { callback ->
                             when (callback) {
                                 PLAY_TRACK -> {
                                     startActivity(
@@ -141,12 +144,28 @@ class PlaylistDetailsActivity : BaseActivity<PlaylistDetailsViewState>() {
                                 }
 
                                 DELETE_TRACK -> {
-                                    if (isRPlus()) {
-                                        deleteTrack(
-                                            DELETE_TRACK_CODE,
-                                            trackCombinedData.track.id ?: 0L
-                                        )
+                                    lifecycleScope.launch {
+                                        fetchSongIdsForPlaylist(
+                                            intent.getLongExtra(
+                                                PLAYLIST_ID,
+                                                0L
+                                            )
+                                        )?.let { songIdsList ->
+                                            songIdsList.forEach { id ->
+                                                if (id == trackCombinedData.track.id) {
+                                                    deleteConfirmationDialog(true) {
+                                                        removeSongFromPlaylist(
+                                                            intent.getLongExtra(
+                                                                PLAYLIST_ID,
+                                                                0L
+                                                            ), id
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
+
                                 }
 
                                 RENAME_TRACK -> {
@@ -175,16 +194,21 @@ class PlaylistDetailsActivity : BaseActivity<PlaylistDetailsViewState>() {
     private fun returnList(list: List<Long>, callback: (List<Track>) -> Unit) {
         val trackList = mutableListOf<Track>()
         var count = 0
-        list.forEach { id ->
-            tracksInteractor.queryTrack(id) { track ->
-                track?.let {
-                    trackList.add(it)
-                }
-                count++
-                if (count == list.size) {
-                    callback(trackList)
+        if (list.isNotEmpty()) {
+            list.forEach { id ->
+                tracksInteractor.queryTrack(id) { track ->
+                    track?.let {
+                        trackList.add(it)
+                    }
+                    count++
+                    if (count == list.size) {
+                        callback(trackList)
+                    }
                 }
             }
+        } else {
+            callback(trackList)
+            finish()
         }
     }
 

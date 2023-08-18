@@ -63,4 +63,12 @@ class PlaylistDetailsViewState @Inject constructor(
     fun insert(crossRef: PlaylistSongCrossRef) {
         return trackRepository.insert(crossRef)
     }
+    fun fetchSongIdsForPlaylistLive(playlistId:Long):LiveData<List<Long>> {
+        return trackRepository.getSongIdsForPlaylistLive(playlistId)
+    }
+    fun removeSongFromPlaylist(playlistId:Long,songId:Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            trackRepository.removeSongFromPlaylist(playlistId, songId)
+        }
+    }
 }

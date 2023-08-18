@@ -1,5 +1,6 @@
 package com.app.musicplayer.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -14,5 +15,11 @@ interface PlaylistSongCrossRefDao {
     fun insert(crossRef: PlaylistSongCrossRef)
 
     @Query("SELECT songId from playlist_song_cross_ref WHERE playlistId = :playlistId")
-    fun getSongIdsForPlaylist(playlistId:Long):List<Long>
+    fun getSongIdsForPlaylist(playlistId: Long): List<Long>
+
+    @Query("SELECT songId from playlist_song_cross_ref WHERE playlistId = :playlistId")
+    fun getSongIdsForPlaylistLive(playlistId: Long): LiveData<List<Long>>
+
+    @Query("DELETE FROM playlist_song_cross_ref WHERE playlistId=:playlistId AND songId=:songId")
+    fun removeSongFromPlaylist(playlistId: Long, songId: Long)
 }
